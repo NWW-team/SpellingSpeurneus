@@ -14,8 +14,8 @@ import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
-import urllib.robotparser
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -51,15 +51,49 @@ def lees_sitemap(url, pauze):
     return re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", xml)
 
 
+def naar_patroon(pad):
+    """Zet een robots-pad ('/api/*', '/zoeken?*') om in een reguliere expressie."""
+    patroon = re.escape(pad).replace(r"\*", ".*")
+    if patroon.endswith(r"\$"):
+        patroon = patroon[:-2] + "$"
+    return re.compile("^" + patroon)
+
+
 def maak_robots_controle():
-    """Leest robots.txt van de site, zodat we verboden paden overslaan."""
-    robots = urllib.robotparser.RobotFileParser()
-    robots.set_url(f"{SITE}/robots.txt")
+    """Leest robots.txt en geeft een functie terug die zegt of een URL mag.
+
+    Dit doen we zelf en niet met urllib.robotparser: die behandelt de ster in
+    'Disallow: /api/*' als een gewoon teken, waardoor zo'n regel niets blokkeert.
+    """
     try:
-        robots.read()
+        tekst = haal_op(f"{SITE}/robots.txt")
     except Exception as fout:  # zonder robots.txt crawlen we niet
         sys.exit(f"Kan robots.txt niet lezen ({fout}). Gestopt uit voorzorg.")
-    return lambda url: robots.can_fetch(USER_AGENT, url)
+
+    regels = []  # (lengte, mag_wel, patroon)
+    geldt_voor_ons = False
+    for regel in tekst.splitlines():
+        regel = regel.split("#")[0].strip()
+        sleutel, _, waarde = regel.partition(":")
+        sleutel, waarde = sleutel.strip().lower(), waarde.strip()
+        if sleutel == "user-agent":
+            geldt_voor_ons = waarde == "*"
+        elif geldt_voor_ons and sleutel in ("disallow", "allow") and waarde:
+            regels.append((len(waarde), sleutel == "allow", naar_patroon(waarde)))
+
+    verboden = [w for lengte, mag, w in regels if not mag]
+    print(f"robots.txt: {len(verboden)} verboden pad(en) voor iedereen.")
+
+    def mag_ophalen(url):
+        onderdelen = urllib.parse.urlsplit(url)
+        pad = onderdelen.path + (f"?{onderdelen.query}" if onderdelen.query else "")
+        # De langste regel die past, wint; bij gelijke lengte wint 'Allow'.
+        passend = [(lengte, mag) for lengte, mag, patroon in regels if patroon.match(pad)]
+        if not passend:
+            return True
+        return max(passend, key=lambda r: (r[0], r[1]))[1]
+
+    return mag_ophalen
 
 
 # --- tekst uit de pagina halen ---------------------------------------------

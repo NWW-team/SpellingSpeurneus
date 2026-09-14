@@ -31,6 +31,7 @@ Geen installatie nodig; alleen Python 3.
 python3 scripts/crawl.py --bron demo --max-paginas 5     # fictieve pagina's, zonder netwerk
 python3 scripts/crawl.py --bron reisadvies --max-paginas 10
 python3 -m http.server --directory docs 8000             # scherm bekijken op localhost:8000
+python3 scripts/test.py                                  # 21 controles; --offline slaat het netwerk over
 ```
 
 Zonder `data/woordenlijst.txt` valt het script terug op `data/woordenlijst-demo.txt`. Dat is
@@ -49,6 +50,7 @@ altijd een harde bovengrens op het aantal pagina's.
 | Pad | Wat het is |
 |---|---|
 | `scripts/crawl.py` | De crawler en de spellingtoets. Alleen de standaardbibliotheek van Python |
+| `scripts/test.py` | Controles: vindt de app de ingebouwde fouten, en volgt hij robots.txt |
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `docs/resultaten.json` | Uitkomst van de laatste crawl |
 | `data/uitzonderingen.txt` | Goedgekeurde woorden die niet in de woordenlijst staan |
