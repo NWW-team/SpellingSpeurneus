@@ -1,0 +1,29 @@
+{
+  "gestart_op": "2026-09-14T14:10:26+00:00",
+  "bron": "demo",
+  "woordenlijst": "woordenlijst-demo.txt",
+  "user_agent": "SpellingSpeurneus/0.1 (+https://github.com/NWW-team/SpellingSpeurneus)",
+  "aantal_paginas": 5,
+  "aantal_bevindingen": 3,
+  "overgeslagen_urls": [],
+  "bevindingen": [
+    {
+      "url": "demo/paspoort-aanvragen.html",
+      "titel": "Paspoort aanvragen in het buitenland",
+      "woord": "aanvraeg",
+      "context": "De aanvraeg duurt ongeveer drie weken."
+    },
+    {
+      "url": "demo/reisadvies-voorbeeldland.html",
+      "titel": "Reisadvies Voorbeeldland",
+      "woord": "gelegenhied",
+      "context": "De ambassade helpt u bij een gelegenhied waarin u uw paspoort verliest."
+    },
+    {
+      "url": "demo/visum-aanvragen.html",
+      "titel": "Visum aanvragen",
+      "woord": "buitenladn",
+      "context": "Woont u in het buitenladn en wilt u langer blijven?"
+    }
+  ]
+}
