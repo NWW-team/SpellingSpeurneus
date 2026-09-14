@@ -1,30 +1,12 @@
 {
-  "gestart_op": "2026-09-14T15:29:16+00:00",
+  "gestart_op": "2026-09-14T15:41:50+00:00",
   "bron": "reisadvies",
   "woordenlijst": "woordenlijst.txt",
   "user_agent": "SpellingSpeurneus/0.1 (+https://github.com/NWW-team/SpellingSpeurneus)",
   "aantal_paginas": 50,
-  "aantal_bevindingen": 779,
+  "aantal_bevindingen": 614,
   "overgeslagen_urls": [],
   "bevindingen": [
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/afghanistan",
-      "titel": "Reisadvies Afghanistan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "U kunt een boete, gevangenisstraf, lijfstraffen of zelfs de doodstraf krijgen voor het volgende gedrag: lichamelijk contact in het openbaar openbare dronkenschap seks buiten het huwelijk seks met een…"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/afghanistan",
-      "titel": "Reisadvies Afghanistan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "U kunt een boete, gevangenisstraf, lijfstraffen of zelfs de doodstraf krijgen voor het volgende gedrag: lichamelijk contact in het openbaar openbare dronkenschap seks buiten het huwelijk seks met een…"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/afghanistan",
-      "titel": "Reisadvies Afghanistan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/afghanistan",
       "titel": "Reisadvies Afghanistan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
@@ -36,24 +18,6 @@
       "titel": "Reisadvies Afghanistan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Earthquake",
       "context": "Lees informatie over aardbevingen en aardverschuivingen op de website van USGS Earthquake Hazards Program (informatie in het Engels)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/albanie",
-      "titel": "Reisadvies Albanië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/albanie",
-      "titel": "Reisadvies Albanië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/albanie",
-      "titel": "Reisadvies Albanië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq+persoon",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/albanie",
@@ -120,24 +84,6 @@
       "titel": "Reisadvies Algerije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Djanet",
       "context": "Bijvoorbeeld in de steden Tamanrasset en Djanet."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/algerije",
-      "titel": "Reisadvies Algerije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/algerije",
-      "titel": "Reisadvies Algerije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/algerije",
-      "titel": "Reisadvies Algerije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/algerije",
@@ -216,24 +162,6 @@
       "titel": "Reisadvies Algerije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "DZD",
       "context": "Dit geld kunt u in Algerije bij een bank omwisselen naar Algerijnse dinar (DZD)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaans-samoa",
-      "titel": "Reisadvies Amerikaans-Samoa | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaans-samoa",
-      "titel": "Reisadvies Amerikaans-Samoa | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaans-samoa",
-      "titel": "Reisadvies Amerikaans-Samoa | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaans-samoa",
@@ -342,30 +270,6 @@
       "titel": "Reisadvies Amerikaans-Samoa | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Visitors",
       "context": "Check wat u mag meenemen naar Amerikaans-Samoa op de website van het American Samoa Visitors Bureau (informatie in het Engels)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaanse-maagdeneilanden",
-      "titel": "Reisadvies Amerikaanse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaanse-maagdeneilanden",
-      "titel": "Reisadvies Amerikaanse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaanse-maagdeneilanden",
-      "titel": "Reisadvies Amerikaanse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken in dit land tegenover lhbtiq+ personen zijn vergelijkbaar met die van Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaanse-maagdeneilanden",
-      "titel": "Reisadvies Amerikaanse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/amerikaanse-maagdeneilanden",
@@ -574,24 +478,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/angola",
       "titel": "Reisadvies Angola | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/angola",
-      "titel": "Reisadvies Angola | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/angola",
-      "titel": "Reisadvies Angola | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/angola",
-      "titel": "Reisadvies Angola | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Cabo",
       "context": "Zoals Cabo Ledo, het schiereiland Mussolo, Kwanza Lodge, Quiçama National Park, Barro do Dande, Pedras Negras de Pundo Andongo en de Calendula Falls."
     },
@@ -694,24 +580,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/anguilla",
       "titel": "Reisadvies Anguilla | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/anguilla",
-      "titel": "Reisadvies Anguilla | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/anguilla",
-      "titel": "Reisadvies Anguilla | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/anguilla",
-      "titel": "Reisadvies Anguilla | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "National",
       "context": "Lees informatie over orkanen en het lokale weer op de volgende websites (informatie in het Engels): National Hurricane Center Severe Weather Information Centre Bent u tijdens een orkaan in Anguilla?"
     },
@@ -774,24 +642,6 @@
       "titel": "Reisadvies Antarctica | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "IAATO",
       "context": "Lees voorafgaand aan uw reis de regels die gelden voor een bezoek aan Antarctica op de volgende websites (informatie in het Engels): Richtlijnen voor bezoekers onder het Antarctisch Verdrag Richtlijn…"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/antigua-en-barbuda",
-      "titel": "Reisadvies Antigua en Barbuda | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/antigua-en-barbuda",
-      "titel": "Reisadvies Antigua en Barbuda | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/antigua-en-barbuda",
-      "titel": "Reisadvies Antigua en Barbuda | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/antigua-en-barbuda",
@@ -852,36 +702,6 @@
       "titel": "Reisadvies Argentinië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Mendoza",
       "context": "Zakkenrollers en diefstal Houd in Argentinië rekening met zakkenrollers en diefstal, vooral in de hoofdstad Buenos Aires en in grote steden zoals Cordoba, Mendoza en Rosario."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/argentinie",
-      "titel": "Reisadvies Argentinië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/argentinie",
-      "titel": "Reisadvies Argentinië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/argentinie",
-      "titel": "Reisadvies Argentinië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten in Argentinië tegenover lhbtiq+ personen zijn vergelijkbaar met die in Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/argentinie",
-      "titel": "Reisadvies Argentinië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq+-vriendelijke",
-      "context": "Buenos Aires staat bekend als een lhbtiq+-vriendelijke stad."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/argentinie",
-      "titel": "Reisadvies Argentinië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/argentinie",
@@ -964,24 +784,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/armenie",
       "titel": "Reisadvies Armenië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/armenie",
-      "titel": "Reisadvies Armenië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/armenie",
-      "titel": "Reisadvies Armenië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/armenie",
-      "titel": "Reisadvies Armenië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "EMSC",
       "context": "Lees informatie over aardbevingen in Armenië op de website van het Europees aardbevingscentrum (EMSC)(informatie in het Engels)."
     },
@@ -990,30 +792,6 @@
       "titel": "Reisadvies Armenië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Jerevan",
       "context": "Nederlandse ambassade in Armenië Bekijk de contactgegevens van de Nederlandse ambassade in Jerevan ."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/aruba",
-      "titel": "Reisadvies Aruba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/aruba",
-      "titel": "Reisadvies Aruba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/aruba",
-      "titel": "Reisadvies Aruba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken op Aruba tegenover lhbtiq+ personen zijn vergelijkbaar met die van Europees Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/aruba",
-      "titel": "Reisadvies Aruba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/aruba",
@@ -1056,30 +834,6 @@
       "titel": "Reisadvies Australië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "System",
       "context": "Dan kunt u het volgende doen: Bekijk wat de borden over brandgevaar betekenen op de website van het Australian Fire Danger Rating System (informatie in het Engels)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/australie",
-      "titel": "Reisadvies Australië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/australie",
-      "titel": "Reisadvies Australië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/australie",
-      "titel": "Reisadvies Australië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken in dit land tegenover lhbtiq+ personen zijn vergelijkbaar met die van Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/australie",
-      "titel": "Reisadvies Australië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/australie",
@@ -1180,24 +934,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/azerbeidzjan",
       "titel": "Reisadvies Azerbeidzjan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/azerbeidzjan",
-      "titel": "Reisadvies Azerbeidzjan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/azerbeidzjan",
-      "titel": "Reisadvies Azerbeidzjan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/azerbeidzjan",
-      "titel": "Reisadvies Azerbeidzjan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "EMSC",
       "context": "Lees informatie over aardbevingen op de website van het Europees aardbevingscentrum EMSC (informatie in het Engels)."
     },
@@ -1252,24 +988,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahamas",
       "titel": "Reisadvies Bahama's | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahamas",
-      "titel": "Reisadvies Bahama's | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahamas",
-      "titel": "Reisadvies Bahama's | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahamas",
-      "titel": "Reisadvies Bahama's | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Royal",
       "context": "Een uitzondering geldt voor het fotograferen van de leden van de Royal Bahamas Police Force."
     },
@@ -1314,24 +1032,6 @@
       "titel": "Reisadvies Bahrein | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Manama",
       "context": "Demonstraties In de dorpen rond de hoofdstad Manama kunnen demonstraties voorkomen."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahrein",
-      "titel": "Reisadvies Bahrein | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahrein",
-      "titel": "Reisadvies Bahrein | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahrein",
-      "titel": "Reisadvies Bahrein | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bahrein",
@@ -1392,30 +1092,6 @@
       "titel": "Reisadvies Bangladesh | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Tracts",
       "context": "Reist u naar de Chittagong Hill Tracts?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bangladesh",
-      "titel": "Reisadvies Bangladesh | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bangladesh",
-      "titel": "Reisadvies Bangladesh | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bangladesh",
-      "titel": "Reisadvies Bangladesh | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Seksuele handelingen tussen lhbtiq+ personen zijn in Bangladesh verboden."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bangladesh",
-      "titel": "Reisadvies Bangladesh | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bangladesh",
@@ -1492,24 +1168,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/barbados",
       "titel": "Reisadvies Barbados | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/barbados",
-      "titel": "Reisadvies Barbados | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/barbados",
-      "titel": "Reisadvies Barbados | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/barbados",
-      "titel": "Reisadvies Barbados | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "National",
       "context": "Lees informatie over orkanen en het lokale weer op de volgende websites (informatie in het Engels): National Hurricane Center Severe Weather Information Centre Bent u tijdens een orkaan op Barbados?"
     },
@@ -1552,24 +1210,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/belarus-wit-rusland",
       "titel": "Reisadvies Belarus (Wit-Rusland) | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/belarus-wit-rusland",
-      "titel": "Reisadvies Belarus (Wit-Rusland) | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/belarus-wit-rusland",
-      "titel": "Reisadvies Belarus (Wit-Rusland) | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/belarus-wit-rusland",
-      "titel": "Reisadvies Belarus (Wit-Rusland) | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Paleski-reservaat",
       "context": "Bijvoorbeeld het Paleski-reservaat in de provincie Homel."
     },
@@ -1584,24 +1224,6 @@
       "titel": "Reisadvies België | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Registeer",
       "context": "Registeer u bij de gemeente waar u verblijft op de website van de Belgische overheid."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/belize",
-      "titel": "Reisadvies Belize | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/belize",
-      "titel": "Reisadvies Belize | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/belize",
-      "titel": "Reisadvies Belize | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/benin",
@@ -1828,24 +1450,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/benin",
       "titel": "Reisadvies Benin | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/benin",
-      "titel": "Reisadvies Benin | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/benin",
-      "titel": "Reisadvies Benin | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/benin",
-      "titel": "Reisadvies Benin | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Harmattan",
       "context": "Woestijnwind Harmattan Van december tot maart heeft Benin te maken met de Harmattan."
     },
@@ -1860,30 +1464,6 @@
       "titel": "Reisadvies Benin | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "SAMU",
       "context": "Neem contact op met de lokale hulpdiensten: Algemeen alarmnummer (politie): 166 Ambulance (of SAMU): 21 30 06 56 Brandweer: 118 Let op: hulpverleners spreken geen of nauwelijks Engels."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bhutan",
-      "titel": "Reisadvies Bhutan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bhutan",
-      "titel": "Reisadvies Bhutan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bhutan",
-      "titel": "Reisadvies Bhutan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken in dit land tegenover lhbtiq+ personen zijn vergelijkbaar met die van Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bhutan",
-      "titel": "Reisadvies Bhutan | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bhutan",
@@ -2008,24 +1588,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bolivia",
       "titel": "Reisadvies Bolivia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bolivia",
-      "titel": "Reisadvies Bolivia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bolivia",
-      "titel": "Reisadvies Bolivia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bolivia",
-      "titel": "Reisadvies Bolivia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Earthquake",
       "context": "Lees actuele informatie over aardbevingen op de website van het USGS Earthquake Hazards Program (informatie in het Engels)."
     },
@@ -2098,30 +1660,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bonaire",
       "titel": "Reisadvies Bonaire | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bonaire",
-      "titel": "Reisadvies Bonaire | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bonaire",
-      "titel": "Reisadvies Bonaire | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken op Bonaire tegenover lhbtiq+ personen zijn vergelijkbaar met die van Europees Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bonaire",
-      "titel": "Reisadvies Bonaire | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bonaire",
-      "titel": "Reisadvies Bonaire | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Severe",
       "context": "Lees informatie over het weer op de volgende websites (informatie in het Engels): Severe Weather Information Centre National Hurricane Center Wat kan ik doen in een noodsituatie?"
     },
@@ -2166,24 +1704,6 @@
       "titel": "Reisadvies Bonaire | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Corporation",
       "context": "Betaal uw toeristenbelasting online op de website van de Tourism Corporation Bonaire."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bosnie-en-herzegovina",
-      "titel": "Reisadvies Bosnië en Herzegovina | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bosnie-en-herzegovina",
-      "titel": "Reisadvies Bosnië en Herzegovina | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bosnie-en-herzegovina",
-      "titel": "Reisadvies Bosnië en Herzegovina | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bosnie-en-herzegovina",
@@ -2234,24 +1754,6 @@
       "context": "Vooral in de grotere plaatsen Gaborone, Francistown en Maun."
     },
     {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/botswana",
-      "titel": "Reisadvies Botswana | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/botswana",
-      "titel": "Reisadvies Botswana | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/botswana",
-      "titel": "Reisadvies Botswana | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/brazilie",
       "titel": "Reisadvies Brazilië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "São",
@@ -2286,24 +1788,6 @@
       "titel": "Reisadvies Brazilië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Tabatinga",
       "context": "In grensplaatsen, zoals Tabatinga, is het risico groter."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/brazilie",
-      "titel": "Reisadvies Brazilië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/brazilie",
-      "titel": "Reisadvies Brazilië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/brazilie",
-      "titel": "Reisadvies Brazilië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/brazilie",
@@ -2364,30 +1848,6 @@
       "titel": "Reisadvies Brazilië | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "São",
       "context": "Nederlandse ambassade in Brazilië Bekijk de contactgegevens van de Nederlandse ambassade in Brasília , het consulaat-generaal in Rio de Janeiro of het consulaat-generaal in São Paulo ."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/britse-maagdeneilanden",
-      "titel": "Reisadvies Britse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/britse-maagdeneilanden",
-      "titel": "Reisadvies Britse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/britse-maagdeneilanden",
-      "titel": "Reisadvies Britse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken in dit land tegenover lhbtiq+ personen zijn vergelijkbaar met die van Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/britse-maagdeneilanden",
-      "titel": "Reisadvies Britse Maagdeneilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/britse-maagdeneilanden",
@@ -2476,32 +1936,8 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/brunei-darussalam",
       "titel": "Reisadvies Brunei Darussalam | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/brunei-darussalam",
-      "titel": "Reisadvies Brunei Darussalam | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/brunei-darussalam",
-      "titel": "Reisadvies Brunei Darussalam | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Darussalam",
       "context": "En wilt u naar Brunei Darussalam reizen?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/brunei-darussalam",
-      "titel": "Reisadvies Brunei Darussalam | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Uitingen van lhbtiq+ personen en seksuele relaties tussen personen van hetzelfde geslacht zijn daar bij wet verboden."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/brunei-darussalam",
-      "titel": "Reisadvies Brunei Darussalam | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/brunei-darussalam",
@@ -2728,24 +2164,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/bulgarije",
       "titel": "Reisadvies Bulgarije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bulgarije",
-      "titel": "Reisadvies Bulgarije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bulgarije",
-      "titel": "Reisadvies Bulgarije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/bulgarije",
-      "titel": "Reisadvies Bulgarije | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "European",
       "context": "Bekijk de actuele bosbranden op de website van de European Forest Fire Information System (EFFIS) (informatie in het Engels)."
     },
@@ -2790,24 +2208,6 @@
       "titel": "Reisadvies Burkina Faso | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Bobo-Dioulasso",
       "context": "Voor de volgende gebieden geldt kleurcode oranje: de hoofdstad Ouagadougou de stad Bobo-Dioulasso Let op: Reis tussen Ouagadougou en Bobo-Dioulasso niet over de weg."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burkina-faso",
-      "titel": "Reisadvies Burkina Faso | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burkina-faso",
-      "titel": "Reisadvies Burkina Faso | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burkina-faso",
-      "titel": "Reisadvies Burkina Faso | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/burkina-faso",
@@ -2986,50 +2386,8 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
       "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
-      "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
-      "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
-      "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Earthquake",
       "context": "Lees informatie over aardbevingen op de website van het USGS Earthquake Hazards Program (informatie in het Engels)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
-      "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Mpox-virus",
-      "context": "Mpox-virus (apenpokken) In Burundi zijn meldingen van het mpox-virus (apenpokken)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
-      "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "apenpokken",
-      "context": "Mpox-virus (apenpokken) In Burundi zijn meldingen van het mpox-virus (apenpokken)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
-      "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "mpox-virus",
-      "context": "Mpox-virus (apenpokken) In Burundi zijn meldingen van het mpox-virus (apenpokken)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/burundi",
-      "titel": "Reisadvies Burundi | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "mpox",
-      "context": "Lees meer over mpox op de website van het RIVM."
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/cambodja",
@@ -3054,30 +2412,6 @@
       "titel": "Reisadvies Cambodja | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Sihanoukville",
       "context": "In de provincie Sihanoukville komen regelmatig gewapende berovingen voor."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cambodja",
-      "titel": "Reisadvies Cambodja | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cambodja",
-      "titel": "Reisadvies Cambodja | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cambodja",
-      "titel": "Reisadvies Cambodja | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De Cambodjaanse bevolking accepteert lhbtiq+ personen wel steeds meer."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cambodja",
-      "titel": "Reisadvies Cambodja | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/cambodja",
@@ -3196,36 +2530,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/canada",
       "titel": "Reisadvies Canada | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/canada",
-      "titel": "Reisadvies Canada | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/canada",
-      "titel": "Reisadvies Canada | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken in dit land tegenover lhbtiq+ personen zijn vergelijkbaar met die van Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/canada",
-      "titel": "Reisadvies Canada | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/canada",
-      "titel": "Reisadvies Canada | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ personen in het openbaar afkeuren is strafbaar in Canada."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/canada",
-      "titel": "Reisadvies Canada | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "electronic",
       "context": "Dit heet een eTA (electronic travel autorisation)."
     },
@@ -3246,24 +2550,6 @@
       "titel": "Reisadvies Centraal-Afrikaanse Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Haut-Mbomou",
       "context": "Vooral in het zuidoosten van het land, in de provincie Haut-Mbomou."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/centraal-afrikaanse-republiek",
-      "titel": "Reisadvies Centraal-Afrikaanse Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/centraal-afrikaanse-republiek",
-      "titel": "Reisadvies Centraal-Afrikaanse Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/centraal-afrikaanse-republiek",
-      "titel": "Reisadvies Centraal-Afrikaanse Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/chili",
@@ -3412,36 +2698,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/chili",
       "titel": "Reisadvies Chili | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/chili",
-      "titel": "Reisadvies Chili | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/chili",
-      "titel": "Reisadvies Chili | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten in Chili tegenover lhbtiq+ personen zijn vergelijkbaar met die in Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/chili",
-      "titel": "Reisadvies Chili | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq+-vriendelijke",
-      "context": "De hoofdstad Santiago staat bekend als een lhbtiq+-vriendelijke stad."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/chili",
-      "titel": "Reisadvies Chili | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/chili",
-      "titel": "Reisadvies Chili | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Senapred",
       "context": "Lees actuele informatie over bosbranden op de website van de Chileense rampenbestrijdingsorganisatie Senapred en op de website van de overheidsdienst voor natuurbeheer CONAF (informatie in het Spaans…"
     },
@@ -3486,30 +2742,6 @@
       "titel": "Reisadvies China | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "persoons",
       "context": "Houd er rekening mee dat de Chinese autoriteiten u streng kunnen controleren, bijvoorbeeld door foto’s van u te nemen, uw persoons- en contactgegevens te noteren en uw mobiele telefoon en andere appa…"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/china",
-      "titel": "Reisadvies China | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/china",
-      "titel": "Reisadvies China | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/china",
-      "titel": "Reisadvies China | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Er gelden geen bijzondere risico’s voor lhbtiq+ personen die naar China reizen."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/china",
-      "titel": "Reisadvies China | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/china",
@@ -3892,24 +3124,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/colombia",
       "titel": "Reisadvies Colombia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/colombia",
-      "titel": "Reisadvies Colombia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/colombia",
-      "titel": "Reisadvies Colombia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/colombia",
-      "titel": "Reisadvies Colombia | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Ministerio",
       "context": "Lees meer op de website van Ministerio de Transporte (informatie in het Spaans)."
     },
@@ -4018,24 +3232,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/comoren",
       "titel": "Reisadvies Comoren | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/comoren",
-      "titel": "Reisadvies Comoren | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/comoren",
-      "titel": "Reisadvies Comoren | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/comoren",
-      "titel": "Reisadvies Comoren | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Severe",
       "context": "Lees actuele informatie over de weersomstandigheden op de Comoren op de website van Severe Weather Information Centre (informatie in het Engels)."
     },
@@ -4140,24 +3336,6 @@
       "titel": "Reisadvies Congo, de Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "doodstaf",
       "context": "U kunt de doodstaf krijgen voor het bezit van een kleine hoeveelheid drugs."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-de-republiek",
-      "titel": "Reisadvies Congo, de Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-de-republiek",
-      "titel": "Reisadvies Congo, de Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-de-republiek",
-      "titel": "Reisadvies Congo, de Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-de-republiek",
@@ -4288,24 +3466,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
       "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
-      "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
-      "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
-      "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Nyiragongo",
       "context": "De meest actieve vulkanen zijn de Nyiragongo en de Nyamulagira in Noord-Kivu."
     },
@@ -4334,48 +3494,6 @@
       "context": "Want de gezondheidszorg is beperkt, vooral buiten Kinshasa en Lubumbashi."
     },
     {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
-      "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Mpox-virus",
-      "context": "Mpox-virus (apenpokken) In de DRC zijn meldingen van het mpox-virus (apenpokken)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
-      "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "apenpokken",
-      "context": "Mpox-virus (apenpokken) In de DRC zijn meldingen van het mpox-virus (apenpokken)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
-      "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "mpox-virus",
-      "context": "Mpox-virus (apenpokken) In de DRC zijn meldingen van het mpox-virus (apenpokken)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/congo-democratische-republiek",
-      "titel": "Reisadvies Congo, Democratische Republiek | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "mpox",
-      "context": "Lees meer over mpox op de website van het RIVM."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cookeilanden",
-      "titel": "Reisadvies Cookeilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cookeilanden",
-      "titel": "Reisadvies Cookeilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cookeilanden",
-      "titel": "Reisadvies Cookeilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/cookeilanden",
       "titel": "Reisadvies Cookeilanden | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "U.S",
@@ -4402,30 +3520,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/costa-rica",
       "titel": "Reisadvies Costa Rica | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/costa-rica",
-      "titel": "Reisadvies Costa Rica | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/costa-rica",
-      "titel": "Reisadvies Costa Rica | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken in dit land tegenover lhbtiq+ personen zijn vergelijkbaar met die van Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/costa-rica",
-      "titel": "Reisadvies Costa Rica | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/costa-rica",
-      "titel": "Reisadvies Costa Rica | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Earthquake",
       "context": "Lees informatie over aardbevingen op de website van het USGS Earthquake Hazards Program (informatie in het Engels)."
     },
@@ -4440,30 +3534,6 @@
       "titel": "Reisadvies Costa Rica | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "BCR",
       "context": "Of betaal de belasting digitaal via de website van Banco BCR (informatie in het Spaans)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cuba",
-      "titel": "Reisadvies Cuba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cuba",
-      "titel": "Reisadvies Cuba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cuba",
-      "titel": "Reisadvies Cuba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten in het land tegenover lhbtiq+ personen zijn vergelijkbaar met die in Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cuba",
-      "titel": "Reisadvies Cuba | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/cuba",
@@ -4564,30 +3634,6 @@
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/curacao",
       "titel": "Reisadvies Curaçao | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/curacao",
-      "titel": "Reisadvies Curaçao | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/curacao",
-      "titel": "Reisadvies Curaçao | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "De wetten en de gebruiken in dit land tegenover lhbtiq+ personen zijn vergelijkbaar met die van Europees Nederland."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/curacao",
-      "titel": "Reisadvies Curaçao | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/curacao",
-      "titel": "Reisadvies Curaçao | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Eustatius",
       "context": "De Nederlandse Vertegenwoordiging biedt hulp bij nood aan Nederlanders (met Nederlands paspoort) die in een gemeente in Europees Nederland staan ingeschreven, of op Bonaire, Sint Eustatius of Saba wo…"
     },
@@ -4596,24 +3642,6 @@
       "titel": "Reisadvies Curaçao | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "sedula",
       "context": "Dit geldt niet voor inwoners van Curaçao die een Curaçaose identiteitskaart (sedula) hebben."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cyprus",
-      "titel": "Reisadvies Cyprus | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cyprus",
-      "titel": "Reisadvies Cyprus | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/cyprus",
-      "titel": "Reisadvies Cyprus | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/cyprus",
@@ -4644,24 +3672,6 @@
       "titel": "Reisadvies Djibouti | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
       "woord": "Lemonnier",
       "context": "Vermijd het gebied rond de Amerikaanse ambassade in de stad Djibouti en de Amerikaanse militaire basis (Camp Lemonnier)."
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/djibouti",
-      "titel": "Reisadvies Djibouti | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "Lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/djibouti",
-      "titel": "Reisadvies Djibouti | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lhbtiq+ Bent u een lhbtiq+ persoon?"
-    },
-    {
-      "url": "https://www.nederlandwereldwijd.nl/reisadvies/djibouti",
-      "titel": "Reisadvies Djibouti | Ministerie van Buitenlandse Zaken | NederlandWereldwijd",
-      "woord": "lhbtiq",
-      "context": "Lees de tips op de pagina Kan ik veilig reizen als lhbtiq+ persoon?"
     },
     {
       "url": "https://www.nederlandwereldwijd.nl/reisadvies/djibouti",
