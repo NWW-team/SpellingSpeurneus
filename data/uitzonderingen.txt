@@ -157,15 +157,22 @@ wegenautoriteit
 regeringskantoren
 
 
+# --- Huisstijl NederlandWereldwijd ---
+# Altijd met de plus. Zonder plus is het fout, en dat meldt de app nu ook:
+# de plus wordt niet meer weggestreept bij het opdelen van de zin.
+lhbtiq+
+lhbtiq+persoon
+lhbtiq+-vriendelijke
+
+# Ziekten waarvan de site beide namen geeft: "Mpox-virus (apenpokken)".
+# Nagekeken op burundi en congo-democratische-republiek: consequent gebruikt.
+mpox
+mpox-virus
+apenpokken
+
 # --- Nog te beslissen door de webredactie ---
 #
-# Deze stonden hier, maar zijn weggehaald omdat het redactiekeuzes zijn
-# en geen spellingfeiten. Zolang ze hier niet staan, meldt de app ze,
-# en zie je dus of de site zichzelf tegenspreekt:
-#
-#   lhbtiq          welke schrijfwijze hanteert BZ? lhbtiq, lhbtiq+, lhbti?
-#   mpox            of apenpokken? De site gebruikt nu allebei.
-#   apenpokken
+# Weggehaald omdat het redactiekeuzes zijn en geen spellingfeiten:
 #
 # Ook weggehaald: Engelse woorden (and, for, travel, control, female en
 # dergelijke) die alleen in namen van buitenlandse diensten voorkomen.

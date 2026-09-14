@@ -37,6 +37,13 @@ def main():
     offline = "--offline" in sys.argv
     tijdelijk = Path(tempfile.mkdtemp())
 
+    def woorden_in(zin):
+        return [b["woord"] for b in zoek_fouten(zin, set())]
+
+    def woorden_in_met(zin, toegestaan):
+        return [b["woord"] for b in zoek_fouten(zin, toegestaan)]
+
+
     print("De drie ingebouwde fouten in demo/")
     resultaat = draai_crawl(tijdelijk / "demo.json")
     gevonden = {b["woord"] for b in resultaat["bevindingen"]}
@@ -61,9 +68,16 @@ def main():
     krullijst.write_text("natuurrisico's\nradiotaxi\n", encoding="utf-8")
     zin = "Let op natuurrisico\u2019s en radiotaxi\u2019s in het land."
     uitz = {w.lower() for w in lijst_woorden(krullijst)}
-    over = [b["woord"] for b in zoek_fouten(zin, set(), uitz)]
+    over = [b["woord"] for b in zoek_fouten(zin, uitz)]
     controle("gekrulde apostrof telt als rechte", "natuurrisico's" not in over, f"over: {over}")
     controle("uitzondering dekt het meervoud", "radiotaxi's" not in over, f"over: {over}")
+
+    print("\nHuisstijl met een plus")
+    huis = {"lhbtiq+", "vriendelijke"}
+    controle("lhbtiq+ wordt goedgekeurd", "lhbtiq+" not in woorden_in_met("Een lhbtiq+ persoon.", huis))
+    controle("lhbtiq zonder plus wordt gemeld", "lhbtiq" in woorden_in_met("Een lhbtiq persoon.", huis))
+    controle("samenstelling over beide lijsten",
+             "lhbtiq+-vriendelijke" not in woorden_in_met("Een lhbtiq+-vriendelijke stad.", huis))
 
     print("\nPatronen uit robots.txt")
     for patroon, pad, verwacht in [
@@ -88,7 +102,10 @@ def main():
 
     print("\nWoorden uit een zin halen")
     def woorden_in(zin):
-        return [b["woord"] for b in zoek_fouten(zin, set(), set())]
+        return [b["woord"] for b in zoek_fouten(zin, set())]
+
+    def woorden_in_met(zin, toegestaan):
+        return [b["woord"] for b in zoek_fouten(zin, toegestaan)]
     controle("weglatingsstreepje", "Nood" in woorden_in("Nood- of crisissituatie."))
     controle("schuine streep splitst",
              woorden_in("Laat familie/vrienden weten.")[1:3] == ["familie", "vrienden"])
