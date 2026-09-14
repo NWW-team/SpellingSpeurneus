@@ -44,6 +44,19 @@ jobs:
           echo "Regels: $regels"
           echo "sha256: $(sha256sum data/woordenlijst.txt | cut -d' ' -f1)"
           echo "Eerste regels:"; head -3 data/woordenlijst.txt
+
+          gezien=$(sha256sum data/woordenlijst.txt | cut -d' ' -f1)
+          verwacht=$(grep -v '^#' data/opentaal.sha256 | tr -d '[:space:]')
+          if [ "$gezien" != "$verwacht" ]; then
+            echo "::warning::OpenTaal heeft de woordenlijst gewijzigd."
+            echo "::warning::Vastgelegd: $verwacht"
+            echo "::warning::Nu opgehaald: $gezien"
+            echo "::warning::De crawl gaat door, maar toetst aan een andere lijst dan"
+            echo "::warning::de vorige keer. Klopt dat? Werk dan data/opentaal.sha256 bij."
+          else
+            echo "Woordenlijst is ongewijzigd ten opzichte van data/opentaal.sha256."
+          fi
+
           if [ "$regels" -lt 100000 ]; then
             echo "::error::De woordenlijst heeft maar $regels regels. Dat klopt niet;"
             echo "::error::verwacht zijn er honderdduizenden. Gestopt om onzin te voorkomen."

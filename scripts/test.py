@@ -12,7 +12,8 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from crawl import SITE, maak_robots_controle, naar_patroon, tekst_uit_main  # noqa: E402
+from crawl import (SITE, is_bekend, lees_woordenlijst as lijst_woorden,  # noqa: E402
+                   maak_robots_controle, naar_patroon, tekst_uit_main, zoek_fouten)
 
 WORTEL = Path(__file__).resolve().parent.parent
 uitkomsten = []
@@ -36,6 +37,13 @@ def main():
     offline = "--offline" in sys.argv
     tijdelijk = Path(tempfile.mkdtemp())
 
+    def woorden_in(zin):
+        return [b["woord"] for b in zoek_fouten(zin, set())]
+
+    def woorden_in_met(zin, toegestaan):
+        return [b["woord"] for b in zoek_fouten(zin, toegestaan)]
+
+
     print("De drie ingebouwde fouten in demo/")
     resultaat = draai_crawl(tijdelijk / "demo.json")
     gevonden = {b["woord"] for b in resultaat["bevindingen"]}
@@ -55,6 +63,22 @@ def main():
     controle("uitgezonderd woord verdwijnt", "gelegenhied" not in woorden)
     controle("de rest blijft staan", len(woorden) == 2, f"over: {sorted(woorden)}")
 
+    print("\nUitzonderingen met een apostrof")
+    krullijst = tijdelijk / "krul.txt"
+    krullijst.write_text("natuurrisico's\nradiotaxi\n", encoding="utf-8")
+    zin = "Let op natuurrisico\u2019s en radiotaxi\u2019s in het land."
+    uitz = {w.lower() for w in lijst_woorden(krullijst)}
+    over = [b["woord"] for b in zoek_fouten(zin, uitz)]
+    controle("gekrulde apostrof telt als rechte", "natuurrisico's" not in over, f"over: {over}")
+    controle("uitzondering dekt het meervoud", "radiotaxi's" not in over, f"over: {over}")
+
+    print("\nHuisstijl met een plus")
+    huis = {"lhbtiq+", "vriendelijke"}
+    controle("lhbtiq+ wordt goedgekeurd", "lhbtiq+" not in woorden_in_met("Een lhbtiq+ persoon.", huis))
+    controle("lhbtiq zonder plus wordt gemeld", "lhbtiq" in woorden_in_met("Een lhbtiq persoon.", huis))
+    controle("samenstelling over beide lijsten",
+             "lhbtiq+-vriendelijke" not in woorden_in_met("Een lhbtiq+-vriendelijke stad.", huis))
+
     print("\nPatronen uit robots.txt")
     for patroon, pad, verwacht in [
         ("/api/*", "/api/iets", True), ("/api/*", "/apart", False),
@@ -69,6 +93,27 @@ def main():
              "verstopt" not in tekst_uit_main("<main><script>verstopt</script>tekst</main>"))
     controle("entiteiten worden vertaald",
              tekst_uit_main("<main>caf&eacute;</main>") == "café")
+
+    print("\nWoordvormen")
+    woordjes = {"radiotaxi", "consulaat", "generaal", "nood", "bus", "chauffeur"}
+    controle("meervoud met apostrof", is_bekend("radiotaxi's", woordjes))
+    controle("samenstelling met koppelteken", is_bekend("consulaat-generaal", woordjes))
+    controle("onzin blijft onbekend", not is_bekend("radiotaxy's", woordjes))
+
+    print("\nWoorden uit een zin halen")
+    def woorden_in(zin):
+        return [b["woord"] for b in zoek_fouten(zin, set())]
+
+    def woorden_in_met(zin, toegestaan):
+        return [b["woord"] for b in zoek_fouten(zin, toegestaan)]
+    controle("weglatingsstreepje", "Nood" in woorden_in("Nood- of crisissituatie."))
+    controle("schuine streep splitst",
+             woorden_in("Laat familie/vrienden weten.")[1:3] == ["familie", "vrienden"])
+    controle("haakje middenin splitst", "chauffeur" in woorden_in("Wijs de (bus)chauffeur erop."))
+    controle("koppelteken blijft heel", "e-mail" in woorden_in("Stuur een e-mail."))
+    controle("e-mailadres wordt overgeslagen",
+             not any("@" in w for w in woorden_in("Mail naar iemand@voorbeeld.nl vandaag.")))
+    controle("onzichtbare tekens weg", "adres" in woorden_in("Het a\u200bdres."))
 
     if offline:
         print("\n(robots.txt tegen de echte site overgeslagen: --offline)")

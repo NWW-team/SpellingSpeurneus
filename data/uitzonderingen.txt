@@ -1,8 +1,3 @@
-# Woorden die goed zijn, maar niet in de woordenlijst staan.
-# Elke regel is een woord; regels met # zijn uitleg.
-#
-# Zet hier een woord neer zodra de app het ten onrechte meldt.
-# Deze lijst hoort bij de webredactie, niet bij de techniek.
 
 # Overheid en organisaties
 DigiD
@@ -32,3 +27,155 @@ urls
 e-mailadres
 webformulier
 cookies
+
+# --- Toegevoegd na de eerste echte crawl (50 reisadviespagina's) ---
+
+# Mensen en groepen
+Oeigoerse
+Rohingya-vluchtelingen
+Mapuche-bevolking
+
+# Reizen en documenten
+reisvaccinaties
+vaccinatieboekje
+medicijnverklaring
+bagageregels
+inreisregels
+inreisdocumenten
+doorreisvliegticket
+uitreisticket
+immigratiekaart
+immigratiebureau
+passagierskaart
+paspoortstempels
+Paspoortdienst
+visumaanvraagcentrum
+visumpagina
+visumzaken
+onderzoeksvergunning
+geslachtsvermelding
+douanebewijs
+Koninkrijksdelen
+
+# Vervoer
+luchthaventaxi
+motortaxi
+radiotaxi
+motodop
+langeafstandsbussen
+expeditieschepen
+helikoptervervoer
+tolbetalingen
+Burgerluchtvaartautoriteit
+
+# Veiligheid en noodsituaties
+crisiswebsite
+waarschuwingsbericht
+veiligheidsautoriteiten
+veiligheidsborden
+Toeristenpolitie
+Wegpolitie
+Risicobestrijding
+Kampvuurverbod
+bergreddingsdiensten
+decompressietank
+overheidsziekenhuizen
+quarantaineplicht
+orkaangebied
+orkaanschuilplaatsen
+sneeuwomstandigheden
+kampeergebieden
+aardbevingsgevoelig
+Geowetenschappen
+Riftvallei
+muistromen
+windkaart
+
+# Criminaliteit
+pinfraude
+afleidingstrucs
+verkeersruzies
+smokkelbendes
+wapensmokkelaars
+bagsnatching
+snatching
+
+# Gezondheid en middelen
+zikakoorts
+opioïden
+oxycodon
+vapes
+haartest
+ayahuasca
+ayahuasca-ceremonies
+voodooceremonie
+
+# Digitaal en betalen
+datingapps
+betaalapps
+creditcard
+ambassadekantoor
+
+# Afkortingen
+DRC
+LCR
+IATA
+USGS
+ESTA
+CPR
+CBD
+THC
+
+# --- Tweede ronde, na het wegnemen van de tokenizer-ruis ---
+
+# Ziekten en vaccinaties
+zika
+oropouche-virus
+gelekoortsvaccinatie
+
+# Reizen en documenten
+eTA
+e-Arrival
+immigratieformulier
+inreisstempel
+uitreisstempel
+inreisvergunning
+inreizen
+doorreisticket
+reisautorisatie
+uitreisbelasting
+terugwisselen
+
+# Natuur en veiligheid
+aardbevingscentrum
+landverschuivingen
+natuurrisico's
+ramppreventie
+camouflagekleding
+off-piste
+wegenautoriteit
+regeringskantoren
+
+
+# --- Huisstijl NederlandWereldwijd ---
+# Altijd met de plus. Zonder plus is het fout, en dat meldt de app nu ook:
+# de plus wordt niet meer weggestreept bij het opdelen van de zin.
+lhbtiq+
+lhbtiq+persoon
+lhbtiq+-vriendelijke
+
+# Ziekten waarvan de site beide namen geeft: "Mpox-virus (apenpokken)".
+# Nagekeken op burundi en congo-democratische-republiek: consequent gebruikt.
+mpox
+mpox-virus
+apenpokken
+
+# --- Nog te beslissen door de webredactie ---
+#
+# Weggehaald omdat het redactiekeuzes zijn en geen spellingfeiten:
+#
+# Ook weggehaald: Engelse woorden (and, for, travel, control, female en
+# dergelijke) die alleen in namen van buitenlandse diensten voorkomen.
+# Ze goedkeuren betekent dat een Engels woord middenin een Nederlandse
+# zin nooit meer opvalt. Dat is aan de redactie, niet aan de techniek.
+

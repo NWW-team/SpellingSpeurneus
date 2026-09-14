@@ -34,6 +34,10 @@ python3 -m http.server --directory docs 8000             # scherm bekijken op lo
 python3 scripts/test.py                                  # 21 controles; --offline slaat het netwerk over
 ```
 
+De workflow haalt per run de OpenTaal-lijst op (ruim 413.000 woorden) en vergelijkt de
+sha256 met [`data/opentaal.sha256`](data/opentaal.sha256). Wijkt die af, dan waarschuwt de
+run: je toetst dan aan een andere lijst dan de vorige keer.
+
 Zonder `data/woordenlijst.txt` valt het script terug op `data/woordenlijst-demo.txt`. Dat is
 een testlijst van ruim honderd woorden, alleen bedoeld voor `demo/`. De echte lijst haalt de
 workflow per run op bij OpenTaal.
@@ -54,6 +58,7 @@ altijd een harde bovengrens op het aantal pagina's.
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `docs/resultaten.json` | Uitkomst van de laatste crawl |
 | `data/uitzonderingen.txt` | Goedgekeurde woorden die niet in de woordenlijst staan |
+| `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |
 | `demo/` | Vijf fictieve pagina's met drie ingebouwde fouten, om op te testen |
 | `.github/workflows/crawl.yml` | De knop die een crawl start |
 

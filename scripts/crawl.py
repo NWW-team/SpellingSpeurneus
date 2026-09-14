@@ -30,7 +30,13 @@ SITEMAPS = {
 }
 
 WORTEL = Path(__file__).resolve().parent.parent
-LEESTEKENS = " \t\n\r.,;:!?()[]{}<>\"'“”‘’„…*•·|/\\&%+=–—@#$^~`"
+LEESTEKENS = " \t\n\r.,;:!?()[]{}<>\"'“”‘’„…*•·|/\\&%=–—@#$^~`-"
+# Tekens zonder breedte. Ze staan soms onzichtbaar in de content en maken
+# van een gewoon woord een onbekend woord.
+ONZICHTBAAR = str.maketrans("", "", "\u200b\u200c\u200d\u2060\ufeff\u00ad")
+# Haakjes en schuine strepen plakken woorden aan elkaar: "(bus)chauffeur",
+# "familie/vrienden". Daar splitsen we op, zodat elk deel apart wordt getoetst.
+SPLITSERS = re.compile(r"[\s/()\[\]]+")
 
 
 # --- ophalen ---------------------------------------------------------------
@@ -142,26 +148,37 @@ def is_bekend(woord, woorden):
     """
     if woord in woorden or woord.lower() in woorden:
         return True
+    # Meervoud of bezit met een apostrof: "radiotaxi's", "foto's". Het losse
+    # deel "s" is geen woord, dus toetsen we het woord zonder die uitgang.
+    zonder_s = re.sub(r"['’]s$", "", woord)
+    if zonder_s != woord and zonder_s.lower() in woorden:
+        return True
     delen = [deel for deel in re.split(r"[-'’]", woord) if deel]
     if len(delen) > 1 and all(deel.lower() in woorden for deel in delen):
         return True
     return False
 
 
-def zoek_fouten(tekst, woorden, uitzonderingen):
-    """Geeft per onbekend woord een bevinding met de zin eromheen."""
+def zoek_fouten(tekst, toegestaan):
+    """Geeft per onbekend woord een bevinding met de zin eromheen.
+
+    `toegestaan` is de woordenlijst en de uitzonderingen bij elkaar. Door ze
+    samen te nemen klopt ook een samenstelling die beide combineert, zoals
+    "lhbtiq+-vriendelijke": het eerste deel komt uit onze eigen lijst, het
+    tweede uit de woordenlijst.
+    """
     bevindingen = []
     gezien = set()
     for zin in re.split(r"(?<=[.!?])\s+", tekst):
-        for ruw in zin.split():
-            woord = ruw.strip(LEESTEKENS)
+        for ruw in SPLITSERS.split(zin):
+            woord = ruw.translate(ONZICHTBAAR).replace("’", "'").strip(LEESTEKENS)
             if not woord or not any(teken.isalpha() for teken in woord):
                 continue
             if any(teken.isdigit() for teken in woord):
                 continue  # versienummers, jaartallen, codes
-            if woord.lower() in uitzonderingen:
-                continue
-            if is_bekend(woord, woorden):
+            if "@" in woord:
+                continue  # e-mailadressen
+            if is_bekend(woord, toegestaan):
                 continue
             sleutel = (woord, zin)
             if sleutel in gezien:
@@ -231,6 +248,7 @@ def main():
         lijst_pad = reserve
     woorden = lees_woordenlijst(lijst_pad)
     uitzonderingen = {woord.lower() for woord in lees_woordenlijst(argumenten.uitzonderingen)}
+    toegestaan = woorden | uitzonderingen
     print(f"Woordenlijst: {lijst_pad.name} ({len(woorden)} vormen), "
           f"{len(uitzonderingen)} uitzonderingen.")
 
@@ -250,7 +268,7 @@ def main():
             print(f"  geen <main> gevonden: {url}")
             continue
         titel = titel_uit(pagina_html)
-        for bevinding in zoek_fouten(tekst, woorden, uitzonderingen):
+        for bevinding in zoek_fouten(tekst, toegestaan):
             bevindingen.append({"url": url, "titel": titel, **bevinding})
 
     resultaat = {
