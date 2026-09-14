@@ -13,7 +13,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from crawl import (SITE, is_bekend, lees_woordenlijst as lijst_woorden,  # noqa: E402
-                   maak_robots_controle, naar_patroon, tekst_uit_main, zoek_fouten)
+                   maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
+                   zoek_fouten)
 
 WORTEL = Path(__file__).resolve().parent.parent
 uitkomsten = []
@@ -50,6 +51,8 @@ def main():
     for fout in ("aanvraeg", "gelegenhied", "buitenladn"):
         controle(f"{fout} gevonden", fout in gevonden)
     controle("geen andere meldingen", len(gevonden) == 3, f"gevonden: {sorted(gevonden)}")
+    controle("alle drie gelden als spelfout, niet als naam",
+             all(b["soort"] == "spelfout" for b in resultaat["bevindingen"]))
 
     print("\nAlleen <main> wordt gelezen")
     for nepwoord in ("kwaliteitt", "navigatiefoutt", "voetfoutt"):
@@ -78,6 +81,29 @@ def main():
     controle("lhbtiq zonder plus wordt gemeld", "lhbtiq" in woorden_in_met("Een lhbtiq persoon.", huis))
     controle("samenstelling over beide lijsten",
              "lhbtiq+-vriendelijke" not in woorden_in_met("Een lhbtiq+-vriendelijke stad.", huis))
+
+    print("\nSpelfout of naam")
+    # Deze indeling haalt ruim 90% van de meldingen uit beeld, dus hij moet
+    # kloppen op precies de gevallen waarop het besluit is genomen.
+    controle("hoofdletter middenin een zin is een naam",
+             soort_van("Cochabamba", "Zoals de steden La Paz en Cochabamba.") == "naam")
+    controle("hoofdletter aan het zinsbegin blijft een spelfout",
+             soort_van("Registeer", "Registeer u bij de ambassade.") == "spelfout")
+    controle("kleine letter middenin blijft een spelfout",
+             soort_van("nieet", "Reis nieet naar dit gebied.") == "spelfout")
+    controle("aanhalingsteken voor het zinsbegin telt niet mee",
+             soort_van("Registeer", "\u2018Registeer u,\u2019 zegt de ambassade.") == "spelfout")
+    controle("vergeten spatie gaat voor de hoofdletterregel",
+             soort_van("III.Let", "De koers van segmento III.Let op dat u wisselt.") == "spelfout")
+    controle("vergeten spatie na een klein woord",
+             soort_van("demonstraties.Volg", "Vermijd demonstraties.Volg het nieuws.") == "spelfout")
+    controle("webadres is geen vergeten spatie",
+             soort_van("Windy.com", "Bekijk de windkaart op Windy.com vandaag.") == "naam")
+    controle("afkorting met punten is geen vergeten spatie",
+             soort_van("U.S", "Lees dit op de website van het U.S Department.") == "naam")
+    controle("de soort staat in elke bevinding",
+             all(b["soort"] in ("spelfout", "naam")
+                 for b in zoek_fouten("Reis nieet naar Cochabamba.", set())))
 
     print("\nPatronen uit robots.txt")
     for patroon, pad, verwacht in [

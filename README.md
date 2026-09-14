@@ -15,9 +15,31 @@ en wat je moet weten als je hieraan verder werkt.
    `<main>`-element. Menu's en voetteksten blijven buiten beeld.
 3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan onze eigen
    [`data/uitzonderingen.txt`](data/uitzonderingen.txt).
-4. Het resultaat komt in `docs/resultaten.json` te staan en verschijnt op de pagina hierboven.
+4. Wat overblijft wordt in tweeën gedeeld: **spelfouten** en **namen**. Zie hieronder.
+5. Het resultaat komt in `docs/resultaten.json` te staan en verschijnt op de pagina hierboven.
 
 Er draait niets automatisch op de achtergrond. Een crawl gebeurt alleen als iemand erom vraagt.
+
+## Spelfouten en namen
+
+De woordenlijst kent geen plaats- en organisatienamen. Op reisadviespagina's staan die
+overal, dus zonder scheiding verdrinken de echte fouten erin: de eerste crawl van 50
+pagina's gaf 614 meldingen, waarvan er 8 een echte fout waren.
+
+Daarom deelt de app elke melding in. **Een woord met een hoofdletter middenin een zin is
+een naam**; aan het zinsbegin zegt een hoofdletter niets, dus daar toetsen we gewoon door.
+Een vergeten spatie gaat voor: `III.Let op dat u` begint met een hoofdletter maar is een
+echte fout. Dezelfde crawl levert zo 42 spelfouten op — met alle 8 echte fouten erbij — en
+315 namen op een tweede tabblad.
+
+Namen worden dus **niet weggegooid**. Ze staan er één keer per naam, met het aantal
+pagina's erbij, zodat een verkeerd gespelde plaatsnaam op te zoeken blijft. De indeling
+staat in `resultaten.json`, dus wie de regel anders wil (hij staat in `soort_van` in
+`scripts/crawl.py`) kan het scherm omgooien zonder opnieuw te crawlen.
+
+Wat de app hierbij níét kan: beoordelen of een naam goed gespeld is. `Cochabamba` en een
+verkeerd gespelde variant krijgen dezelfde melding, want geen van beide staat in de
+woordenlijst. Dat nakijken blijft mensenwerk.
 
 ## Vals alarm wegwerken
 
@@ -33,7 +55,7 @@ Geen installatie nodig; alleen Python 3.
 python3 scripts/crawl.py --bron demo --max-paginas 5     # fictieve pagina's, zonder netwerk
 python3 scripts/crawl.py --bron reisadvies --max-paginas 10
 python3 -m http.server --directory docs 8000             # scherm bekijken op localhost:8000
-python3 scripts/test.py                                  # 21 controles; --offline slaat het netwerk over
+python3 scripts/test.py                                  # 45 controles; --offline slaat het netwerk over
 ```
 
 De workflow haalt per run de OpenTaal-lijst op (ruim 413.000 woorden) en vergelijkt de
