@@ -32,3 +32,104 @@ urls
 e-mailadres
 webformulier
 cookies
+
+# --- Toegevoegd na de eerste echte crawl (50 reisadviespagina's) ---
+# Vaktermen en samenstellingen die goed zijn, maar niet in de woordenlijst staan.
+
+# Mensen en groepen
+lhbtiq
+lhbtiq+persoon
+Oeigoerse
+Rohingya-vluchtelingen
+Mapuche-bevolking
+
+# Reizen en documenten
+reisvaccinaties
+vaccinatieboekje
+medicijnverklaring
+bagageregels
+inreisregels
+inreisdocumenten
+doorreisvliegticket
+uitreisticket
+immigratiekaart
+immigratiebureau
+passagierskaart
+paspoortstempels
+Paspoortdienst
+visumaanvraagcentrum
+visumpagina
+visumzaken
+onderzoeksvergunning
+geslachtsvermelding
+douanebewijs
+Koninkrijksdelen
+
+# Vervoer
+luchthaventaxi
+motortaxi
+radiotaxi
+motodop
+langeafstandsbussen
+expeditieschepen
+helikoptervervoer
+tolbetalingen
+Burgerluchtvaartautoriteit
+
+# Veiligheid en noodsituaties
+crisiswebsite
+waarschuwingsbericht
+veiligheidsautoriteiten
+veiligheidsborden
+Toeristenpolitie
+Wegpolitie
+Risicobestrijding
+Kampvuurverbod
+bergreddingsdiensten
+decompressietank
+overheidsziekenhuizen
+quarantaineplicht
+orkaangebied
+orkaanschuilplaatsen
+sneeuwomstandigheden
+kampeergebieden
+aardbevingsgevoelig
+Geowetenschappen
+Riftvallei
+muistromen
+windkaart
+
+# Criminaliteit
+pinfraude
+afleidingstrucs
+verkeersruzies
+smokkelbendes
+wapensmokkelaars
+bagsnatching
+snatching
+
+# Gezondheid en middelen
+zikakoorts
+opioïden
+oxycodon
+vapes
+haartest
+ayahuasca
+ayahuasca-ceremonies
+voodooceremonie
+
+# Digitaal en betalen
+datingapps
+betaalapps
+creditcard
+ambassadekantoor
+
+# Afkortingen
+DRC
+LCR
+IATA
+USGS
+ESTA
+CPR
+CBD
+THC

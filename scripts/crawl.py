@@ -30,7 +30,13 @@ SITEMAPS = {
 }
 
 WORTEL = Path(__file__).resolve().parent.parent
-LEESTEKENS = " \t\n\r.,;:!?()[]{}<>\"'“”‘’„…*•·|/\\&%+=–—@#$^~`"
+LEESTEKENS = " \t\n\r.,;:!?()[]{}<>\"'“”‘’„…*•·|/\\&%+=–—@#$^~`-"
+# Tekens zonder breedte. Ze staan soms onzichtbaar in de content en maken
+# van een gewoon woord een onbekend woord.
+ONZICHTBAAR = str.maketrans("", "", "\u200b\u200c\u200d\u2060\ufeff\u00ad")
+# Haakjes en schuine strepen plakken woorden aan elkaar: "(bus)chauffeur",
+# "familie/vrienden". Daar splitsen we op, zodat elk deel apart wordt getoetst.
+SPLITSERS = re.compile(r"[\s/()\[\]]+")
 
 
 # --- ophalen ---------------------------------------------------------------
@@ -153,8 +159,8 @@ def zoek_fouten(tekst, woorden, uitzonderingen):
     bevindingen = []
     gezien = set()
     for zin in re.split(r"(?<=[.!?])\s+", tekst):
-        for ruw in zin.split():
-            woord = ruw.strip(LEESTEKENS)
+        for ruw in SPLITSERS.split(zin):
+            woord = ruw.translate(ONZICHTBAAR).strip(LEESTEKENS)
             if not woord or not any(teken.isalpha() for teken in woord):
                 continue
             if any(teken.isdigit() for teken in woord):
