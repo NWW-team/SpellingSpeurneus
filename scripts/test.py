@@ -12,8 +12,8 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from crawl import (SITE, is_bekend, maak_robots_controle, naar_patroon,  # noqa: E402
-                   tekst_uit_main, zoek_fouten)
+from crawl import (SITE, is_bekend, lees_woordenlijst as lijst_woorden,  # noqa: E402
+                   maak_robots_controle, naar_patroon, tekst_uit_main, zoek_fouten)
 
 WORTEL = Path(__file__).resolve().parent.parent
 uitkomsten = []
@@ -55,6 +55,15 @@ def main():
     woorden = {b["woord"] for b in met_uitzondering["bevindingen"]}
     controle("uitgezonderd woord verdwijnt", "gelegenhied" not in woorden)
     controle("de rest blijft staan", len(woorden) == 2, f"over: {sorted(woorden)}")
+
+    print("\nUitzonderingen met een apostrof")
+    krullijst = tijdelijk / "krul.txt"
+    krullijst.write_text("natuurrisico's\nradiotaxi\n", encoding="utf-8")
+    zin = "Let op natuurrisico\u2019s en radiotaxi\u2019s in het land."
+    uitz = {w.lower() for w in lijst_woorden(krullijst)}
+    over = [b["woord"] for b in zoek_fouten(zin, set(), uitz)]
+    controle("gekrulde apostrof telt als rechte", "natuurrisico's" not in over, f"over: {over}")
+    controle("uitzondering dekt het meervoud", "radiotaxi's" not in over, f"over: {over}")
 
     print("\nPatronen uit robots.txt")
     for patroon, pad, verwacht in [

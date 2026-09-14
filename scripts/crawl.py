@@ -165,14 +165,14 @@ def zoek_fouten(tekst, woorden, uitzonderingen):
     gezien = set()
     for zin in re.split(r"(?<=[.!?])\s+", tekst):
         for ruw in SPLITSERS.split(zin):
-            woord = ruw.translate(ONZICHTBAAR).strip(LEESTEKENS)
+            woord = ruw.translate(ONZICHTBAAR).replace("’", "'").strip(LEESTEKENS)
             if not woord or not any(teken.isalpha() for teken in woord):
                 continue
             if any(teken.isdigit() for teken in woord):
                 continue  # versienummers, jaartallen, codes
             if "@" in woord:
                 continue  # e-mailadressen
-            if woord.lower() in uitzonderingen:
+            if is_bekend(woord, uitzonderingen):
                 continue
             if is_bekend(woord, woorden):
                 continue
