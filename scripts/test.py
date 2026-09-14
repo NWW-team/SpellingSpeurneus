@@ -12,7 +12,8 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from crawl import SITE, maak_robots_controle, naar_patroon, tekst_uit_main  # noqa: E402
+from crawl import (SITE, is_bekend, maak_robots_controle, naar_patroon,  # noqa: E402
+                   tekst_uit_main, zoek_fouten)
 
 WORTEL = Path(__file__).resolve().parent.parent
 uitkomsten = []
@@ -69,6 +70,24 @@ def main():
              "verstopt" not in tekst_uit_main("<main><script>verstopt</script>tekst</main>"))
     controle("entiteiten worden vertaald",
              tekst_uit_main("<main>caf&eacute;</main>") == "café")
+
+    print("\nWoordvormen")
+    woordjes = {"radiotaxi", "consulaat", "generaal", "nood", "bus", "chauffeur"}
+    controle("meervoud met apostrof", is_bekend("radiotaxi's", woordjes))
+    controle("samenstelling met koppelteken", is_bekend("consulaat-generaal", woordjes))
+    controle("onzin blijft onbekend", not is_bekend("radiotaxy's", woordjes))
+
+    print("\nWoorden uit een zin halen")
+    def woorden_in(zin):
+        return [b["woord"] for b in zoek_fouten(zin, set(), set())]
+    controle("weglatingsstreepje", "Nood" in woorden_in("Nood- of crisissituatie."))
+    controle("schuine streep splitst",
+             woorden_in("Laat familie/vrienden weten.")[1:3] == ["familie", "vrienden"])
+    controle("haakje middenin splitst", "chauffeur" in woorden_in("Wijs de (bus)chauffeur erop."))
+    controle("koppelteken blijft heel", "e-mail" in woorden_in("Stuur een e-mail."))
+    controle("e-mailadres wordt overgeslagen",
+             not any("@" in w for w in woorden_in("Mail naar iemand@voorbeeld.nl vandaag.")))
+    controle("onzichtbare tekens weg", "adres" in woorden_in("Het a\u200bdres."))
 
     if offline:
         print("\n(robots.txt tegen de echte site overgeslagen: --offline)")

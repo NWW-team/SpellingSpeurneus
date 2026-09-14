@@ -148,6 +148,11 @@ def is_bekend(woord, woorden):
     """
     if woord in woorden or woord.lower() in woorden:
         return True
+    # Meervoud of bezit met een apostrof: "radiotaxi's", "foto's". Het losse
+    # deel "s" is geen woord, dus toetsen we het woord zonder die uitgang.
+    zonder_s = re.sub(r"['’]s$", "", woord)
+    if zonder_s != woord and zonder_s.lower() in woorden:
+        return True
     delen = [deel for deel in re.split(r"[-'’]", woord) if deel]
     if len(delen) > 1 and all(deel.lower() in woorden for deel in delen):
         return True
@@ -165,6 +170,8 @@ def zoek_fouten(tekst, woorden, uitzonderingen):
                 continue
             if any(teken.isdigit() for teken in woord):
                 continue  # versienummers, jaartallen, codes
+            if "@" in woord:
+                continue  # e-mailadressen
             if woord.lower() in uitzonderingen:
                 continue
             if is_bekend(woord, woorden):

@@ -133,3 +133,59 @@ ESTA
 CPR
 CBD
 THC
+
+# --- Tweede ronde, na het wegnemen van de tokenizer-ruis ---
+
+# Ziekten en vaccinaties
+zika
+mpox
+mpox-virus
+apenpokken
+oropouche-virus
+gelekoortsvaccinatie
+
+# Reizen en documenten
+eTA
+e-Arrival
+immigratieformulier
+inreisstempel
+uitreisstempel
+inreisvergunning
+inreizen
+doorreisticket
+reisautorisatie
+uitreisbelasting
+terugwisselen
+
+# Natuur en veiligheid
+aardbevingscentrum
+landverschuivingen
+natuurrisico's
+ramppreventie
+camouflagekleding
+off-piste
+wegenautoriteit
+regeringskantoren
+lhbtiq+-vriendelijke
+
+# Woorden uit anderstalige eigennamen. Deze staan in namen van buitenlandse
+# diensten en formulieren, bijvoorbeeld "National Oceanic and Atmospheric
+# Administration" of "Registro de Viajeros". Het zijn geen Nederlandse
+# woorden, maar ze horen ook niet als spelfout gemeld te worden.
+and
+for
+travel
+customs
+immigration
+control
+electronic
+flood
+floods
+currents
+female
+casa
+segmento
+viajeros
+turísmo
+sivetur
+autorisation
