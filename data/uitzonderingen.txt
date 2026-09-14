@@ -1,0 +1,34 @@
+# Woorden die goed zijn, maar niet in de woordenlijst staan.
+# Elke regel is een woord; regels met # zijn uitleg.
+#
+# Zet hier een woord neer zodra de app het ten onrechte meldt.
+# Deze lijst hoort bij de webredactie, niet bij de techniek.
+
+# Overheid en organisaties
+DigiD
+SVB
+BZ
+RVIG
+IND
+CJIB
+RDW
+Nederlandwereldwijd
+
+# Consulaire en reizende termen
+Schengen
+Schengenvisum
+Schengengebied
+consulaat-generaal
+consulaten-generaal
+reisadvies
+reisadviezen
+Caribisch
+machtiging
+mvv
+
+# Digitaal
+url
+urls
+e-mailadres
+webformulier
+cookies

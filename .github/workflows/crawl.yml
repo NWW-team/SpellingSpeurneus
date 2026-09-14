@@ -1,0 +1,74 @@
+name: Crawl
+
+# De redacteur start een crawl zelf, via de knop "Run workflow".
+# Er draait niets automatisch op de achtergrond.
+on:
+  workflow_dispatch:
+    inputs:
+      bron:
+        description: "Welk deel van de site"
+        type: choice
+        default: reisadvies
+        options: [demo, reisadvies, paginas, ambassades]
+      max_paginas:
+        description: "Maximaal aantal pagina's"
+        default: "50"
+      opentaal_ref:
+        description: "Versie van de OpenTaal-woordenlijst (tag of commit)"
+        default: "master"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crawl-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Controles draaien
+        run: python3 scripts/test.py --offline
+
+      - name: Woordenlijst ophalen (OpenTaal)
+        env:
+          OPENTAAL_REF: ${{ inputs.opentaal_ref }}
+        run: |
+          bron="https://raw.githubusercontent.com/OpenTaal/opentaal-wordlist/${OPENTAAL_REF}/wordlist.txt"
+          echo "Ophalen: $bron"
+          curl -sSfL "$bron" -o data/woordenlijst.txt
+          regels=$(wc -l < data/woordenlijst.txt)
+          echo "Regels: $regels"
+          echo "sha256: $(sha256sum data/woordenlijst.txt | cut -d' ' -f1)"
+          echo "Eerste regels:"; head -3 data/woordenlijst.txt
+          if [ "$regels" -lt 100000 ]; then
+            echo "::error::De woordenlijst heeft maar $regels regels. Dat klopt niet;"
+            echo "::error::verwacht zijn er honderdduizenden. Gestopt om onzin te voorkomen."
+            exit 1
+          fi
+
+      - name: Crawlen en spelling toetsen
+        env:
+          BRON: ${{ inputs.bron }}
+          MAX_PAGINAS: ${{ inputs.max_paginas }}
+        run: |
+          python3 scripts/crawl.py --bron "$BRON" --max-paginas "$MAX_PAGINAS"
+
+      - name: Resultaat vastleggen
+        env:
+          BRON: ${{ inputs.bron }}
+          MAX_PAGINAS: ${{ inputs.max_paginas }}
+          TAK: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/resultaten.json
+          if git diff --staged --quiet; then
+            echo "Geen wijziging in de resultaten."
+          else
+            git commit -m "Crawl $BRON ($MAX_PAGINAS pagina's)"
+            git push origin "HEAD:$TAK"
+          fi

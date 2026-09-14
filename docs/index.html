@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpellingSpeurneus</title>
+<style>
+  :root {
+    --inkt: #1a1a1a; --gedempt: #5b6570; --lijn: #d8dde3;
+    --grond: #f7f8fa; --vlak: #ffffff; --accent: #154273; --markering: #fdf3d7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --inkt: #e8eaed; --gedempt: #9aa4b0; --lijn: #333a42;
+      --markering: #3a341f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--grond); color: var(--inkt);
+         font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+  .omhulsel { max-width: 1000px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .ondertitel { color: var(--gedempt); margin: 0 0 24px; }
+  .kaart { background: var(--vlak); border: 1px solid var(--lijn);
+           border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+  .feiten { display: flex; flex-wrap: wrap; gap: 24px; }
+  .feit strong { display: block; font-size: 1.5rem; line-height: 1.2; }
+  .feit span { color: var(--gedempt); font-size: .85rem; }
+  .filters { display: flex; flex-wrap: wrap; gap: 12px; }
+  .filter { flex: 1 1 220px; }
+  label { display: block; font-size: .85rem; color: var(--gedempt); margin-bottom: 4px; }
+  input[type=search] { width: 100%; padding: 9px 10px; font-size: 1rem;
+    border: 1px solid var(--lijn); border-radius: 6px;
+    background: var(--grond); color: var(--inkt); }
+  input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .tabelhouder { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th { text-align: left; font-size: .8rem; text-transform: uppercase;
+       letter-spacing: .04em; color: var(--gedempt); font-weight: 600;
+       border-bottom: 1px solid var(--lijn); padding: 8px 10px; }
+  td { border-bottom: 1px solid var(--lijn); padding: 10px; vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  .woord { font-weight: 600; white-space: nowrap; }
+  .context mark { background: var(--markering); color: inherit;
+                  font-weight: 600; padding: 0 2px; border-radius: 2px; }
+  .bron a { color: var(--accent); word-break: break-word; }
+  .bron small { display: block; color: var(--gedempt); }
+  button { font: inherit; font-size: .8rem; padding: 4px 8px; cursor: pointer;
+    border: 1px solid var(--lijn); border-radius: 5px;
+    background: var(--grond); color: var(--gedempt); white-space: nowrap; }
+  button:hover { color: var(--inkt); border-color: var(--gedempt); }
+  .melding { color: var(--gedempt); padding: 24px 10px; text-align: center; }
+  footer { color: var(--gedempt); font-size: .85rem; margin-top: 32px;
+           border-top: 1px solid var(--lijn); padding-top: 16px; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="omhulsel">
+
+  <h1>SpellingSpeurneus</h1>
+  <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
+
+  <div class="kaart feiten" id="feiten"><span class="melding">Bezig met laden…</span></div>
+
+  <div class="kaart filters">
+    <div class="filter">
+      <label for="urlfilter">Filter op URL</label>
+      <input type="search" id="urlfilter" placeholder="bijvoorbeeld: reisadvies" autocomplete="off">
+    </div>
+    <div class="filter">
+      <label for="woordfilter">Filter op woord</label>
+      <input type="search" id="woordfilter" placeholder="bijvoorbeeld: aanvra" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="kaart tabelhouder">
+    <table>
+      <thead><tr><th>Woord</th><th>Zin</th><th>Pagina</th><th></th></tr></thead>
+      <tbody id="rijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
+    </table>
+  </div>
+
+  <footer>
+    Spelling getoetst aan de <a href="https://github.com/OpenTaal/opentaal-wordlist">OpenTaal-woordenlijst</a>
+    (Keurmerk Spelling van de Taalunie, licentie BSD/CC BY 3.0).
+    Code en uitleg staan in de <a href="https://github.com/NWW-team/SpellingSpeurneus">repository</a>.
+  </footer>
+
+</div>
+
+<script>
+const rijenLichaam = document.getElementById("rijen");
+const feitenVak = document.getElementById("feiten");
+const urlFilter = document.getElementById("urlfilter");
+const woordFilter = document.getElementById("woordfilter");
+let bevindingen = [];
+
+function ontsnap(tekst) {
+  const hulp = document.createElement("div");
+  hulp.textContent = tekst;
+  return hulp.innerHTML;
+}
+
+function markeer(zin, woord) {
+  const veilig = ontsnap(zin);
+  const patroon = new RegExp("(^|[^\\p{L}])(" + woord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")(?![\\p{L}])", "u");
+  return veilig.replace(patroon, "$1<mark>$2</mark>");
+}
+
+function korteUrl(url) {
+  try { return new URL(url).pathname; } catch { return url; }
+}
+
+function toonFeiten(gegevens) {
+  const datum = new Date(gegevens.gestart_op).toLocaleString("nl-NL",
+    { dateStyle: "medium", timeStyle: "short" });
+  feitenVak.innerHTML = `
+    <div class="feit"><strong>${gegevens.aantal_bevindingen}</strong><span>bevindingen</span></div>
+    <div class="feit"><strong>${gegevens.aantal_paginas}</strong><span>pagina's bekeken</span></div>
+    <div class="feit"><strong>${ontsnap(gegevens.bron)}</strong><span>deel van de site</span></div>
+    <div class="feit"><strong>${datum}</strong><span>laatste crawl</span></div>`;
+}
+
+function teken() {
+  const urlTerm = urlFilter.value.trim().toLowerCase();
+  const woordTerm = woordFilter.value.trim().toLowerCase();
+  const zichtbaar = bevindingen.filter(b =>
+    b.url.toLowerCase().includes(urlTerm) && b.woord.toLowerCase().includes(woordTerm));
+
+  if (!zichtbaar.length) {
+    rijenLichaam.innerHTML = `<tr><td colspan="4" class="melding">
+      Geen bevindingen die aan het filter voldoen.</td></tr>`;
+    return;
+  }
+
+  rijenLichaam.innerHTML = zichtbaar.map(b => `
+    <tr>
+      <td class="woord">${ontsnap(b.woord)}</td>
+      <td class="context">${markeer(b.context, b.woord)}</td>
+      <td class="bron">
+        ${b.url.startsWith("http")
+          ? `<a href="${ontsnap(b.url)}" target="_blank" rel="noopener">${ontsnap(korteUrl(b.url))}</a>`
+          : ontsnap(b.url)}
+        <small>${ontsnap(b.titel || "")}</small>
+      </td>
+      <td><button type="button" data-woord="${ontsnap(b.woord)}"
+            title="Kopieer dit woord, om het in data/uitzonderingen.txt te plakken">
+            Kopieer als uitzondering</button></td>
+    </tr>`).join("");
+}
+
+rijenLichaam.addEventListener("click", event => {
+  const knop = event.target.closest("button[data-woord]");
+  if (!knop) return;
+  navigator.clipboard.writeText(knop.dataset.woord).then(() => {
+    const oud = knop.textContent;
+    knop.textContent = "Gekopieerd";
+    setTimeout(() => { knop.textContent = oud; }, 1500);
+  });
+});
+
+urlFilter.addEventListener("input", teken);
+woordFilter.addEventListener("input", teken);
+
+fetch("resultaten.json?t=" + Date.now())
+  .then(antwoord => { if (!antwoord.ok) throw new Error(antwoord.status); return antwoord.json(); })
+  .then(gegevens => { bevindingen = gegevens.bevindingen || []; toonFeiten(gegevens); teken(); })
+  .catch(fout => {
+    feitenVak.innerHTML = `<span class="melding">Kan resultaten.json niet laden (${ontsnap(String(fout))}).</span>`;
+    rijenLichaam.innerHTML = `<tr><td colspan="4" class="melding">
+      Er is nog geen crawl gedraaid, of je opent dit bestand rechtstreeks vanaf de schijf.
+      Start een webserver: <code>python3 -m http.server --directory docs 8000</code></td></tr>`;
+  });
+</script>
+</body>
+</html>
