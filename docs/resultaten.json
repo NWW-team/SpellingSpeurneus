@@ -1,7 +1,7 @@
 {
-  "gestart_op": "2026-09-14T14:13:09+00:00",
+  "gestart_op": "2026-09-14T14:17:48+00:00",
   "bron": "demo",
-  "woordenlijst": "woordenlijst-demo.txt",
+  "woordenlijst": "woordenlijst.txt",
   "user_agent": "SpellingSpeurneus/0.1 (+https://github.com/NWW-team/SpellingSpeurneus)",
   "aantal_paginas": 5,
   "aantal_bevindingen": 3,
