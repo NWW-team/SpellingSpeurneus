@@ -60,7 +60,7 @@ altijd een harde bovengrens op het aantal pagina's.
 ## Gegevens
 
 Deze app leest alleen openbare webpagina's en een openbare woordenlijst. Er gaat geen
-interne informatie en geen persoonsgegeven doorheen, en er zijn geen wachtwoorden of
+interne informatie en geen persoonsgegevens doorheen, en er zijn geen wachtwoorden of
 sleutels nodig. De resultaten staan in deze publieke repository, dus ze zijn voor iedereen
 te zien: ze bevatten alleen citaten uit pagina's die toch al openbaar zijn.
 
