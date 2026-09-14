@@ -1,7 +1,9 @@
 # SpellingSpeurneus
 
 Zoekt spelfouten op [nederlandwereldwijd.nl](https://www.nederlandwereldwijd.nl),
-wanneer de webredacteur daarom vraagt. Zie [STRATEGY.md](STRATEGY.md) voor het waarom.
+wanneer de webredacteur daarom vraagt. Zie [STRATEGY.md](STRATEGY.md) voor het waarom
+en [OVERDRACHT.md](OVERDRACHT.md) voor de stand van zaken, de openstaande besluiten
+en wat je moet weten als je hieraan verder werkt.
 
 **Resultaten bekijken:** https://nww-team.github.io/SpellingSpeurneus/ — geen account nodig.
 
@@ -60,6 +62,7 @@ altijd een harde bovengrens op het aantal pagina's.
 | `data/uitzonderingen.txt` | Goedgekeurde woorden die niet in de woordenlijst staan |
 | `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |
 | `demo/` | Vijf fictieve pagina's met drie ingebouwde fouten, om op te testen |
+| `OVERDRACHT.md` | Stand van zaken, openstaande besluiten, beperkingen en beheer |
 | `.github/workflows/crawl.yml` | De knop die een crawl start |
 
 ## Gegevens
