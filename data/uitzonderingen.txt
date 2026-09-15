@@ -67,6 +67,8 @@ expeditieschepen
 helikoptervervoer
 tolbetalingen
 Burgerluchtvaartautoriteit
+huurvoertuigen
+safarivoertuigen
 
 # Veiligheid en noodsituaties
 crisiswebsite
@@ -90,6 +92,10 @@ Geowetenschappen
 Riftvallei
 muistromen
 windkaart
+bereikbaarheidsdienst
+crisisorganisatie
+informatiebericht
+veiligheidsadviezen
 
 # Criminaliteit
 pinfraude
@@ -99,6 +105,7 @@ smokkelbendes
 wapensmokkelaars
 bagsnatching
 snatching
+bootkapingen
 
 # Gezondheid en middelen
 zikakoorts
@@ -145,6 +152,9 @@ doorreisticket
 reisautorisatie
 uitreisbelasting
 terugwisselen
+douanestempel
+immigratiesysteem
+reisperiodes
 
 # Natuur en veiligheid
 aardbevingscentrum
@@ -155,6 +165,7 @@ camouflagekleding
 off-piste
 wegenautoriteit
 regeringskantoren
+riviergrenzen
 
 
 # --- Huisstijl NederlandWereldwijd ---
@@ -215,6 +226,7 @@ namaakproducten
 # Organisaties en gebieden
 Al-Shabaab
 oblasten
+Zuid-Kivu
 
 # "etc." is goed; onze zinsopdeling haalt de laatste punt weg, waardoor "etc"
 # overblijft. Hier goedgekeurd, want het is geen spelfout. Datzelfde geldt voor
@@ -222,12 +234,33 @@ oblasten
 etc
 
 
+# --- Vierde ronde: woorden aangeleverd door de redactie (15 september 2026) ---
+
+# Engelse woorden, bewust goedgekeurd door de redactie ondanks de terughoudendheid
+# hieronder. Gevolg: deze woorden worden voortaan nergens meer als fout gezien,
+# ook niet los in een Nederlandse zin.
+and
+arrival
+currents
+electronic
+emergency
+female
+flood
+floods
+for
+foreign
+police
+travel
+
 # --- Nog te beslissen door de webredactie ---
 #
-# Weggehaald omdat het redactiekeuzes zijn en geen spellingfeiten:
+# Weggehaald omdat het redactiekeuzes zijn en geen spellingfeiten. "and", "for",
+# "travel" en "female" zijn op 15 september 2026 alsnog goedgekeurd, zie
+# hierboven; deze toelichting blijft staan voor vergelijkbare, nog niet
+# beoordeelde gevallen.
 #
-# Ook weggehaald: Engelse woorden (and, for, travel, control, female en
-# dergelijke) die alleen in namen van buitenlandse diensten voorkomen.
-# Ze goedkeuren betekent dat een Engels woord middenin een Nederlandse
-# zin nooit meer opvalt. Dat is aan de redactie, niet aan de techniek.
+# Overweeg per geval: Engelse woorden (control en dergelijke) die alleen in
+# namen van buitenlandse diensten voorkomen. Ze goedkeuren betekent dat een
+# Engels woord middenin een Nederlandse zin nooit meer opvalt. Dat is aan de
+# redactie, niet aan de techniek.
 
