@@ -251,12 +251,130 @@ travel
 # --- Nog te beslissen door de webredactie ---
 #
 # Weggehaald omdat het redactiekeuzes zijn en geen spellingfeiten. "and", "for",
-# "travel" en "female" zijn op 15 september 2026 alsnog goedgekeurd, zie
-# hierboven; deze toelichting blijft staan voor vergelijkbare, nog niet
-# beoordeelde gevallen.
+# "travel", "female" en "control" zijn op 15 september 2026 alsnog goedgekeurd,
+# zie hierboven en de vijfde ronde; deze toelichting blijft staan voor
+# vergelijkbare, nog niet beoordeelde gevallen.
 #
-# Overweeg per geval: Engelse woorden (control en dergelijke) die alleen in
-# namen van buitenlandse diensten voorkomen. Ze goedkeuren betekent dat een
-# Engels woord middenin een Nederlandse zin nooit meer opvalt. Dat is aan de
-# redactie, niet aan de techniek.
+# Overweeg per geval: woorden uit een andere taal (Engels, Spaans, Frans en
+# dergelijke) die alleen in namen van buitenlandse diensten of lokale termen
+# voorkomen. Ze goedkeuren betekent dat zo'n woord middenin een Nederlandse
+# zin nooit meer opvalt. Dat is aan de redactie, niet aan de techniek.
+
+# --- Vijfde ronde: woorden aangeleverd door de redactie (15 september 2026) ---
+#
+# "motodop" was in dezelfde dag al verwijderd (zie eerdere commit op main) en
+# is op uitdrukkelijk verzoek van de redactie hier opnieuw toegevoegd.
+
+# Reizen, documenten en grenscontrole
+immigration
+customs
+control
+immigratieprocedures
+administrative
+boundary
+lines
+line
+division
+identiteitsnummer
+verblijfsstempel
+douaneregels
+sedula
+dalasi
+lari
+permit
+entry
+declaration
+approval
+officer
+nooddocument
+immigratieautoriteiten
+migratieambtenaar
+migration
+visitors
+tolbetaling
+
+# Vervoer
+lancha
+pirogues
+tuktuks
+bajaj
+matutu's
+boda
+motodop
+scooterrijders
+off-road
+scooterverhuur
+huurscooters
+huurvoertuig
+veerbootmaatschappij
+kaartverkopers
+grab
+vliegtuigspotten
+
+# Veiligheid, criminaliteit en noodsituaties
+bezness
+scams
+scamming
+love
+guerillabeweging
+gevangenisrellen
+nepuniform
+aswolken
+harmattan
+poolklimaat
+zonweerkaatsing
+oogschade
+klimaatheffing
+busongelukken
+stadsgrenzen
+flooding
+severe
+crisisinformatie
+filmverbod
+jamming
+alarmtonen
+
+# Gezondheid en natuur
+mazelenuitbraak
+lassakoorts
+anti-choleramedicijn
+decompressiekamers
+khat
+iboga-plant
+bwiti-rituelen
+kruidenbrouwsel
+palmlikeur
+drankmerken
+hersluitbare
+
+# Cultuur, religie en gewoonten
+abaya
+hijab
+shisha
+hookah
+vastende
+nazisymbolen
+
+# Buitenlandse termen (Spaans, Frans en andere talen)
+casa
+turismo
+sivetur
+viajeros
+segmento
+ambiente
+bruma
+seca
+nacional
+metrologia
+geofisica
+colonias
+barrio's
+l'Ouest
+valmis
+
+# Overige Engelse woorden
+public
+vehicles
+information
+digital
 
