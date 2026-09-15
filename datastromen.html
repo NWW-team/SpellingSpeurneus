@@ -1,0 +1,1103 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datastromen SpellingSpeurneus</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Kleuren in de trant van de Rijkshuisstijl, net als docs/index.html:
+   donkerblauw #154273, hemelblauw, lichtblauw, geel markeerveld. Bewust geen
+   logo, woordmerk of Rijksoverheid-lettertype. Geen webfonts en geen externe
+   bestanden: dit bestand moet los van alles openen, ook zonder internet.
+   --------------------------------------------------------------------------- */
+:root {
+  --grond:#eceff4; --vlak:#ffffff; --vlak2:#f5f8fb;
+  --inkt:#14181d; --gedempt:#4e5a68; --lijn:#d2d9e2; --lijnzacht:#e4e9f0;
+  --kopvlak:#154273; --kopinkt:#ffffff; --kopsub:#a9cfe9;
+  --accent:#154273; --accent2:#00679f;
+  --duurzaam:#154273;  --duurzaamvlak:#e2ebf6;
+  --tijdelijk:#0d6b5d; --tijdelijkvlak:#ddf0eb;
+  --extern:#5b3a8c;    --externvlak:#ebe3f7;
+  --keuze:#8d4300;     --keuzevlak:#fdeddc;
+  --markering:#fcf3a5; --markeringinkt:#14181d;
+  --schaduw:0 1px 2px rgba(20,24,29,.06), 0 6px 18px rgba(20,24,29,.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --grond:#15181c; --vlak:#1e2329; --vlak2:#262c33;
+    --inkt:#e7eaef; --gedempt:#a6b1bd; --lijn:#343b44; --lijnzacht:#2a3038;
+    --kopvlak:#102135; --kopinkt:#eef4f9; --kopsub:#8FCAE7;
+    --accent:#8FCAE7; --accent2:#7cc0e4;
+    --duurzaam:#8FCAE7;  --duurzaamvlak:#17293c;
+    --tijdelijk:#63d3bd; --tijdelijkvlak:#11302b;
+    --extern:#c3a7f0;    --externvlak:#262038;
+    --keuze:#f0a95c;     --keuzevlak:#3a2711;
+    --markering:#4a4318; --markeringinkt:#f2ecd0;
+    --schaduw:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  --grond:#15181c; --vlak:#1e2329; --vlak2:#262c33;
+  --inkt:#e7eaef; --gedempt:#a6b1bd; --lijn:#343b44; --lijnzacht:#2a3038;
+  --kopvlak:#102135; --kopinkt:#eef4f9; --kopsub:#8FCAE7;
+  --accent:#8FCAE7; --accent2:#7cc0e4;
+  --duurzaam:#8FCAE7;  --duurzaamvlak:#17293c;
+  --tijdelijk:#63d3bd; --tijdelijkvlak:#11302b;
+  --extern:#c3a7f0;    --externvlak:#262038;
+  --keuze:#f0a95c;     --keuzevlak:#3a2711;
+  --markering:#4a4318; --markeringinkt:#f2ecd0;
+  --schaduw:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.25);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin:0; background:var(--grond); color:var(--inkt);
+  font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+.omhulsel { max-width:1120px; margin:0 auto; padding-inline:20px; }
+code, .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; font-size:.88em; }
+.serif { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+
+/* --- kop --- */
+.kop { background:var(--kopvlak); color:var(--kopinkt); border-bottom:4px solid var(--accent2); }
+.kop .omhulsel { padding-block:30px 26px; }
+.kop .eyebrow { color:var(--kopsub); }
+h1 { font-size:clamp(1.55rem, 1.1rem + 1.9vw, 2.3rem); line-height:1.15; margin:6px 0 10px;
+     letter-spacing:-.015em; text-wrap:balance; }
+.kop .lede { font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+  font-size:1.05rem; line-height:1.6; color:#dce8f2; margin:0; max-width:62ch; }
+:root[data-theme="dark"] .kop .lede { color:#cfe0ee; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .kop .lede { color:#cfe0ee; } }
+.kop .stand { margin:16px 0 0; display:flex; flex-wrap:wrap; gap:8px 10px; }
+.kop .stand span { font-size:.78rem; letter-spacing:.03em; color:var(--kopsub);
+  border:1px solid rgba(143,202,231,.38); border-radius:999px; padding:3px 11px; }
+
+.eyebrow { font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+
+/* --- secties --- */
+main { padding-block:0 72px; }
+section { padding-block:40px 8px; }
+h2 { font-size:1.3rem; letter-spacing:-.01em; margin:0 0 6px; text-wrap:balance; }
+h3 { font-size:1rem; margin:0 0 8px; }
+.sectiekop { border-top:2px solid var(--inkt); padding-top:14px; margin-bottom:22px; }
+.sectiekop .eyebrow { color:var(--gedempt); }
+.sectiekop p { color:var(--gedempt); margin:6px 0 0; max-width:68ch; font-size:.95rem; }
+
+/* --- onderdelenkaart --- */
+.onderdelen { display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(196px,1fr)); }
+.groep { background:var(--vlak); border:1px solid var(--lijn); border-radius:10px; padding:14px 15px 15px; }
+.groep > .eyebrow { display:block; margin-bottom:10px; color:var(--gedempt); }
+.groep ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
+.groep li { font-size:.9rem; line-height:1.4; padding-left:16px; position:relative; }
+.groep li::before { content:""; position:absolute; left:0; top:.5em; width:8px; height:8px; }
+.groep li .sub { display:block; color:var(--gedempt); }
+.g-persoon li::before { border-radius:50%; background:var(--accent2); }
+.g-extern  li::before { transform:rotate(45deg); background:var(--extern); }
+.g-app     li::before { background:var(--duurzaam); }
+.g-opslag  li::before { background:var(--tijdelijk); border-radius:2px; box-shadow:0 3px 0 -1px var(--tijdelijk); }
+.g-scherm  li::before { border:2px solid var(--keuze); background:transparent; }
+
+/* --- bedieningsbalk --- */
+.balk { position:sticky; top:0; z-index:20; background:var(--vlak);
+  border:1px solid var(--lijn); border-radius:12px; padding:13px 15px;
+  box-shadow:var(--schaduw); display:flex; flex-wrap:wrap; gap:14px 22px; align-items:flex-end; }
+.balkwrap { position:sticky; top:0; z-index:20; padding-block:12px; background:var(--grond); }
+.bediening { display:flex; flex-direction:column; gap:7px; }
+.bediening > .eyebrow { color:var(--gedempt); }
+.segment { display:flex; flex-wrap:wrap; gap:6px; }
+.segment button { font:inherit; font-size:.85rem; padding:7px 13px; cursor:pointer;
+  border:1px solid var(--lijn); background:var(--vlak2); color:var(--inkt);
+  border-radius:7px; line-height:1.2; }
+.segment button:hover { border-color:var(--accent); }
+.segment button[aria-pressed="true"] { background:var(--accent); color:var(--vlak);
+  border-color:var(--accent); font-weight:600; }
+:root[data-theme="dark"] .segment button[aria-pressed="true"] { color:#10243a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .segment button[aria-pressed="true"] { color:#10243a; } }
+.segment button .n { opacity:.72; font-variant-numeric:tabular-nums; margin-left:5px; }
+.schakelaars { display:flex; flex-direction:column; gap:7px; }
+.schakel { display:flex; align-items:center; gap:9px; font-size:.88rem; cursor:pointer; }
+.schakel input { width:17px; height:17px; accent-color:var(--accent); cursor:pointer; margin:0; }
+:focus-visible { outline:2px solid var(--accent2); outline-offset:2px; border-radius:3px; }
+.balkhint { flex:1 1 200px; color:var(--gedempt); font-size:.8rem; line-height:1.4; min-width:180px; }
+
+/* --- legenda --- */
+.legenda { display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(235px,1fr)); margin-bottom:8px; }
+.legkaart { border:1px solid var(--lijn); border-radius:10px; background:var(--vlak); padding:12px 14px;
+  border-left:5px solid var(--kleur); }
+.legkaart .naam { font-weight:700; font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--kleur); }
+.legkaart p { margin:5px 0 0; font-size:.86rem; color:var(--gedempt); line-height:1.45; }
+.cat-duurzaam  { --kleur:var(--duurzaam); }
+.cat-tijdelijk { --kleur:var(--tijdelijk); }
+.cat-extern    { --kleur:var(--extern); }
+.cat-keuze     { --kleur:var(--keuze); }
+
+/* --- fases en stromen --- */
+.fase { margin-top:30px; }
+.fasekop { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+  border-bottom:1px solid var(--lijn); padding-bottom:7px; margin-bottom:16px; }
+.fasekop .letter { font-size:.8rem; font-weight:700; letter-spacing:.1em; color:var(--gedempt); }
+.fasekop h3 { margin:0; font-size:1.05rem; }
+.fasekop .toelichting { color:var(--gedempt); font-size:.85rem; }
+
+.stroom { background:var(--vlak); border:1px solid var(--lijn); border-left:5px solid var(--kleur);
+  border-radius:10px; padding:15px 17px 17px; margin-bottom:13px; box-shadow:var(--schaduw); }
+.stroomkop { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:baseline; margin-bottom:13px; }
+.nummer { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.8rem;
+  font-weight:700; color:var(--kleur); background:var(--kleurvlak); border-radius:5px;
+  padding:2px 7px; font-variant-numeric:tabular-nums; }
+.stroomnaam { font-weight:700; font-size:1rem; flex:1 1 240px; line-height:1.35; }
+.badge { font-size:.7rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:3px 8px; border-radius:999px; white-space:nowrap; }
+.badge-cat { background:var(--kleurvlak); color:var(--kleur); }
+.badge-status { border:1px dashed var(--gedempt); color:var(--gedempt); }
+.badge-status[data-status="gebouwd"] { border:1px solid var(--tijdelijk); color:var(--tijdelijk);
+  background:var(--tijdelijkvlak); border-style:solid; }
+.badge-status[data-status="aanname"] { border-style:dotted; border-color:var(--keuze); color:var(--keuze); }
+
+/* de route zelf */
+.route { display:flex; flex-wrap:wrap; align-items:stretch; gap:8px; }
+.knoop { flex:0 1 auto; min-width:0; max-width:100%; background:var(--vlak2);
+  border:1px solid var(--lijn); border-radius:8px; padding:9px 12px; }
+.knoop .soort { display:block; font-size:.63rem; font-weight:700; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--knoopkleur); margin-bottom:3px; }
+.knoop .titel { display:block; font-size:.9rem; font-weight:600; line-height:1.3; }
+.knoop .sub { display:block; font-size:.78rem; color:var(--gedempt); margin-top:2px; word-break:break-word;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+.k-persoon { --knoopkleur:var(--accent2); border-color:var(--accent2); }
+.k-extern  { --knoopkleur:var(--extern);  border-color:var(--extern); }
+.k-app     { --knoopkleur:var(--duurzaam);border-color:var(--duurzaam); }
+.k-opslag  { --knoopkleur:var(--tijdelijk); border-color:var(--tijdelijk); border-width:2px; }
+.k-scherm  { --knoopkleur:var(--keuze);   border-color:var(--keuze); }
+.k-geen    { --knoopkleur:var(--gedempt); border-style:dashed; opacity:.85; }
+
+.pijl { flex:1 1 160px; min-width:130px; display:flex; flex-direction:column; justify-content:center;
+  gap:4px; padding:2px 2px 2px 0; position:relative; }
+.pijl .lijn { display:flex; align-items:center; gap:4px; color:var(--gedempt); }
+.pijl .lijn::before { content:""; flex:1; height:2px; background:var(--lijn); border-radius:2px; }
+.pijl .punt { font-size:.95rem; line-height:1; color:var(--lijn); }
+.pijl .etiket { font-size:.79rem; line-height:1.35; color:var(--inkt); }
+.pijl .crud { font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  border-radius:4px; padding:2px 6px; align-self:flex-start; }
+.crud-actie { background:var(--duurzaamvlak); color:var(--duurzaam); }
+.crud-geen  { background:transparent; color:var(--gedempt); border:1px dashed var(--lijn); font-weight:600; }
+body:not(.toon-crud) .crud { display:none; }
+
+.notitie { margin-top:13px; border-radius:8px; padding:10px 13px; font-size:.86rem; line-height:1.5;
+  background:var(--kleurvlak); border:1px solid var(--lijn); }
+.notitie .kopje { display:block; font-size:.68rem; font-weight:700; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--kleur); margin-bottom:3px; }
+.notitie.let { --kleur:var(--keuze); --kleurvlak:var(--keuzevlak); }
+
+.feiten { margin-top:13px; display:grid; gap:10px 22px; grid-template-columns:repeat(auto-fit, minmax(230px,1fr));
+  border-top:1px solid var(--lijnzacht); padding-top:12px; }
+.feit .eyebrow { display:block; color:var(--gedempt); margin-bottom:2px; }
+.feit p { margin:0; font-size:.87rem; line-height:1.5; }
+mark { background:var(--markering); color:var(--markeringinkt); padding:0 3px; border-radius:2px; }
+
+/* --- matrix --- */
+.tabelhouder { overflow-x:auto; background:var(--vlak); border:1px solid var(--lijn);
+  border-radius:10px; box-shadow:var(--schaduw); }
+table { width:100%; border-collapse:collapse; font-size:.87rem; min-width:940px; }
+thead th { position:sticky; top:0; background:var(--vlak2); text-align:left; font-size:.68rem;
+  letter-spacing:.09em; text-transform:uppercase; color:var(--gedempt); font-weight:700;
+  padding:11px 12px; border-bottom:2px solid var(--lijn); z-index:1; }
+tbody td { padding:12px; border-bottom:1px solid var(--lijnzacht); vertical-align:top; line-height:1.5; }
+tbody tr:last-child td { border-bottom:0; }
+tbody tr { border-left:4px solid var(--kleur); }
+td .nr { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:var(--kleur);
+  font-weight:700; font-variant-numeric:tabular-nums; }
+td .gegeven { font-weight:700; display:block; margin-top:2px; }
+td .pad { color:var(--gedempt); }
+td .pad b { color:var(--inkt); font-weight:600; }
+td .keuzeregel { display:block; margin-top:5px; }
+td .keuzeregel .k { font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--gedempt); }
+body:not(.toon-crud) .kolom-crud { display:none; }
+
+/* --- voorstel --- */
+.voorstel { background:var(--vlak); border:1px solid var(--lijn); border-radius:12px;
+  padding:26px 26px 28px; box-shadow:var(--schaduw); }
+.voorstel .conclusie { font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+  font-size:1.22rem; line-height:1.5; margin:0 0 20px; max-width:60ch; text-wrap:pretty; }
+.voorstel .conclusie strong { background:var(--markering); color:var(--markeringinkt); padding:1px 5px; }
+.kolommen { display:grid; gap:22px; grid-template-columns:repeat(auto-fit, minmax(265px,1fr)); }
+.kolommen h3 { font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gedempt);
+  border-bottom:1px solid var(--lijn); padding-bottom:6px; margin-bottom:11px; }
+.kolommen ol, .kolommen ul { margin:0; padding-left:1.15em; display:flex; flex-direction:column; gap:9px; }
+.kolommen li { font-size:.9rem; line-height:1.5; }
+.kolommen li b { display:block; }
+.kolommen li .waarom { color:var(--gedempt); }
+.drempels { margin-top:24px; border-top:1px solid var(--lijn); padding-top:18px; }
+.drempels ul { list-style:none; padding:0; margin:10px 0 0; display:grid; gap:9px;
+  grid-template-columns:repeat(auto-fit, minmax(255px,1fr)); }
+.drempels li { font-size:.88rem; line-height:1.45; padding-left:24px; position:relative; color:var(--gedempt); }
+.drempels li::before { content:attr(data-nr); position:absolute; left:0; top:0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.75rem;
+  font-weight:700; color:var(--keuze); }
+.drempels li b { color:var(--inkt); }
+
+footer { margin-top:44px; border-top:1px solid var(--lijn); padding-top:18px;
+  color:var(--gedempt); font-size:.83rem; line-height:1.6; }
+footer p { margin:0 0 8px; max-width:78ch; }
+footer a { color:var(--accent); }
+
+.leeg { display:none; background:var(--vlak); border:1px dashed var(--lijn); border-radius:10px;
+  padding:26px; text-align:center; color:var(--gedempt); }
+body.niets .leeg { display:block; }
+
+@media (max-width: 760px) {
+  .route { flex-direction:column; align-items:stretch; }
+  .knoop { flex:1 1 auto; }
+  .pijl { flex:1 1 auto; min-width:0; padding:0 0 0 14px; }
+  .pijl .lijn { display:none; }
+  .pijl .etiket::before { content:"↓ "; color:var(--gedempt); font-weight:700; }
+  .balkwrap { position:static; }
+}
+@media (max-width: 900px) {
+  table { min-width:0; }
+  thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  tbody tr { display:block; border-bottom:1px solid var(--lijn); padding:6px 0 10px; }
+  tbody tr:last-child { border-bottom:0; }
+  tbody td { display:block; border:0; padding:5px 14px; }
+  tbody td::before { content:attr(data-label); display:block; font-size:.66rem; font-weight:700;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--gedempt); margin-bottom:2px; }
+  tbody td[data-label=""]::before { display:none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body class="toon-crud">
+
+<header class="kop">
+  <div class="omhulsel">
+    <p class="eyebrow">SpellingSpeurneus · datastromen · 15 september 2026</p>
+    <h1>Waar de gegevens vandaan komen en waar ze blijven</h1>
+    <p class="lede">Deze app crawlt op verzoek een deel van
+      www.nederlandwereldwijd.nl, toetst elk woord aan de OpenTaal-woordenlijst en
+      toont wat er overblijft. Hieronder staat elke datastroom uit
+      <code>crawl.yml</code>, <code>scripts/crawl.py</code> en
+      <code>docs/index.html</code> — met per gegeven de vraag die er echt toe doet:
+      moet dit bewaard blijven, of mag het na de run weg?</p>
+    <p class="stand">
+      <span>Gelezen: STRATEGY.md · OVERDRACHT.md · README.md</span>
+      <span>Code: crawl.py · crawl.yml · index.html</span>
+      <span>Er is nu geen database</span>
+    </p>
+  </div>
+</header>
+
+<main class="omhulsel">
+
+  <!-- ============ 1. de onderdelen ============ -->
+  <section id="onderdelen">
+    <div class="sectiekop">
+      <p class="eyebrow">Onderdeel 1</p>
+      <h2>Wie doet wat</h2>
+      <p>Vijf soorten onderdelen. Ze komen in elke route hieronder terug, met
+        dezelfde naam en hetzelfde merkteken.</p>
+    </div>
+    <div class="onderdelen">
+      <div class="groep g-persoon">
+        <span class="eyebrow">Mensen</span>
+        <ul>
+          <li>Webredacteur<span class="sub">start de crawl, leest de uitslag, beheert de uitzonderingen</span></li>
+          <li>Meelezende collega<span class="sub">opent de publieke pagina, geen account nodig</span></li>
+        </ul>
+      </div>
+      <div class="groep g-extern">
+        <span class="eyebrow">Externe bronnen</span>
+        <ul>
+          <li>www.nederlandwereldwijd.nl<span class="sub">robots.txt · sitemap.xml · pagina-HTML</span></li>
+          <li>OpenTaal-woordenlijst<span class="sub">raw.githubusercontent.com · 413.937 woorden</span></li>
+          <li>GitHub Actions<span class="sub">draait de run, bewaart het logboek</span></li>
+        </ul>
+      </div>
+      <div class="groep g-app">
+        <span class="eyebrow">De app — verwerking</span>
+        <ul>
+          <li>De startknop<span class="sub">.github/workflows/crawl.yml</span></li>
+          <li>De crawler en spellingtoets<span class="sub">scripts/crawl.py</span></li>
+          <li>De indeling spelfout of naam<span class="sub">soort_van()</span></li>
+        </ul>
+      </div>
+      <div class="groep g-opslag">
+        <span class="eyebrow">Opslag</span>
+        <ul>
+          <li>Git-repository<span class="sub">uitzonderingen.txt · opentaal.sha256 · resultaten.json</span></li>
+          <li>GitHub Pages<span class="sub">publieke kopie van docs/</span></li>
+          <li>Schijf van de runner<span class="sub">woordenlijst.txt — verdwijnt na de run</span></li>
+        </ul>
+      </div>
+      <div class="groep g-scherm">
+        <span class="eyebrow">Scherm</span>
+        <ul>
+          <li>Het resultatenscherm<span class="sub">docs/index.html — tabbladen Spelfouten en Namen</span></li>
+          <li>Browsergeheugen<span class="sub">bevindingen, filters — géén localStorage</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. de routes ============ -->
+  <section id="routes">
+    <div class="sectiekop">
+      <p class="eyebrow">Onderdeel 2</p>
+      <h2>De datastromen, in de volgorde van een crawl</h2>
+      <p>Elke balk is één volledige route: van waar het gegeven vandaan komt, via
+        de verwerking, tot waar het terechtkomt. Een filter verbergt hele routes,
+        nooit een stuk van een route — wat je ziet is dus altijd het hele pad.</p>
+    </div>
+
+    <div class="legenda">
+      <div class="legkaart cat-duurzaam">
+        <span class="naam">Duurzaam bewaren</span>
+        <p>Moet een crawl en een herlading overleven. Staat nu als bestand in de
+          git-repository; een database is er niet.</p>
+      </div>
+      <div class="legkaart cat-tijdelijk">
+        <span class="naam">Tijdelijk</span>
+        <p>Alleen nodig tijdens invoer, verwerking, berekening of weergave. Mag
+          daarna weg en verdwijnt ook echt.</p>
+      </div>
+      <div class="legkaart cat-extern">
+        <span class="naam">Staat al elders</span>
+        <p>Leeft in het CMS van de site of bij OpenTaal. Per run opnieuw lezen,
+          bewust niet naar de eigen opslag kopiëren.</p>
+      </div>
+      <div class="legkaart cat-keuze">
+        <span class="naam">Keuze nodig</span>
+        <p>Twijfelgeval of openstaand besluit. De vraag die beantwoord moet
+          worden staat in de balk zelf.</p>
+      </div>
+    </div>
+
+    <div class="balkwrap">
+      <div class="balk">
+        <div class="bediening">
+          <span class="eyebrow" id="lbl-filter">Toon</span>
+          <div class="segment" role="group" aria-labelledby="lbl-filter" id="opslagfilter">
+            <button type="button" data-filter="alles" aria-pressed="true">Alle data <span class="n"></span></button>
+            <button type="button" data-filter="db" aria-pressed="false">Databaseopslag <span class="n"></span></button>
+            <button type="button" data-filter="geen" aria-pressed="false">Geen eigen databaseopslag <span class="n"></span></button>
+          </div>
+        </div>
+        <div class="schakelaars">
+          <label class="schakel" for="crudschakelaar">
+            <input type="checkbox" id="crudschakelaar" checked>
+            <span>CRUD-labels tonen</span>
+          </label>
+          <label class="schakel" for="gebouwdschakelaar">
+            <input type="checkbox" id="gebouwdschakelaar">
+            <span>Alleen wat al gebouwd is</span>
+          </label>
+        </div>
+        <p class="balkhint">&ldquo;Databaseopslag&rdquo; betekent hier: gegevens die
+          duurzaam bij ons blijven staan. Twijfelgevallen staan in beide filters,
+          want de keuze is nog niet gemaakt.</p>
+      </div>
+    </div>
+
+    <div id="fases"></div>
+    <div class="leeg">Geen enkele route voldoet aan deze combinatie van filters.</div>
+  </section>
+
+  <!-- ============ 3. de matrix ============ -->
+  <section id="matrix">
+    <div class="sectiekop">
+      <p class="eyebrow">Onderdeel 3</p>
+      <h2>Matrix: bron, verwerking, bestemming en CRUD</h2>
+      <p>Dezelfde routes en dezelfde nummers als hierboven, in één tabel. De
+        filters werken ook hier. &ldquo;Nu&rdquo; is hoe het vandaag in de code staat;
+        &ldquo;advies&rdquo; is wat ik zou doen.</p>
+    </div>
+    <div class="tabelhouder">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Gegeven of handeling</th>
+            <th scope="col">Bron &rarr; verwerking &rarr; bestemming</th>
+            <th scope="col" class="kolom-crud">CRUD</th>
+            <th scope="col">Waar</th>
+            <th scope="col">Opslagkeuze</th>
+            <th scope="col">Na afsluiten of herladen</th>
+            <th scope="col">Reden vanuit de use case</th>
+          </tr>
+        </thead>
+        <tbody id="matrixrijen"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 4. CRUD-dekking ============ -->
+  <section id="crud">
+    <div class="sectiekop">
+      <p class="eyebrow">Onderdeel 4</p>
+      <h2>Welke CRUD-acties er zijn — en welke terecht ontbreken</h2>
+      <p>Alleen over gegevens die de app zelf duurzaam bewaart. Alles wat de app
+        van de site of van OpenTaal leest, is Read bij een externe bron en telt
+        hier niet mee.</p>
+    </div>
+    <div class="tabelhouder">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Bewaard gegeven</th>
+            <th scope="col">Create</th>
+            <th scope="col">Read</th>
+            <th scope="col">Update</th>
+            <th scope="col">Delete</th>
+            <th scope="col">Oordeel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="--kleur:var(--duurzaam)">
+            <td data-label="Gegeven"><span class="gegeven">Goedgekeurde woorden</span><code>data/uitzonderingen.txt</code></td>
+            <td data-label="Create">Woord toevoegen na vals alarm</td>
+            <td data-label="Read">Elke crawl leest de lijst</td>
+            <td data-label="Update">Regel corrigeren of verplaatsen</td>
+            <td data-label="Delete">Woord terugtrekken als het toch fout is</td>
+            <td data-label="Oordeel">Compleet. Alle vier de acties worden echt gebruikt — via een commit of pull request, niet vanuit het scherm.</td>
+          </tr>
+          <tr style="--kleur:var(--duurzaam)">
+            <td data-label="Gegeven"><span class="gegeven">Vastgelegde woordenlijstversie</span><code>data/opentaal.sha256</code></td>
+            <td data-label="Create">Eenmalig, 14&nbsp;september 2026</td>
+            <td data-label="Read">Elke run vergelijkt ermee</td>
+            <td data-label="Update">Nieuwe sha256 overnemen na goedkeuring</td>
+            <td data-label="Delete">Niet nodig</td>
+            <td data-label="Oordeel">Delete ontbreekt terecht: er is altijd precies één versie waarop je je baseert.</td>
+          </tr>
+          <tr style="--kleur:var(--duurzaam)">
+            <td data-label="Gegeven"><span class="gegeven">Uitslag van de laatste crawl</span><code>docs/resultaten.json</code></td>
+            <td data-label="Create">Eerste crawl maakt het bestand</td>
+            <td data-label="Read">Het scherm haalt het per bezoek op</td>
+            <td data-label="Update">Elke volgende crawl overschrijft alles</td>
+            <td data-label="Delete">Niet nodig</td>
+            <td data-label="Oordeel">Eén document zonder historie. Verwijderen per bevinding zou een knop zijn om de letter D af te vinken, niet om een probleem op te lossen.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 5. voorstel ============ -->
+  <section id="voorstel">
+    <div class="sectiekop">
+      <p class="eyebrow">Onderdeel 5</p>
+      <h2>Voorstel</h2>
+    </div>
+    <div class="voorstel">
+      <p class="conclusie serif"><strong>Een database heeft deze app niet nodig.</strong>
+        Drie bestanden dekken alles wat moet blijven bestaan: één redactielijst,
+        één versieregel en één uitslag. Er is één schrijver (de workflow), één
+        lezer (de browser), geen gebruiker die inlogt en geen gegeven per persoon.
+        Een database zou hier alleen beheer toevoegen.</p>
+
+      <div class="kolommen">
+        <div>
+          <h3>Minimaal bewaren — dit en niet meer</h3>
+          <ol>
+            <li><b>data/uitzonderingen.txt</b>
+              <span class="waarom">Redactiekennis die groeit met het gebruik. Zonder deze lijst
+                begint elke crawl weer bij 614 meldingen in plaats van 42.</span></li>
+            <li><b>data/opentaal.sha256</b>
+              <span class="waarom">Eén regel. Zonder vastgelegde versie weet je bij een andere
+                uitslag niet of de site veranderde of de woordenlijst.</span></li>
+            <li><b>docs/resultaten.json</b>
+              <span class="waarom">De laatste uitslag, inclusief de URL, de titel en het citaat
+                per bevinding. Anders moet een meelezende collega eerst zelf crawlen.</span></li>
+          </ol>
+        </div>
+        <div>
+          <h3>Niet bewaren — mag na de run weg</h3>
+          <ul>
+            <li><b>Pagina-HTML en de tekst uit <code>&lt;main&gt;</code></b>
+              <span class="waarom">Het CMS is de bron van waarheid; een kopie is bij de volgende publicatie al fout.</span></li>
+            <li><b>Sitemap-URL's en robots-regels</b>
+              <span class="waarom">Per run opnieuw lezen. Een gekopieerde robots.txt betekent crawlen op verouderde toestemming.</span></li>
+            <li><b>De OpenTaal-woordenlijst zelf</b>
+              <span class="waarom">413.937 woorden van iemand anders, met een eigen licentie en eigen ritme. De vingerafdruk volstaat.</span></li>
+            <li><b>Filterwaarden, tabbladkeuze, namentelling, klembord</b>
+              <span class="waarom">Werkgeheugen van de browser. Na F5 staan de filters weer leeg, en dat is prima.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="drempels">
+        <h3 style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gedempt);border-bottom:1px solid var(--lijn);padding-bottom:6px;margin:0 0 4px;">Keuzes die nog openstaan</h3>
+        <ul>
+          <li data-nr="01"><b>Mogen de bevindingen publiek blijven staan?</b> Besluit 3 uit
+            OVERDRACHT.md. Het zijn citaten uit openbare pagina's, maar zodra iemand hier
+            conceptteksten of interne pagina's in wil, klopt de hele opzet niet meer.</li>
+          <li data-nr="02"><b>Blijft de uitslag een commit, of wordt het een los artefact?</b>
+            Op 14 september gaf een crawl op twee branches een merge-conflict. Werkbaar voor
+            één persoon, niet voor twee.</li>
+          <li data-nr="03"><b>Komt er een lijst met goedgekeurde namen?</b> Dan krimpt het
+            namentabblad per crawl tot alleen nieuwe namen. Eerst de vraag: gaat iemand hem bijhouden?</li>
+          <li data-nr="04"><b>Wil de redactie trends over tijd zien?</b> Nu bewaart de app alleen
+            de laatste crawl. Dit is het eerste echte argument voor een database — en het staat
+            bewust op de lijst van wat er niet in zit.</li>
+          <li data-nr="05"><b>Moet een bevinding afgevinkt kunnen worden?</b> Aanname van mij: bij
+            42 meldingen en één redacteur niet nodig. Bij twee mensen wel, en dán heb je gedeelde opslag nodig.</li>
+          <li data-nr="06"><b>Moeten de filters onthouden worden?</b> Dat zou localStorage zijn —
+            dus opslag, geen werkgeheugen. Het overleeft het sluiten van het tabblad en staat per
+            browser en per apparaat anders.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Hoe je dit leest.</b> Deze pagina beschrijft alleen; er is niets aan de
+      werking van de app veranderd en er is geen database aangemaakt. Waar ik iets
+      invul dat niet in STRATEGY.md, OVERDRACHT.md of de code staat, staat het
+      gemarkeerd als <span class="badge badge-status" data-status="aanname" style="display:inline-block">Aanname</span>.</p>
+    <p><b>Voorbeeldwaarden.</b> De getallen komen uit de crawl van 14 september 2026
+      (50 reisadviespagina's, 614 meldingen, 42 spelfouten, 315 ontdubbelde namen).
+      Voorbeeldinvoer is fictief. Er staan geen sleutels, wachtwoorden of
+      persoonsgegevens in dit bestand — de app heeft die ook niet nodig.</p>
+  </footer>
+
+</main>
+
+<script>
+/* --------------------------------------------------------------------------
+   Eén bron voor het diagram én de matrix: dezelfde namen, dezelfde nummers,
+   dezelfde keuzes. Wie een oordeel wil veranderen, verandert het hier.
+   soorten knopen: persoon | extern | app | opslag | scherm | geen
+   categorie:      duurzaam | tijdelijk | extern | keuze
+   status:         gebouwd | strategie | aanname
+   -------------------------------------------------------------------------- */
+const FASES = [
+  { letter: "A", titel: "Starten", toelichting: "De redacteur drukt op de knop. Er draait niets vanzelf." },
+  { letter: "B", titel: "Ophalen", toelichting: "Wat de app bij anderen leest, met toestemming en met een pauze." },
+  { letter: "C", titel: "Toetsen", toelichting: "Woord voor woord, in het geheugen van de runner." },
+  { letter: "D", titel: "Vastleggen", toelichting: "Het enige moment waarop de app iets van zichzelf wegschrijft." },
+  { letter: "E", titel: "Tonen", toelichting: "Alles in de browser van de lezer. Niets wordt daar bewaard." },
+  { letter: "F", titel: "Terugkoppelen", toelichting: "De weg terug loopt via een mens, niet via de app." },
+  { letter: "G", titel: "Alleen in de strategie of nog te beslissen", toelichting: "Niet gebouwd. Hier hoort de vraag, niet het antwoord." }
+];
+
+const STROMEN = [
+/* ---------------- A. Starten ---------------- */
+{
+  nr: 1, fase: "A", status: "gebouwd", categorie: "tijdelijk",
+  naam: "Crawlopdracht: welk deel van de site, hoeveel pagina's",
+  route: [
+    { s:"persoon", t:"Webredacteur" },
+    { l:"bron = reisadvies, max_paginas = 50, opentaal_ref = master", crud:null },
+    { s:"app", t:"De startknop", sub:"crawl.yml · Run workflow" },
+    { l:"argumenten --bron en --max-paginas", crud:null },
+    { s:"app", t:"De crawler", sub:"scripts/crawl.py" }
+  ],
+  waar: "GitHub Actions, een externe dienst",
+  nu: "Niet apart opgeslagen. De gekozen bron en het aantal pagina's komen wel mee in resultaten.json.",
+  advies: "Zo laten.",
+  herladen: "Niets. Wat je ervan terug wilt zien, staat al in de uitslag.",
+  reden: "Een opdracht geldt één keer. De redacteur bepaalt per keer opnieuw wat hij wil laten nakijken — dat is de hele aanpak uit STRATEGY.md."
+},
+{
+  nr: 2, fase: "A", status: "gebouwd", categorie: "extern",
+  naam: "Crawlregels uit robots.txt",
+  route: [
+    { s:"extern", t:"robots.txt van de site", sub:"www.nederlandwereldwijd.nl/robots.txt" },
+    { l:"Disallow: /zoeken?* en /api/*", crud:null },
+    { s:"app", t:"Toestemmingscontrole", sub:"maak_robots_controle()" },
+    { l:"per URL: mag wel of mag niet", crud:null },
+    { s:"app", t:"De ophaallus" }
+  ],
+  waar: "Gelezen bij de externe bron, per run",
+  nu: "Niet gekopieerd. Overgeslagen URL's komen wel in het logboek en in overgeslagen_urls.",
+  advies: "Niet kopiëren.",
+  herladen: "Niets van de regels zelf.",
+  reden: "Een gekopieerde robots.txt veroudert stil. Dan crawl je op toestemming van vorige maand — precies wat je bij een site van Buitenlandse Zaken niet wilt."
+},
+/* ---------------- B. Ophalen ---------------- */
+{
+  nr: 3, fase: "B", status: "gebouwd", categorie: "extern",
+  naam: "Lijst met pagina-URL's uit de sitemap",
+  route: [
+    { s:"extern", t:"Sitemap van het gekozen deel", sub:"/reisadvies/sitemap.xml" },
+    { l:"alle <loc>-regels", crud:null },
+    { s:"app", t:"Sitemap lezen", sub:"lees_sitemap()" },
+    { l:"de eerste 50 die robots.txt toestaat", crud:null },
+    { s:"app", t:"De ophaallus" }
+  ],
+  waar: "Gelezen bij de externe bron, per run",
+  nu: "Niet bewaard.",
+  advies: "Niet bewaren.",
+  herladen: "Niets.",
+  reden: "De sitemap is de actuele waarheid over welke pagina's er zijn. Een eigen kopie mist juist de nieuwe pagina's — en dat zijn de pagina's waar de verse fouten in zitten."
+},
+{
+  nr: 4, fase: "B", status: "gebouwd", categorie: "extern",
+  naam: "De HTML van een pagina",
+  route: [
+    { s:"extern", t:"Pagina op de site", sub:"/reisadvies/afghanistan" },
+    { l:"volledige HTML · User-Agent SpellingSpeurneus/0.1 · een halve seconde pauze", crud:null },
+    { s:"app", t:"Ophalen", sub:"haal_op()" },
+    { l:"HTML als tekst in het geheugen van de runner", crud:null },
+    { s:"app", t:"Tekst uitpakken", sub:"tekst_uit_main()" }
+  ],
+  waar: "Geheugen van de runner, per pagina",
+  nu: "Niets bewaard. De HTML wordt na de pagina losgelaten.",
+  advies: "Niet bewaren.",
+  herladen: "Niets.",
+  reden: "Het CMS van de site is de bron van waarheid. Een kopie van de pagina is bij de volgende publicatie alweer fout, en de redacteur corrigeert toch in het CMS zelf."
+},
+{
+  nr: 5, fase: "B", status: "gebouwd", categorie: "extern",
+  naam: "De OpenTaal-woordenlijst",
+  route: [
+    { s:"extern", t:"OpenTaal", sub:"raw.githubusercontent.com/OpenTaal" },
+    { l:"wordlist.txt · 413.937 woorden · per run opgehaald", crud:null },
+    { s:"opslag", t:"Schijf van de runner", sub:"data/woordenlijst.txt · staat in .gitignore" },
+    { l:"ingelezen als verzameling woordvormen", crud:null },
+    { s:"app", t:"De spellingtoets", sub:"is_bekend()" }
+  ],
+  waar: "Tijdelijk op de runner; de bron blijft bij OpenTaal",
+  nu: "Wordt per run opgehaald en verdwijnt met de runner. Bewust in .gitignore.",
+  advies: "Zo houden.",
+  herladen: "Niets — de runner wordt na de run opgeruimd, en dat is de bedoeling.",
+  reden: "Andermans lijst met een eigen licentie en een eigen ritme van bijwerken. Kopiëren betekent onderhouden, en de app wint er niets mee."
+},
+{
+  nr: 6, fase: "B", status: "gebouwd", categorie: "duurzaam",
+  naam: "Vingerafdruk van de woordenlijst (sha256)",
+  route: [
+    { s:"app", t:"De startknop", sub:"crawl.yml · sha256sum" },
+    { l:"gezien: 12e5fb5e…7be", crud:"R" },
+    { s:"opslag", t:"Vastgelegde versie", sub:"data/opentaal.sha256" },
+    { l:"gelijk? anders een waarschuwing in de run", crud:null },
+    { s:"extern", t:"Logboek van de run", sub:"GitHub Actions" }
+  ],
+  waar: "Bestand in de eigen git-repository",
+  nu: "Eén regel in de repo, vastgelegd op 14 september 2026.",
+  advies: "Duurzaam bewaren. Eén regel, groot effect.",
+  herladen: "Blijft staan.",
+  reden: "Zonder vastgelegde versie weet je bij een afwijkende uitslag niet of de site is veranderd of de woordenlijst. Dat onderscheid is het verschil tussen een echte vondst en ruis."
+},
+/* ---------------- C. Toetsen ---------------- */
+{
+  nr: 7, fase: "C", status: "gebouwd", categorie: "tijdelijk",
+  naam: "De leesbare tekst uit het <main>-element",
+  route: [
+    { s:"app", t:"HTML in het geheugen" },
+    { l:"script en style eruit, tags eruit, entiteiten terug, witruimte samengetrokken", crud:null },
+    { s:"app", t:"Platte paginatekst" },
+    { l:"gesplitst op zinnen en op ( ) [ ] en /", crud:null },
+    { s:"app", t:"Losse woorden", sub:"zoek_fouten()" }
+  ],
+  waar: "Geheugen van de runner",
+  nu: "Niets bewaard.",
+  advies: "Niet bewaren.",
+  herladen: "Niets. Uit de pagina opnieuw af te leiden.",
+  reden: "Tussenresultaat. Bewaren zou betekenen dat een oude tekst en een nieuwe regel uit soort_van() door elkaar gaan lopen.",
+  let: "Aanname in de code: alleen <main> is redactionele content — menu's, voetteksten en cookiemeldingen blijven buiten beeld. Verandert de site van structuur, dan breekt deze stap als eerste. Zo staat het ook bij de bekende beperkingen in OVERDRACHT.md."
+},
+{
+  nr: 8, fase: "C", status: "gebouwd", categorie: "duurzaam",
+  naam: "Goedgekeurde woorden (de uitzonderingenlijst)",
+  route: [
+    { s:"opslag", t:"Uitzonderingenlijst", sub:"data/uitzonderingen.txt" },
+    { l:"circa 185 woorden, kleingemaakt", crud:"R" },
+    { s:"app", t:"Samengevoegd tot één toetslijst", sub:"woordenlijst + uitzonderingen" },
+    { l:"woord staat erin, dus geen melding", crud:null },
+    { s:"app", t:"De spellingtoets", sub:"is_bekend()" }
+  ],
+  waar: "Bestand in de eigen git-repository",
+  nu: "Duurzaam, en met de hand bijgehouden door de redactie.",
+  advies: "Duurzaam bewaren. Dit is het enige gegeven dat de app echt niet kan missen.",
+  herladen: "Blijft staan, en moet blijven staan.",
+  reden: "Redactiekennis, geen techniek: er staan huisstijlkeuzes in, zoals dat NederlandWereldwijd altijd lhbtiq+ schrijft. Zonder deze lijst begint elke crawl weer bij 614 meldingen in plaats van 42."
+},
+{
+  nr: 9, fase: "C", status: "gebouwd", categorie: "tijdelijk",
+  naam: "De indeling spelfout of naam",
+  route: [
+    { s:"app", t:"Onbekend woord plus de zin eromheen" },
+    { l:"hoofdletter middenin de zin? dan een naam · vergeten spatie gaat voor", crud:null },
+    { s:"app", t:"De indeelregel", sub:"soort_van()" },
+    { l:"soort = spelfout of soort = naam", crud:null },
+    { s:"app", t:"De bevinding" }
+  ],
+  waar: "Geheugen van de runner; de uitkomst gaat mee in de bevinding",
+  nu: "De regel staat in de code, de uitkomst per bevinding in resultaten.json.",
+  advies: "Zo laten: de uitkomst meeschrijven, de regel niet.",
+  herladen: "De indeling blijft per bevinding bewaard.",
+  reden: "Doordat het oordeel per bevinding wordt meegeschreven, kan het scherm anders worden ingericht zonder opnieuw te crawlen. Zo staat besluit 1 er ook in: terug te draaien."
+},
+/* ---------------- D. Vastleggen ---------------- */
+{
+  nr: 10, fase: "D", status: "gebouwd", categorie: "duurzaam",
+  naam: "De bevinding: woord, soort, URL en paginatitel",
+  route: [
+    { s:"app", t:"De spellingtoets", sub:"zoek_fouten() + soort_van()" },
+    { l:"woord, soort, url, titel", crud:"C · U" },
+    { s:"opslag", t:"Uitslagbestand", sub:"docs/resultaten.json" },
+    { l:"commit door github-actions[bot], daarna push", crud:"U" },
+    { s:"opslag", t:"Git-repository", sub:"nww-team/SpellingSpeurneus" }
+  ],
+  waar: "Bestand in de eigen git-repository",
+  nu: "Eén document met alleen de laatste crawl. Elke volgende crawl overschrijft het geheel.",
+  advies: "Duurzaam bewaren, maar als één document. Geen historie zolang niemand trends wil zien.",
+  herladen: "Blijft staan — dit is wat het scherm laat zien.",
+  reden: "Zonder dit bestand moet elke lezer eerst zelf een crawl starten. Juist het acceptatiecriterium 'een collega zonder account ziet de resultaten' hangt hieraan."
+},
+{
+  nr: 11, fase: "D", status: "gebouwd", categorie: "keuze",
+  naam: "Het zin-citaat bij een bevinding (maximaal 200 tekens)",
+  route: [
+    { s:"app", t:"Platte paginatekst" },
+    { l:"de zin waarin het woord staat, afgekapt op 200 tekens", crud:"C · U" },
+    { s:"opslag", t:"Uitslagbestand", sub:"veld context in resultaten.json" },
+    { l:"publieke repository en GitHub Pages", crud:"R" },
+    { s:"persoon", t:"Iedereen met de link" }
+  ],
+  waar: "Bestand in de eigen git-repository, publiek zichtbaar",
+  nu: "Duurzaam en publiek. Het is een gedeeltelijke kopie van de site.",
+  advies: "Bewaren — zonder de zin is een melding niet te beoordelen. Maar de publieke kant is een keuze.",
+  herladen: "Blijft staan.",
+  reden: "De redacteur kan alleen beoordelen of 'mahram' fout is als hij de zin erbij ziet. Het citaat is dus geen luxe maar de kern van de melding.",
+  vraag: "Besluit 3 uit OVERDRACHT.md: mogen citaten uit de site publiek blijven staan? Nu wel, het zijn openbare pagina's. Zodra hier conceptteksten of afgeschermde pagina's in komen, klopt deze opzet niet meer."
+},
+{
+  nr: 12, fase: "D", status: "gebouwd", categorie: "keuze",
+  naam: "De manier waarop de uitslag wordt vastgelegd",
+  route: [
+    { s:"app", t:"De crawler", sub:"scripts/crawl.py" },
+    { l:"resultaten.json geschreven en overschreven", crud:"U" },
+    { s:"app", t:"De startknop", sub:"git commit en git push" },
+    { l:"nieuwe versie op de branch", crud:"C · U" },
+    { s:"opslag", t:"Git-repository en GitHub Pages" }
+  ],
+  waar: "Eigen git-repository",
+  nu: "De workflow commit het bestand terug naar de branch waarop hij draait.",
+  advies: "Voor één persoon prima. Zodra er twee mensen zijn, hoort de uitslag een los artefact te zijn.",
+  herladen: "Blijft staan; de git-geschiedenis houdt bovendien alle oude versies bij, ook als je dat niet vraagt.",
+  reden: "Het ontwerppunt uit OVERDRACHT.md: op 14 september draaide er op twee branches een crawl, en dat gaf een merge-conflict.",
+  vraag: "Blijft de uitslag een commit in de repository, of wordt het een los artefact van de run?"
+},
+{
+  nr: 13, fase: "D", status: "gebouwd", categorie: "tijdelijk",
+  naam: "Het logboek van de run",
+  route: [
+    { s:"app", t:"Crawler en workflow", sub:"print() en echo" },
+    { l:"voortgang, overgeslagen URL's, waarschuwing over de woordenlijst", crud:null },
+    { s:"extern", t:"Logboek van de run", sub:"GitHub Actions" },
+    { l:"opgezocht als iemand wil weten wat er gebeurde", crud:null },
+    { s:"persoon", t:"Webredacteur" }
+  ],
+  waar: "Bij GitHub, niet in eigen opslag",
+  nu: "Blijft bij GitHub staan zolang de standaardbewaartermijn loopt.",
+  advies: "Niets mee doen. Wat je echt moet kunnen terugvinden — de overgeslagen URL's — staat al in resultaten.json.",
+  herladen: "Blijft ongeveer 90 dagen bij GitHub staan.",
+  reden: "Het logboek is verantwoording achteraf, geen gegeven waar de app op draait.",
+  let: "Aanname: de bewaartermijn van 90 dagen is de standaardinstelling van GitHub Actions. Nergens in deze repository is dat vastgelegd of bewust gekozen."
+},
+/* ---------------- E. Tonen ---------------- */
+{
+  nr: 14, fase: "E", status: "gebouwd", categorie: "tijdelijk",
+  naam: "De uitslag laden in het scherm",
+  route: [
+    { s:"opslag", t:"Uitslagbestand via Pages", sub:"nww-team.github.io/SpellingSpeurneus/" },
+    { l:"fetch(\"resultaten.json?t=\" + Date.now())", crud:"R" },
+    { s:"scherm", t:"Browsergeheugen", sub:"variabele bevindingen" },
+    { l:"tabellen opbouwen", crud:null },
+    { s:"scherm", t:"Tabbladen Spelfouten en Namen" }
+  ],
+  waar: "Lezen van een bestand; er is geen database om van te lezen",
+  nu: "In het geheugen van het tabblad. Er wordt niets in de browser opgeslagen.",
+  advies: "Zo laten.",
+  herladen: "Niets. Bij elke herlading opnieuw opgehaald — de ?t= zorgt dat het de verse versie is.",
+  reden: "Bij 614 bevindingen is opnieuw ophalen sneller dan bijhouden of je kopie nog klopt. En na een nieuwe crawl wil je juist de nieuwe uitslag zien."
+},
+{
+  nr: 15, fase: "E", status: "gebouwd", categorie: "tijdelijk",
+  naam: "Filterwaarden en het gekozen tabblad",
+  route: [
+    { s:"persoon", t:"Webredacteur" },
+    { l:"typt \"reisadvies\" bij URL, \"aanvra\" bij woord, klikt op Namen", crud:null },
+    { s:"scherm", t:"Invoervelden en tabbladstand" },
+    { l:"filteren in het geheugen, zonder de server", crud:null },
+    { s:"scherm", t:"Zichtbare rijen" }
+  ],
+  waar: "Alleen in het geopende tabblad",
+  nu: "Nergens opgeslagen. Het scherm gebruikt géén localStorage — ik heb docs/index.html erop nagekeken.",
+  advies: "Zo laten. Wil je ze wél onthouden, lees dan de waarschuwing hiernaast.",
+  herladen: "Niets. Na F5 staan de filters weer leeg.",
+  reden: "Een filter hoort bij het moment van kijken, niet bij het gegeven. Leeg beginnen voorkomt ook dat iemand een half gefilterde lijst voor de hele lijst aanziet.",
+  let: "Browseropslag is ook opslag. Zou je de filters willen onthouden met localStorage, dan is dat geen werkgeheugen: het overleeft het sluiten van het tabblad, staat per browser en per apparaat anders, en jij kunt er niet bij om het te corrigeren."
+},
+{
+  nr: 16, fase: "E", status: "gebouwd", categorie: "tijdelijk",
+  naam: "Namen ontdubbelen en per naam de pagina's tellen",
+  route: [
+    { s:"scherm", t:"Bevindingen met soort = naam" },
+    { l:"één regel per naam, verzameling unieke URL's erbij", crud:null },
+    { s:"scherm", t:"Berekening in de browser", sub:"tekenNamen()" },
+    { l:"315 namen met het aantal pagina's", crud:null },
+    { s:"scherm", t:"Tabblad Namen" }
+  ],
+  waar: "Berekening in de browser — geen databaseactie",
+  nu: "Wordt elke keer opnieuw berekend uit de bevindingen.",
+  advies: "Niet opslaan.",
+  herladen: "Niets. Opnieuw berekend.",
+  reden: "De telling is volledig af te leiden uit de bevindingen. Zou je hem opslaan, dan kan hij gaan afwijken van de bevindingen waar hij bij hoort — en dan vertrouwt niemand het getal nog."
+},
+{
+  nr: 17, fase: "E", status: "gebouwd", categorie: "duurzaam",
+  naam: "Meelezen zonder account",
+  route: [
+    { s:"persoon", t:"Meelezende collega" },
+    { l:"opent de publieke pagina, geen inlog", crud:null },
+    { s:"opslag", t:"GitHub Pages", sub:"publieke kopie van docs/" },
+    { l:"index.html en resultaten.json", crud:"R" },
+    { s:"scherm", t:"Het resultatenscherm" }
+  ],
+  waar: "Lezen van bestanden bij GitHub Pages",
+  nu: "Publiek toegankelijk, bevestigd in een privévenster.",
+  advies: "Houden — maar het hangt aan besluit 3 hiernaast (route 11).",
+  herladen: "Er wordt niets weggeschreven; alleen gelezen.",
+  reden: "Het staat als acceptatiecriterium in OVERDRACHT.md: een collega zonder account moet de resultaten kunnen zien. Inloggen en rollen zijn bewust buiten de app gehouden."
+},
+/* ---------------- F. Terugkoppelen ---------------- */
+{
+  nr: 18, fase: "F", status: "gebouwd", categorie: "duurzaam",
+  naam: "Vals alarm goedkeuren: een woord op de uitzonderingenlijst zetten",
+  route: [
+    { s:"scherm", t:"Knop Kopieer als uitzondering" },
+    { l:"het woord naar het klembord", crud:null },
+    { s:"persoon", t:"Webredacteur", sub:"plakt het woord, commit of pull request" },
+    { l:"regel toevoegen, corrigeren of terugtrekken", crud:"C · U · D" },
+    { s:"opslag", t:"Uitzonderingenlijst", sub:"data/uitzonderingen.txt" }
+  ],
+  waar: "Met de hand in de git-repository — niet vanuit het scherm",
+  nu: "Het klembord is de hele koppeling. De app schrijft zelf nergens naartoe.",
+  advies: "Zo laten zolang het één redacteur is.",
+  herladen: "Het woord blijft; de inhoud van het klembord niet.",
+  reden: "Hier zit alle CRUD van de app: toevoegen na vals alarm, corrigeren, en terugtrekken als een woord toch fout blijkt. Een schrijfweg vanuit het scherm betekent een server, inloggen en rollen — precies wat bewust buiten de app is gehouden."
+},
+{
+  nr: 19, fase: "F", status: "gebouwd", categorie: "duurzaam",
+  naam: "Een nieuwe versie van de woordenlijst goedkeuren",
+  route: [
+    { s:"extern", t:"Waarschuwing in de run", sub:"gezien ≠ vastgelegd" },
+    { l:"OpenTaal heeft de lijst gewijzigd", crud:null },
+    { s:"persoon", t:"Webredacteur of beheerder", sub:"kijkt na of de nieuwe lijst klopt" },
+    { l:"nieuwe sha256 overnemen", crud:"U" },
+    { s:"opslag", t:"Vastgelegde versie", sub:"data/opentaal.sha256" }
+  ],
+  waar: "Met de hand in de git-repository",
+  nu: "De run waarschuwt maar gaat door; iemand moet er daarna naar kijken.",
+  advies: "Zo laten. Doorgaan met een waarschuwing is beter dan een crawl die afbreekt.",
+  herladen: "Blijft staan.",
+  reden: "Iemand moet bewust zeggen: hieraan toetsen wij nu. Anders verschuift de norm stilletjes en denk je dat de site is veranderd."
+},
+/* ---------------- G. Strategie en open vragen ---------------- */
+{
+  nr: 20, fase: "G", status: "strategie", categorie: "keuze",
+  naam: "Een lijst met goedgekeurde namen",
+  route: [
+    { s:"scherm", t:"Tabblad Namen", sub:"315 namen, grotendeels elke crawl dezelfde" },
+    { l:"naam goedkeuren", crud:"C" },
+    { s:"geen", t:"Nog niet gebouwd", sub:"bijvoorbeeld data/namen-goedgekeurd.txt" },
+    { l:"volgende crawl toont alleen nieuwe namen", crud:"R" },
+    { s:"app", t:"De spellingtoets" }
+  ],
+  waar: "Zou een bestand in de eigen repository worden, net als uitzonderingen.txt",
+  nu: "Bestaat niet. Bewust uitgesteld in besluit 1 van OVERDRACHT.md.",
+  advies: "Nog niet bouwen. Eerst een eigenaar, dan pas een lijst.",
+  herladen: "Zou blijven staan, net als de uitzonderingen.",
+  reden: "Het namentabblad krimpt er flink van, maar alleen als iemand hem echt bijhoudt. Zonder eigenaar groeit zo'n lijst één keer en daarna nooit meer.",
+  vraag: "Gaat de webredactie deze lijst echt onderhouden? Zo niet, dan is het namentabblad met 315 regels het eerlijkere antwoord."
+},
+{
+  nr: 21, fase: "G", status: "strategie", categorie: "keuze",
+  naam: "Historie van crawls, om trends te zien",
+  route: [
+    { s:"app", t:"Elke nieuwe crawl" },
+    { l:"overschrijft resultaten.json volledig", crud:"U" },
+    { s:"opslag", t:"Alleen de laatste uitslag" },
+    { l:"oudere uitslagen alleen nog in de git-geschiedenis", crud:null },
+    { s:"geen", t:"Geen overzicht over tijd" }
+  ],
+  waar: "Zou de eerste echte reden voor een database zijn",
+  nu: "De app bewaart alleen de laatste crawl. Trends staan op de lijst 'wat er bewust niet in zit'.",
+  advies: "Nog niet bouwen. Wacht tot iemand de vraag stelt of het beter wordt.",
+  herladen: "Nu: alleen de laatste crawl. De git-geschiedenis heeft de oude bestanden wel, maar daar kun je niet op filteren of in tellen.",
+  reden: "Twee crawls over hetzelfde deel vergelijken is de enige manier om te laten zien dat de kwaliteit vooruitgaat. Dat is een echte vraag, maar nog niet gesteld.",
+  vraag: "Wil de redactie kunnen zien of het beter wordt? Pas dan is er een reden om per crawl iets te bewaren — en pas dan is een database te verdedigen."
+},
+{
+  nr: 22, fase: "G", status: "aanname", categorie: "keuze",
+  naam: "Een bevinding afvinken als nagekeken",
+  route: [
+    { s:"persoon", t:"Webredacteur", sub:"heeft 42 meldingen nagelopen" },
+    { l:"dit is geen fout / deze heb ik gecorrigeerd", crud:"C · U" },
+    { s:"geen", t:"Nog niet gebouwd", sub:"status per bevinding, over crawls heen" },
+    { l:"scherm toont alleen wat nog openstaat", crud:"R" },
+    { s:"scherm", t:"Tabblad Spelfouten" }
+  ],
+  waar: "Zou gedeelde opslag nodig hebben, dus echt een database",
+  nu: "Bestaat niet en is ook nergens gevraagd.",
+  advies: "Niet bouwen bij één redacteur en 42 meldingen.",
+  herladen: "Zou moeten blijven — en per persoon verschillen, wat het meteen ingewikkeld maakt.",
+  reden: "Dit is de enige plek waar de gebruiker zelf gegevens zou aanmaken en wijzigen. Daarom noem ik het, ook al staat het nergens.",
+  let: "Aanname van mij: dit staat niet in STRATEGY.md en niet in OVERDRACHT.md. Ik noem het omdat het het tweede echte argument voor een database zou zijn — zodra twee mensen dezelfde lijst nalopen.",
+  vraag: "Moet bijgehouden worden wie wat al heeft nagekeken? Bij één redacteur waarschijnlijk niet; bij twee wel."
+},
+{
+  nr: 23, fase: "G", status: "strategie", categorie: "extern",
+  naam: "De correctie doorvoeren in de site",
+  route: [
+    { s:"scherm", t:"Bevinding met de zin erbij" },
+    { l:"de redacteur ziet de fout en de pagina", crud:null },
+    { s:"persoon", t:"Webredacteur" },
+    { l:"corrigeert in het CMS — buiten deze app om", crud:null },
+    { s:"extern", t:"CMS van de site" }
+  ],
+  waar: "In het CMS, een externe bron",
+  nu: "Er is geen weg terug vanuit de app; dat staat zo op de lijst van wat er bewust niet in zit.",
+  advies: "Zo laten. De app leest de site, hij schrijft er niet in.",
+  herladen: "De correctie leeft verder in het CMS; de app merkt hem pas bij de volgende crawl.",
+  reden: "Terugschrijven naar het CMS zou rechten, inloggen en een koppeling vragen. Dat maakt van een leesbaar hulpmiddel een systeem dat beheerd moet worden."
+}
+];
+
+/* -------------------------------------------------------------------------- */
+const catNaam  = { duurzaam:"Duurzaam bewaren", tijdelijk:"Tijdelijk", extern:"Staat al elders", keuze:"Keuze nodig" };
+const statNaam = { gebouwd:"Gebouwd", strategie:"Alleen in de strategie", aanname:"Aanname" };
+const soortNaam= { persoon:"Persoon", extern:"Externe bron", app:"App", opslag:"Opslag", scherm:"Scherm", geen:"Nog niet gebouwd" };
+
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const kleuren = c => `--kleur:var(--${c});--kleurvlak:var(--${c}vlak)`;
+
+function knoopHtml(k) {
+  return `<div class="knoop k-${k.s}">
+      <span class="soort">${esc(soortNaam[k.s])}</span>
+      <span class="titel">${esc(k.t)}</span>
+      ${k.sub ? `<span class="sub">${esc(k.sub)}</span>` : ""}
+    </div>`;
+}
+
+function pijlHtml(p) {
+  const label = p.crud
+    ? `<span class="crud crud-actie">${esc(p.crud)}</span>`
+    : `<span class="crud crud-geen">geen databaseactie</span>`;
+  return `<div class="pijl">
+      <span class="lijn" aria-hidden="true"><span class="punt">&#9654;</span></span>
+      <span class="etiket">${esc(p.l)}</span>
+      ${label}
+    </div>`;
+}
+
+function stroomHtml(s) {
+  const route = s.route.map(deel => deel.l !== undefined ? pijlHtml(deel) : knoopHtml(deel)).join("");
+  const notities = [
+    s.let   ? `<div class="notitie let"><span class="kopje">Let op</span>${esc(s.let)}</div>` : "",
+    s.vraag ? `<div class="notitie" style="${kleuren("keuze")}"><span class="kopje">Vraag die we moeten beantwoorden</span>${esc(s.vraag)}</div>` : ""
+  ].join("");
+  return `<article class="stroom" data-nr="${s.nr}" style="${kleuren(s.categorie)}">
+    <div class="stroomkop">
+      <span class="nummer">${String(s.nr).padStart(2,"0")}</span>
+      <span class="stroomnaam">${esc(s.naam)}</span>
+      <span class="badge badge-cat">${esc(catNaam[s.categorie])}</span>
+      <span class="badge badge-status" data-status="${s.status}">${esc(statNaam[s.status])}</span>
+    </div>
+    <div class="route">${route}</div>
+    ${notities}
+    <div class="feiten">
+      <div class="feit"><span class="eyebrow">Nu opgeslagen</span><p>${esc(s.nu)}</p></div>
+      <div class="feit"><span class="eyebrow">Mijn advies</span><p>${esc(s.advies)}</p></div>
+      <div class="feit"><span class="eyebrow">Na afsluiten of herladen</span><p>${esc(s.herladen)}</p></div>
+    </div>
+  </article>`;
+}
+
+function matrixHtml(s) {
+  const knopen = s.route.filter(d => d.l === undefined);
+  const bron = knopen[0], best = knopen[knopen.length - 1];
+  const midden = knopen.slice(1, -1).map(k => esc(k.t)).join(" &rarr; ") || "&mdash;";
+  const cruds = s.route.filter(d => d.l !== undefined && d.crud).map(d => d.crud);
+  const crud = cruds.length ? cruds.join(" &middot; ") : "geen databaseactie";
+  return `<tr data-nr="${s.nr}" style="${kleuren(s.categorie)}">
+    <td data-label="Gegeven"><span class="nr">${String(s.nr).padStart(2,"0")}</span>
+      <span class="gegeven">${esc(s.naam)}</span>
+      <span class="badge badge-status" data-status="${s.status}" style="display:inline-block;margin-top:6px">${esc(statNaam[s.status])}</span></td>
+    <td data-label="Route" class="pad"><b>${esc(bron.t)}</b><br>&rarr; ${midden}<br>&rarr; <b>${esc(best.t)}</b></td>
+    <td data-label="CRUD" class="kolom-crud">${crud}</td>
+    <td data-label="Waar">${esc(s.waar)}</td>
+    <td data-label="Opslagkeuze"><span class="badge badge-cat">${esc(catNaam[s.categorie])}</span>
+      <span class="keuzeregel"><span class="k">Nu</span> ${esc(s.nu)}</span>
+      <span class="keuzeregel"><span class="k">Advies</span> ${esc(s.advies)}</span>
+      ${s.vraag ? `<span class="keuzeregel"><span class="k" style="color:var(--keuze)">Vraag</span> ${esc(s.vraag)}</span>` : ""}</td>
+    <td data-label="Na herladen">${esc(s.herladen)}</td>
+    <td data-label="Reden">${esc(s.reden)}</td>
+  </tr>`;
+}
+
+/* --- opbouwen --- */
+const fasesVak = document.getElementById("fases");
+fasesVak.innerHTML = FASES.map(f => {
+  const eigen = STROMEN.filter(s => s.fase === f.letter);
+  return `<div class="fase" data-fase="${f.letter}">
+    <div class="fasekop">
+      <span class="letter">Fase ${f.letter}</span>
+      <h3>${esc(f.titel)}</h3>
+      <span class="toelichting">${esc(f.toelichting)}</span>
+    </div>
+    ${eigen.map(stroomHtml).join("")}
+  </div>`;
+}).join("");
+document.getElementById("matrixrijen").innerHTML = STROMEN.map(matrixHtml).join("");
+
+/* --- filters --- */
+let opslagfilter = "alles";
+let alleenGebouwd = false;
+
+function inFilter(s, filter) {
+  if (filter === "db")   return s.categorie === "duurzaam" || s.categorie === "keuze";
+  if (filter === "geen") return s.categorie === "tijdelijk" || s.categorie === "extern" || s.categorie === "keuze";
+  return true;
+}
+const zichtbaar = s => inFilter(s, opslagfilter) && (!alleenGebouwd || s.status === "gebouwd");
+
+function teken() {
+  let aantal = 0;
+  for (const s of STROMEN) {
+    const toon = zichtbaar(s);
+    if (toon) aantal++;
+    for (const el of document.querySelectorAll(`[data-nr="${s.nr}"]`)) el.hidden = !toon;
+  }
+  for (const f of FASES) {
+    const leeg = !STROMEN.some(s => s.fase === f.letter && zichtbaar(s));
+    document.querySelector(`.fase[data-fase="${f.letter}"]`).hidden = leeg;
+  }
+  document.body.classList.toggle("niets", aantal === 0);
+  for (const knop of document.querySelectorAll("#opslagfilter button")) {
+    const f = knop.dataset.filter;
+    knop.setAttribute("aria-pressed", String(f === opslagfilter));
+    knop.querySelector(".n").textContent =
+      STROMEN.filter(s => inFilter(s, f) && (!alleenGebouwd || s.status === "gebouwd")).length;
+  }
+}
+
+document.getElementById("opslagfilter").addEventListener("click", e => {
+  const knop = e.target.closest("button[data-filter]");
+  if (!knop) return;
+  opslagfilter = knop.dataset.filter;
+  teken();
+});
+document.getElementById("gebouwdschakelaar").addEventListener("change", e => {
+  alleenGebouwd = e.target.checked;
+  teken();
+});
+document.getElementById("crudschakelaar").addEventListener("change", e => {
+  document.body.classList.toggle("toon-crud", e.target.checked);
+});
+teken();
+</script>
+</body>
+</html>
