@@ -5,26 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SpellingSpeurneus</title>
 <style>
+  /* Kleuren in de trant van de Rijkshuisstijl: donkerblauw, hemelblauw,
+     lichtblauw en het gele accent. Benaderd, niet de officiële tokens - die
+     staan in nl-design-system/rijkshuisstijl-community. Bewust géén logo,
+     woordmerk of het Rijksoverheid-lettertype: dit is een hulpmiddel voor de
+     redactie, geen officiële pagina van de Rijksoverheid.
+     Elke tekstkleur is op WCAG AA-contrast getoetst tegen zijn achtergrond. */
   :root {
-    --inkt: #1a1a1a; --gedempt: #5b6570; --lijn: #d8dde3;
-    --grond: #f7f8fa; --vlak: #ffffff; --accent: #154273; --markering: #fdf3d7;
+    --donkerblauw: #154273; --hemelblauw: #007BC7; --lichtblauw: #8FCAE7;
+    --inkt: #1a1a1a; --gedempt: #535353; --lijn: #d4d9e0;
+    --grond: #f0f2f5; --vlak: #ffffff;
+    --accent: var(--donkerblauw); --tabrand: var(--hemelblauw);
+    --markering: #fcf3a5;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --inkt: #e8eaed; --gedempt: #9aa4b0; --lijn: #333a42;
-      --markering: #3a341f;
+      --inkt: #e8eaed; --gedempt: #a7b0ba; --lijn: #3a4048;
+      --grond: #1b1e22; --vlak: #24282e;
+      --accent: var(--lichtblauw); --tabrand: var(--lichtblauw);
+      --markering: #4a4318;
     }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--grond); color: var(--inkt);
          font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
   .omhulsel { max-width: 1000px; margin: 0 auto; padding: 24px 16px 64px; }
+  /* De donkerblauwe balk is het meest herkenbare element van de huisstijl. */
+  .kop { background: var(--donkerblauw); color: #fff;
+         border-bottom: 4px solid var(--hemelblauw); }
+  .kop .omhulsel { padding-block: 20px; }
   h1 { font-size: 1.6rem; margin: 0 0 4px; }
-  .ondertitel { color: var(--gedempt); margin: 0 0 24px; }
+  .ondertitel { color: var(--lichtblauw); margin: 0; }
   .kaart { background: var(--vlak); border: 1px solid var(--lijn);
            border-radius: 8px; padding: 16px; margin-bottom: 20px; }
   .feiten { display: flex; flex-wrap: wrap; gap: 24px; }
-  .feit strong { display: block; font-size: 1.5rem; line-height: 1.2; }
+  .feit strong { display: block; font-size: 1.5rem; line-height: 1.2;
+                 color: var(--accent); }
   .feit span { color: var(--gedempt); font-size: .85rem; }
   .filters { display: flex; flex-wrap: wrap; gap: 12px; }
   .filter { flex: 1 1 220px; }
@@ -33,7 +49,16 @@
     border: 1px solid var(--lijn); border-radius: 6px;
     background: var(--grond); color: var(--inkt); }
   input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .tabbladen { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tabblad { font-size: .95rem; padding: 8px 14px; border-radius: 6px;
+    background: transparent; border: 1px solid transparent; color: var(--gedempt); }
+  .tabblad[aria-selected="true"] { background: var(--vlak); border-color: var(--lijn);
+    color: var(--inkt); font-weight: 600;
+    border-bottom: 3px solid var(--tabrand); border-radius: 6px 6px 0 0; }
+  .tabblad .aantal { color: var(--gedempt); font-weight: 400; }
+  .uitleg { color: var(--gedempt); font-size: .9rem; margin: 0 0 16px; }
   .tabelhouder { overflow-x: auto; }
+  td.telling { color: var(--gedempt); white-space: nowrap; }
   table { width: 100%; border-collapse: collapse; font-size: .95rem; }
   th { text-align: left; font-size: .8rem; text-transform: uppercase;
        letter-spacing: .04em; color: var(--gedempt); font-weight: 600;
@@ -41,14 +66,14 @@
   td { border-bottom: 1px solid var(--lijn); padding: 10px; vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
   .woord { font-weight: 600; white-space: nowrap; }
-  .context mark { background: var(--markering); color: inherit;
+  .context mark { background: var(--markering); color: var(--inkt);
                   font-weight: 600; padding: 0 2px; border-radius: 2px; }
   .bron a { color: var(--accent); word-break: break-word; }
   .bron small { display: block; color: var(--gedempt); }
   button { font: inherit; font-size: .8rem; padding: 4px 8px; cursor: pointer;
     border: 1px solid var(--lijn); border-radius: 5px;
-    background: var(--grond); color: var(--gedempt); white-space: nowrap; }
-  button:hover { color: var(--inkt); border-color: var(--gedempt); }
+    background: var(--grond); color: var(--accent); white-space: nowrap; }
+  button:hover { border-color: var(--accent); background: var(--vlak); }
   .melding { color: var(--gedempt); padding: 24px 10px; text-align: center; }
   footer { color: var(--gedempt); font-size: .85rem; margin-top: 32px;
            border-top: 1px solid var(--lijn); padding-top: 16px; }
@@ -56,10 +81,15 @@
 </style>
 </head>
 <body>
-<div class="omhulsel">
 
-  <h1>SpellingSpeurneus</h1>
-  <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
+<header class="kop">
+  <div class="omhulsel">
+    <h1>SpellingSpeurneus</h1>
+    <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
+  </div>
+</header>
+
+<div class="omhulsel">
 
   <div class="kaart feiten" id="feiten"><span class="melding">Bezig met laden…</span></div>
 
@@ -74,11 +104,36 @@
     </div>
   </div>
 
-  <div class="kaart tabelhouder">
-    <table>
-      <thead><tr><th>Woord</th><th>Zin</th><th>Pagina</th><th></th></tr></thead>
-      <tbody id="rijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
-    </table>
+  <div class="tabbladen" role="tablist">
+    <button type="button" class="tabblad" role="tab" id="tab-spelfouten"
+            aria-controls="paneel-spelfouten" aria-selected="true">
+      Spelfouten <span class="aantal" id="aantal-spelfouten"></span>
+    </button>
+    <button type="button" class="tabblad" role="tab" id="tab-namen"
+            aria-controls="paneel-namen" aria-selected="false" tabindex="-1">
+      Namen <span class="aantal" id="aantal-namen"></span>
+    </button>
+  </div>
+
+  <div id="paneel-spelfouten" role="tabpanel" aria-labelledby="tab-spelfouten">
+    <div class="kaart tabelhouder">
+      <table>
+        <thead><tr><th>Woord</th><th>Zin</th><th>Pagina</th><th></th></tr></thead>
+        <tbody id="rijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="paneel-namen" role="tabpanel" aria-labelledby="tab-namen" hidden>
+    <p class="uitleg">Woorden met een hoofdletter middenin een zin: plaatsen,
+      organisaties en anderstalige bronnen. De woordenlijst kent geen namen, dus
+      ze staan hier allemaal — ook de goede. Elke naam staat één keer.</p>
+    <div class="kaart tabelhouder">
+      <table>
+        <thead><tr><th>Naam</th><th>Pagina's</th><th>Voorbeeld</th><th></th></tr></thead>
+        <tbody id="naamrijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
+      </table>
+    </div>
   </div>
 
   <footer>
@@ -91,10 +146,16 @@
 
 <script>
 const rijenLichaam = document.getElementById("rijen");
+const naamLichaam = document.getElementById("naamrijen");
 const feitenVak = document.getElementById("feiten");
 const urlFilter = document.getElementById("urlfilter");
 const woordFilter = document.getElementById("woordfilter");
+const tabbladen = [...document.querySelectorAll(".tabblad")];
 let bevindingen = [];
+
+// Een bevinding zonder soort komt uit een crawl van voor de scheiding tussen
+// spelfouten en namen. Die tonen we bij de spelfouten, zoals hij toen ook stond.
+const isNaam = b => b.soort === "naam";
 
 function ontsnap(tekst) {
   const hulp = document.createElement("div");
@@ -115,11 +176,25 @@ function korteUrl(url) {
 function toonFeiten(gegevens) {
   const datum = new Date(gegevens.gestart_op).toLocaleString("nl-NL",
     { dateStyle: "medium", timeStyle: "short" });
+  const spelfouten = bevindingen.filter(b => !isNaam(b)).length;
+  // Namen tellen we per uniek woord, want zo staan ze ook in de tabel.
+  const namen = new Set(bevindingen.filter(isNaam).map(b => b.woord)).size;
   feitenVak.innerHTML = `
-    <div class="feit"><strong>${gegevens.aantal_bevindingen}</strong><span>bevindingen</span></div>
+    <div class="feit"><strong>${spelfouten}</strong><span>spelfouten</span></div>
+    <div class="feit"><strong>${namen}</strong><span>namen apart gezet</span></div>
     <div class="feit"><strong>${gegevens.aantal_paginas}</strong><span>pagina's bekeken</span></div>
     <div class="feit"><strong>${ontsnap(gegevens.bron)}</strong><span>deel van de site</span></div>
     <div class="feit"><strong>${datum}</strong><span>laatste crawl</span></div>`;
+}
+
+function knopCel(woord) {
+  return `<td><button type="button" data-woord="${ontsnap(woord)}"
+            title="Kopieer dit woord, om het in data/uitzonderingen.txt te plakken">
+            Kopieer als uitzondering</button></td>`;
+}
+
+function leeg(lichaam, tekst) {
+  lichaam.innerHTML = `<tr><td colspan="4" class="melding">${tekst}</td></tr>`;
 }
 
 function teken() {
@@ -128,13 +203,20 @@ function teken() {
   const zichtbaar = bevindingen.filter(b =>
     b.url.toLowerCase().includes(urlTerm) && b.woord.toLowerCase().includes(woordTerm));
 
-  if (!zichtbaar.length) {
-    rijenLichaam.innerHTML = `<tr><td colspan="4" class="melding">
-      Geen bevindingen die aan het filter voldoen.</td></tr>`;
+  const spelfouten = zichtbaar.filter(b => !isNaam(b));
+  tekenSpelfouten(spelfouten);
+  tekenNamen(zichtbaar.filter(isNaam));
+
+  document.getElementById("aantal-spelfouten").textContent = spelfouten.length;
+}
+
+function tekenSpelfouten(rijen) {
+  if (!rijen.length) {
+    leeg(rijenLichaam, "Geen spelfouten die aan het filter voldoen.");
     return;
   }
 
-  rijenLichaam.innerHTML = zichtbaar.map(b => `
+  rijenLichaam.innerHTML = rijen.map(b => `
     <tr>
       <td class="woord">${ontsnap(b.woord)}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
@@ -144,13 +226,58 @@ function teken() {
           : ontsnap(b.url)}
         <small>${ontsnap(b.titel || "")}</small>
       </td>
-      <td><button type="button" data-woord="${ontsnap(b.woord)}"
-            title="Kopieer dit woord, om het in data/uitzonderingen.txt te plakken">
-            Kopieer als uitzondering</button></td>
+      ${knopCel(b.woord)}
     </tr>`).join("");
 }
 
-rijenLichaam.addEventListener("click", event => {
+// Namen staan één keer in de lijst, met het aantal pagina's erbij. Dezelfde naam
+// komt op reisadviespagina's tientallen keren terug; ontdubbeld is de lijst door
+// te scrollen, terwijl een verkeerd gespelde plaatsnaam op te zoeken blijft.
+function tekenNamen(rijen) {
+  const perNaam = new Map();
+  for (const b of rijen) {
+    if (!perNaam.has(b.woord)) perNaam.set(b.woord, { ...b, paginas: new Set() });
+    perNaam.get(b.woord).paginas.add(b.url);
+  }
+  const namen = [...perNaam.values()]
+    .sort((a, z) => a.woord.localeCompare(z.woord, "nl", { sensitivity: "base" }));
+
+  document.getElementById("aantal-namen").textContent = namen.length;
+  if (!namen.length) {
+    leeg(naamLichaam, "Geen namen die aan het filter voldoen.");
+    return;
+  }
+
+  naamLichaam.innerHTML = namen.map(b => `
+    <tr>
+      <td class="woord">${ontsnap(b.woord)}</td>
+      <td class="telling">${b.paginas.size}</td>
+      <td class="context">${markeer(b.context, b.woord)}</td>
+      ${knopCel(b.woord)}
+    </tr>`).join("");
+}
+
+function kiesTabblad(gekozen) {
+  for (const tab of tabbladen) {
+    const actief = tab === gekozen;
+    tab.setAttribute("aria-selected", String(actief));
+    tab.tabIndex = actief ? 0 : -1;
+    document.getElementById(tab.getAttribute("aria-controls")).hidden = !actief;
+  }
+  gekozen.focus();
+}
+
+for (const [nummer, tab] of tabbladen.entries()) {
+  tab.addEventListener("click", () => kiesTabblad(tab));
+  tab.addEventListener("keydown", gebeurtenis => {
+    const stap = { ArrowLeft: -1, ArrowRight: 1 }[gebeurtenis.key];
+    if (!stap) return;
+    gebeurtenis.preventDefault();
+    kiesTabblad(tabbladen[(nummer + stap + tabbladen.length) % tabbladen.length]);
+  });
+}
+
+document.addEventListener("click", event => {
   const knop = event.target.closest("button[data-woord]");
   if (!knop) return;
   navigator.clipboard.writeText(knop.dataset.woord).then(() => {
@@ -168,9 +295,9 @@ fetch("resultaten.json?t=" + Date.now())
   .then(gegevens => { bevindingen = gegevens.bevindingen || []; toonFeiten(gegevens); teken(); })
   .catch(fout => {
     feitenVak.innerHTML = `<span class="melding">Kan resultaten.json niet laden (${ontsnap(String(fout))}).</span>`;
-    rijenLichaam.innerHTML = `<tr><td colspan="4" class="melding">
-      Er is nog geen crawl gedraaid, of je opent dit bestand rechtstreeks vanaf de schijf.
-      Start een webserver: <code>python3 -m http.server --directory docs 8000</code></td></tr>`;
+    leeg(rijenLichaam, `Er is nog geen crawl gedraaid, of je opent dit bestand rechtstreeks
+      vanaf de schijf. Start een webserver:
+      <code>python3 -m http.server --directory docs 8000</code>`);
   });
 </script>
 </body>

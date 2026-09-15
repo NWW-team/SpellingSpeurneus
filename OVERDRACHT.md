@@ -22,18 +22,43 @@ Alle zes acceptatiecriteria uit het bouwplan zijn gehaald:
 
 Op 50 reisadviespagina's vond de app **acht echte redactionele fouten**:
 `nieet`, `Registeer`, `doodstaf`, `metrologisch`, `doen.n.`, `III.Let`,
-`demonstraties.Volg` en `autorisation`. Naast die acht staan er ongeveer 600
-meldingen die geen fout zijn — zie het openstaande besluit hieronder.
+`demonstraties.Volg` en `autorisation`.
+
+Sinds besluit 1 staan die acht in een lijst van 42 meldingen in plaats van 614:
+namen zijn naar een tweede tabblad verhuisd. Zie "Spelfouten en namen" in
+[README.md](README.md) voor de regel, en `soort_van` in `scripts/crawl.py` voor
+de code.
+
+## Genomen besluiten
+
+**1. De eigennamen — gescheiden, niet weggegooid.** (14 september 2026)
+
+Van de 614 meldingen waren er 573 een plaatsnaam, organisatie of anderstalige
+bronnaam middenin een zin. Drie dingen gaven de doorslag:
+
+- In die 573 zat **geen enkele verkeerd gespelde plaatsnaam**. Alle acht echte
+  fouten waren gewone woorden. De prijs van doorzoeken was gemeten, de
+  opbrengst bleef theoretisch.
+- De app kán een foute plaatsnaam niet herkennen: OpenTaal bevat geen namen,
+  dus `Cochabamba` en een verkeerd gespelde variant krijgen dezelfde melding.
+  Ze allemaal melden levert de redacteur dus geen signaal op — hij zou ze
+  stuk voor stuk moeten natrekken.
+- Er bleek geen uit te leggen middenweg. Filteren op frequentie haalde maar
+  161 van de 614 weg; filteren op naamreeksen (`USGS Earthquake Hazards
+  Program`) liet losse correcte plaatsnamen in opsommingen gewoon staan.
+
+Gekozen is niet voor een schakelaar per crawl maar voor **twee lijsten in
+hetzelfde resultaat**, met spelfouten open bij binnenkomst. Namen staan er
+ontdubbeld (315 in plaats van 573) met het aantal pagina's erbij, dus ze
+blijven na te lopen. De indeling staat per bevinding in `resultaten.json`,
+dus de keuze is terug te draaien zonder opnieuw te crawlen.
+
+Wat nog niet is besloten: of de redactie een **lijst met goedgekeurde namen**
+wil gaan bijhouden, zoals `uitzonderingen.txt` nu voor woorden doet. Dan
+krimpt het namentabblad per crawl tot alleen nieuwe namen. Bewust uitgesteld
+tot duidelijk is of iemand dat onderhoud echt gaat doen.
 
 ## Openstaande besluiten
-
-**1. De eigennamen.** Van de 614 meldingen zijn er 573 een plaatsnaam,
-organisatie of anderstalige bronnaam middenin een zin. Op reisadviespagina's
-is dat onvermijdelijk veel. Hoofdletterwoorden middenin een zin overslaan
-neemt ruim 70% van de ruis weg, maar dan valt een verkeerd gespelde
-plaatsnaam niet meer op — en juist op reisadviezen zijn plaatsnamen
-belangrijk. Dit is een keuze voor de webredactie, niet voor de techniek.
-Het is te bouwen als schakelaar per crawl.
 
 **2. De sitebeheerder inlichten.** `robots.txt` van
 www.nederlandwereldwijd.nl staat crawlen toe, en we houden ons aan de
@@ -47,17 +72,26 @@ Het gaat alleen om citaten uit pagina's die al openbaar zijn, maar het is
 wel een bewuste keuze. Zodra iemand hier interne pagina's of conceptteksten
 in wil, klopt deze opzet niet meer.
 
+Dit besluit werd op 15 september scherper: het scherm heeft nu de kleuren van
+de Rijkshuisstijl. Logo, woordmerk en het Rijksoverheid-lettertype zitten er
+bewust níét in, juist om te voorkomen dat een publieke pagina voor een
+officiële pagina van de Rijksoverheid wordt aangezien. Wie de vormgeving
+verder officieel wil maken, moet dit eerst met de huisstijlbeheerder bij BZ
+afstemmen. Zie "Vormgeving" in [README.md](README.md).
+
 ## Bekende beperkingen
 
 - **`persoons-` uit "persoons- en bagagecontrole"** wordt getoetst als
   `persoons`, en dat is geen los woord. Bij een weglatingsstreepje valt niet
   vast te stellen wat het hele woord had moeten zijn.
-- **Anderstalige eigennamen** worden gemeld: `and` uit "US Customs and
-  Border Protection", `viajeros` uit "Para viajeros". Die staan bewust niet
-  op de uitzonderingenlijst — zie de toelichting onderaan
-  `data/uitzonderingen.txt`. Ze goedkeuren zou betekenen dat een Engels
-  woord middenin een Nederlandse zin nooit meer opvalt, en dat kostte bijna
-  de vondst van `autorisation`.
+- **Anderstalige woorden zonder hoofdletter** blijven bij de spelfouten
+  staan: `and` uit "US Customs and Border Protection", `viajeros` uit "Para
+  viajeros", `floods`, `travel`. Na besluit 1 zijn dit de 34 meldingen die
+  naast de 8 echte fouten overblijven — dus veruit de grootste rest-ruis.
+  Ze staan bewust niet op de uitzonderingenlijst en vallen bewust niet onder
+  de naam-regel: zie de toelichting onderaan `data/uitzonderingen.txt`. Ze
+  goedkeuren zou betekenen dat een Engels woord middenin een Nederlandse zin
+  nooit meer opvalt, en dat kostte bijna de vondst van `autorisation`.
 - **Alleen de tekst in `<main>`** wordt gelezen. Menu's, voetteksten en
   cookiemeldingen blijven buiten beeld. Verandert de site van structuur, dan
   is dit de aanname die als eerste breekt.
@@ -114,8 +148,10 @@ Twee dingen zijn licht, maar wel echt werk:
 **Voordat collega's hierop kunnen vertrouwen:**
 
 1. Het percentage vals alarm moet bekend zijn over meer dan 50 pagina's.
-   Nu weten we: 8 echte fouten op 614 meldingen, waarvan 573 eigennamen.
-   Besluit 1 hierboven bepaalt of dat werkbaar is.
+   Na besluit 1 weten we: 8 echte fouten op 42 spelfoutmeldingen. Dat is één
+   op de vijf en dus na te lopen, maar het is één crawl. Een tweede crawl over
+   een ander deel van de site moet dat bevestigen — en laten zien of de
+   hoofdletterregel daar net zo goed uitpakt als op reisadviezen.
 2. Afspraak met de beheerder van de website (besluit 2).
 3. Besluit over publiek publiceren (besluit 3).
 4. Iemand die het onderhoudt als de website van structuur verandert.

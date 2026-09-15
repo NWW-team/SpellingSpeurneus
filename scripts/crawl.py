@@ -37,6 +37,9 @@ ONZICHTBAAR = str.maketrans("", "", "\u200b\u200c\u200d\u2060\ufeff\u00ad")
 # Haakjes en schuine strepen plakken woorden aan elkaar: "(bus)chauffeur",
 # "familie/vrienden". Daar splitsen we op, zodat elk deel apart wordt getoetst.
 SPLITSERS = re.compile(r"[\s/()\[\]]+")
+# Een punt middenin een woord wijst op een vergeten spatie, behalve bij een
+# webadres. Deze staarten laten we daarom met rust.
+DOMEINEN = (".com", ".nl", ".org", ".net", ".eu", ".gov", ".int")
 
 
 # --- ophalen ---------------------------------------------------------------
@@ -159,6 +162,44 @@ def is_bekend(woord, woorden):
     return False
 
 
+def is_plakfout(woord):
+    """Zegt of een punt middenin het woord op een vergeten spatie wijst.
+
+    "demonstraties.Volg het nieuws" is een echte redactionele fout. Een
+    webadres ("Windy.com") en een afkorting ("U.S") zijn dat niet.
+    """
+    delen = [deel for deel in woord.split(".") if deel]
+    if len(delen) < 2:
+        return False
+    if woord.lower().endswith(DOMEINEN):
+        return False
+    return not all(len(deel) == 1 for deel in delen)
+
+
+def soort_van(woord, zin):
+    """Deelt een bevinding in: 'spelfout' of 'naam'.
+
+    Een hoofdletter middenin een zin duidt vrijwel altijd op een naam: een
+    plaats, een organisatie of een anderstalige bron. Op reisadviespagina's is
+    dat het leeuwendeel van de meldingen. We gooien ze niet weg maar zetten ze
+    apart, zodat de echte spelfouten er niet in verdwijnen.
+
+    Aan het zinsbegin zegt een hoofdletter niets, dus daar toetsen we gewoon
+    door - zo blijft "Registeer" een spelfout. En een vergeten spatie gaat
+    voor: "III.Let op dat u" begint met een hoofdletter maar is geen naam.
+
+    De regel is met opzet uit te leggen aan een redacteur. Wie hem anders wil,
+    verandert hem hier; de indeling staat in resultaten.json, dus het scherm
+    is om te gooien zonder opnieuw te crawlen.
+    """
+    if is_plakfout(woord):
+        return "spelfout"
+    begin = zin.lstrip("“‘'\"([ ")
+    if woord[:1].isupper() and not begin.startswith(woord):
+        return "naam"
+    return "spelfout"
+
+
 def zoek_fouten(tekst, toegestaan):
     """Geeft per onbekend woord een bevinding met de zin eromheen.
 
@@ -184,7 +225,8 @@ def zoek_fouten(tekst, toegestaan):
             if sleutel in gezien:
                 continue
             gezien.add(sleutel)
-            bevindingen.append({"woord": woord, "context": kort(zin)})
+            bevindingen.append({"woord": woord, "soort": soort_van(woord, zin),
+                                "context": kort(zin)})
     return bevindingen
 
 
@@ -278,6 +320,8 @@ def main():
         "user_agent": USER_AGENT,
         "aantal_paginas": aantal_paginas,
         "aantal_bevindingen": len(bevindingen),
+        "aantal_spelfouten": sum(1 for b in bevindingen if b["soort"] == "spelfout"),
+        "aantal_namen": sum(1 for b in bevindingen if b["soort"] == "naam"),
         "overgeslagen_urls": overgeslagen,
         "bevindingen": bevindingen,
     }
@@ -285,7 +329,9 @@ def main():
     uit.parent.mkdir(parents=True, exist_ok=True)
     uit.write_text(json.dumps(resultaat, ensure_ascii=False, indent=2) + "\n",
                    encoding="utf-8")
-    print(f"\n{aantal_paginas} pagina's bekeken, {len(bevindingen)} bevindingen -> {uit}")
+    print(f"\n{aantal_paginas} pagina's bekeken, {len(bevindingen)} bevindingen "
+          f"({resultaat['aantal_spelfouten']} spelfouten, "
+          f"{resultaat['aantal_namen']} namen) -> {uit}")
 
 
 if __name__ == "__main__":
