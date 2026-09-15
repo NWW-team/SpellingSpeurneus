@@ -5,3 +5,6 @@ data/woordenlijst.txt
 # Python-restanten
 __pycache__/
 *.pyc
+
+# Het crawlresultaat gaat naar Supabase, niet in deze publieke repository.
+resultaten.json

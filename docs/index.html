@@ -27,6 +27,7 @@
     }
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body { margin: 0; background: var(--grond); color: var(--inkt);
          font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
   .omhulsel { max-width: 1000px; margin: 0 auto; padding: 24px 16px 64px; }
@@ -45,7 +46,8 @@
   .filters { display: flex; flex-wrap: wrap; gap: 12px; }
   .filter { flex: 1 1 220px; }
   label { display: block; font-size: .85rem; color: var(--gedempt); margin-bottom: 4px; }
-  input[type=search] { width: 100%; padding: 9px 10px; font-size: 1rem;
+  input[type=search], input[type=email], input[type=password] {
+    width: 100%; padding: 9px 10px; font-size: 1rem;
     border: 1px solid var(--lijn); border-radius: 6px;
     background: var(--grond); color: var(--inkt); }
   input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -78,18 +80,82 @@
   footer { color: var(--gedempt); font-size: .85rem; margin-top: 32px;
            border-top: 1px solid var(--lijn); padding-top: 16px; }
   footer a { color: var(--accent); }
+  /* De kopbalk draagt nu ook de sessie: wie ben je, en de uitlogknop. */
+  .kop .omhulsel { display: flex; flex-wrap: wrap; gap: 12px 24px;
+                   align-items: center; justify-content: space-between; }
+  .sessie { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            color: var(--lichtblauw); font-size: .9rem; }
+  .sessie button { background: transparent; border-color: var(--lichtblauw);
+                   color: #fff; }
+  .sessie button:hover { background: rgba(255,255,255,.12);
+                         border-color: #fff; }
+  h2 { font-size: 1.15rem; margin: 0 0 8px; }
+  .poort { max-width: 560px; }
+  .poort .filters { margin-bottom: 16px; }
+  .fout { color: #a3110f; background: #fdeceb; border: 1px solid #f5c2c0;
+          border-radius: 6px; padding: 9px 11px; margin: 12px 0 0;
+          font-size: .9rem; }
+  @media (prefers-color-scheme: dark) {
+    .fout { color: #ffb3b0; background: #3a1f1e; border-color: #6b2f2c; }
+  }
+  code { font-size: .85em; background: var(--grond); padding: 1px 4px;
+         border-radius: 4px; }
 </style>
 </head>
 <body>
 
 <header class="kop">
   <div class="omhulsel">
-    <h1>SpellingSpeurneus</h1>
-    <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
+    <div>
+      <h1>SpellingSpeurneus</h1>
+      <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
+    </div>
+    <div class="sessie" id="sessie" hidden>
+      <span id="sessie-wie"></span>
+      <button type="button" class="uitloggen">Uitloggen</button>
+    </div>
   </div>
 </header>
 
 <div class="omhulsel">
+
+  <!-- De toegangspoort. Let op: dit formulier is GEEN toegangscontrole. Dit
+       bestand is publiek en iedereen kan het opvragen en lezen. De controle
+       zit in de RLS-policies in Supabase; hieronder bepaalt alleen wat je te
+       zien krijgt. Zonder geldige sessie op een toegestaan account weigert de
+       database de gegevens, wat je in de browser ook probeert. -->
+  <div class="kaart poort" id="poort">
+    <p class="melding" id="poort-bezig">Bezig met controleren…</p>
+
+    <form id="inlogformulier" hidden>
+      <h2>Inloggen</h2>
+      <p class="uitleg">De crawlresultaten zijn alleen voor vooraf toegestane
+        accounts. Zelf aanmelden kan niet — vraag de beheerder om een account.</p>
+      <div class="filters">
+        <div class="filter">
+          <label for="email">E-mailadres</label>
+          <input type="email" id="email" autocomplete="username" required>
+        </div>
+        <div class="filter">
+          <label for="wachtwoord">Wachtwoord</label>
+          <input type="password" id="wachtwoord" autocomplete="current-password" required>
+        </div>
+      </div>
+      <button type="submit" id="inlogknop">Inloggen</button>
+      <p class="fout" id="inlogfout" hidden></p>
+    </form>
+
+    <div id="geen-toegang" hidden>
+      <h2>Geen toegang</h2>
+      <p class="uitleg">Je bent ingelogd als <strong id="geen-toegang-wie"></strong>,
+        maar dit account staat niet op de lijst met toegestane gebruikers. De
+        database geeft daarom geen resultaten vrij. Vraag de beheerder om je
+        account toe te voegen.</p>
+      <button type="button" class="uitloggen">Uitloggen</button>
+    </div>
+  </div>
+
+  <div id="app" hidden>
 
   <div class="kaart feiten" id="feiten"><span class="melding">Bezig met laden…</span></div>
 
@@ -136,6 +202,8 @@
     </div>
   </div>
 
+  </div><!-- /#app -->
+
   <footer>
     Spelling getoetst aan de <a href="https://github.com/OpenTaal/opentaal-wordlist">OpenTaal-woordenlijst</a>
     (Keurmerk Spelling van de Taalunie, licentie BSD/CC BY 3.0).
@@ -144,7 +212,28 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+// Publieke projectconfiguratie. Dit hoort hier: de publishable key is bedoeld
+// om in een frontend te staan en geeft niets weg. Hij verleent uitsluitend wat
+// de RLS-policies toestaan, en die eisen een sessie op een toegestaan account.
+// Wat hier NOOIT in mag: het databasewachtwoord, een secret key of de
+// service-role key. Die zetten RLS buiten werking.
+const SUPABASE_URL = "https://riwznqurcluudvyrkwxe.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8D0tbPlRD5eWqjIJDdQgKg_BxKn2Knx";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+const poortVak = document.getElementById("poort");
+const poortBezig = document.getElementById("poort-bezig");
+const inlogformulier = document.getElementById("inlogformulier");
+const inlogfout = document.getElementById("inlogfout");
+const inlogknop = document.getElementById("inlogknop");
+const geenToegangVak = document.getElementById("geen-toegang");
+const appVak = document.getElementById("app");
+const sessieVak = document.getElementById("sessie");
+const sessieWie = document.getElementById("sessie-wie");
+
 const rijenLichaam = document.getElementById("rijen");
 const naamLichaam = document.getElementById("naamrijen");
 const feitenVak = document.getElementById("feiten");
@@ -290,15 +379,163 @@ document.addEventListener("click", event => {
 urlFilter.addEventListener("input", teken);
 woordFilter.addEventListener("input", teken);
 
-fetch("resultaten.json?t=" + Date.now())
-  .then(antwoord => { if (!antwoord.ok) throw new Error(antwoord.status); return antwoord.json(); })
-  .then(gegevens => { bevindingen = gegevens.bevindingen || []; toonFeiten(gegevens); teken(); })
-  .catch(fout => {
-    feitenVak.innerHTML = `<span class="melding">Kan resultaten.json niet laden (${ontsnap(String(fout))}).</span>`;
-    leeg(rijenLichaam, `Er is nog geen crawl gedraaid, of je opent dit bestand rechtstreeks
-      vanaf de schijf. Start een webserver:
-      <code>python3 -m http.server --directory docs 8000</code>`);
+// ---------------------------------------------------------------------------
+// Sessie en toegang
+// ---------------------------------------------------------------------------
+// Er zijn vier toestanden: bezig, uitgelogd, ingelogd-maar-niet-toegestaan, en
+// ingelogd-en-toegestaan. Welke er geldt bepaalt de server, niet dit bestand.
+
+function toonAlleen(welke) {
+  poortBezig.hidden = welke !== "bezig";
+  inlogformulier.hidden = welke !== "uitgelogd";
+  geenToegangVak.hidden = welke !== "geenToegang";
+  poortVak.hidden = welke === "app";
+  appVak.hidden = welke !== "app";
+  sessieVak.hidden = welke === "bezig" || welke === "uitgelogd";
+}
+
+// Een nieuwere ronde mag een oudere overrulen: bij snel in- en uitloggen komen
+// de antwoorden niet per se in volgorde terug.
+let ronde = 0;
+
+async function bepaalToestand() {
+  const mijn = ++ronde;
+  toonAlleen("bezig");
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (mijn !== ronde) return;
+
+  if (!session) {
+    wisGegevens();
+    toonAlleen("uitgelogd");
+    return;
+  }
+
+  sessieWie.textContent = session.user.email;
+
+  // Vraag de server of dit account op de allowlist staat. Dit is alleen om een
+  // duidelijke melding te kunnen tonen; de echte bescherming zijn de policies
+  // op crawls en bevindingen. Al zou dit antwoord onjuist zijn, dan nog geeft
+  // de database geen enkele rij vrij.
+  const { data: mag, error: toegangsfout } = await sb.rpc("is_toegestaan");
+  if (mijn !== ronde) return;
+
+  if (toegangsfout || !mag) {
+    wisGegevens();
+    document.getElementById("geen-toegang-wie").textContent = session.user.email;
+    toonAlleen("geenToegang");
+    return;
+  }
+
+  toonAlleen("app");
+  await laadResultaten(mijn);
+}
+
+function wisGegevens() {
+  bevindingen = [];
+  feitenVak.innerHTML = '<span class="melding">Bezig met laden…</span>';
+  leeg(rijenLichaam, "Bezig met laden…");
+  leeg(naamLichaam, "Bezig met laden…");
+}
+
+// ---------------------------------------------------------------------------
+// De afgeschermde gegevens ophalen
+// ---------------------------------------------------------------------------
+
+async function laadResultaten(mijn) {
+  try {
+    const { data: crawls, error: crawlfout } = await sb
+      .from("crawls")
+      .select("id, gestart_op, bron, aantal_paginas")
+      .order("gestart_op", { ascending: false })
+      .limit(1);
+    if (crawlfout) throw crawlfout;
+    if (mijn !== ronde) return;
+
+    if (!crawls.length) {
+      feitenVak.innerHTML = '<span class="melding">Er is nog geen crawl gedraaid.</span>';
+      document.getElementById("aantal-spelfouten").textContent = "0";
+      document.getElementById("aantal-namen").textContent = "0";
+      leeg(rijenLichaam, "Start een crawl via de Crawl-workflow in GitHub.");
+      leeg(naamLichaam, "Nog niets te zien.");
+      return;
+    }
+
+    const crawl = crawls[0];
+    bevindingen = await haalBevindingen(crawl.id);
+    if (mijn !== ronde) return;
+
+    toonFeiten(crawl);
+    teken();
+  } catch (fout) {
+    if (mijn !== ronde) return;
+    feitenVak.innerHTML =
+      `<span class="melding">Kan de resultaten niet ophalen: ${ontsnap(fout.message || String(fout))}</span>`;
+    leeg(rijenLichaam, "Geen gegevens opgehaald.");
+    leeg(naamLichaam, "Geen gegevens opgehaald.");
+  }
+}
+
+// In blokken ophalen: de API geeft er standaard maximaal duizend per verzoek,
+// en een crawl over een groter deel van de site levert er meer op.
+async function haalBevindingen(crawlId) {
+  const blok = 1000;
+  const alles = [];
+  for (let van = 0; ; van += blok) {
+    const { data, error } = await sb
+      .from("bevindingen")
+      .select("url, titel, woord, soort, context")
+      .eq("crawl_id", crawlId)
+      .order("id")
+      .range(van, van + blok - 1);
+    if (error) throw error;
+    alles.push(...data);
+    if (data.length < blok) return alles;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Inloggen en uitloggen
+// ---------------------------------------------------------------------------
+// Supabase Auth doet het wachtwoordwerk. Deze app slaat geen wachtwoord op,
+// hasht er geen en vergelijkt er geen.
+
+inlogformulier.addEventListener("submit", async gebeurtenis => {
+  gebeurtenis.preventDefault();
+  inlogfout.hidden = true;
+  inlogknop.disabled = true;
+  inlogknop.textContent = "Bezig…";
+
+  const { error } = await sb.auth.signInWithPassword({
+    email: document.getElementById("email").value.trim(),
+    password: document.getElementById("wachtwoord").value,
   });
+
+  inlogknop.disabled = false;
+  inlogknop.textContent = "Inloggen";
+
+  if (error) {
+    inlogfout.textContent = "Inloggen is niet gelukt: " + error.message;
+    inlogfout.hidden = false;
+    return;
+  }
+  document.getElementById("wachtwoord").value = "";
+  // De rest doet onAuthStateChange.
+});
+
+for (const knop of document.querySelectorAll(".uitloggen")) {
+  knop.addEventListener("click", async () => {
+    knop.disabled = true;
+    await sb.auth.signOut();
+    knop.disabled = false;
+  });
+}
+
+sb.auth.onAuthStateChange(gebeurtenis => {
+  if (["INITIAL_SESSION", "SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(gebeurtenis)) {
+    bepaalToestand();
+  }
+});
 </script>
 </body>
 </html>
