@@ -111,6 +111,21 @@ blijft (besluit 4) maakt dit punt niet kleiner.
 
 ## Bekende beperkingen
 
+- **Uitloggen trekt een al uitgegeven token niet in.** Getoetst over HTTP: na een
+  `logout`-verzoek (dat netjes 204 teruggeeft) blijft hetzelfde access token nog
+  werken en levert het gewoon de bevindingen op. Dat is hoe JWT's werken —
+  PostgREST controleert de signatuur zelf en kijkt niet of de sessie nog bestaat.
+
+  Wat dit **niet** betekent: dat uitloggen niet werkt. De browser gooit het token
+  weg, dus de app kan na uitloggen niets meer ophalen; dat is getoetst. Wat het
+  **wel** betekent: wie het token vóór het uitloggen uit de browser heeft
+  gekopieerd, kan daarmee nog tot een uur lezen. De levensduur is 3600 seconden.
+
+  Wil je dat venster kleiner, dan kan de access-tokenlevensduur omlaag in
+  Authentication → Sessions in het dashboard. Korter betekent vaker verversen.
+  Voor een werklijst met citaten uit openbare pagina's is een uur verdedigbaar;
+  voor iets vertrouwelijkers niet.
+
 - **`persoons-` uit "persoons- en bagagecontrole"** wordt getoetst als
   `persoons`, en dat is geen los woord. Bij een weglatingsstreepje valt niet
   vast te stellen wat het hele woord had moeten zijn.
