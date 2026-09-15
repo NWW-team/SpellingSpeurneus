@@ -78,13 +78,18 @@ jobs:
       # RLS-policies het alleen aan toegestane accounts vrijgeven.
       - name: Resultaat naar Supabase
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          # De project-URL is geen geheim: hij staat ook in docs/index.html, dat
+          # publiek is. Hier ingevuld in plaats van als secret, zodat er maar
+          # één ding echt geheim te beheren valt.
+          SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "::error::De secrets SUPABASE_URL en SUPABASE_SERVICE_ROLE_KEY"
-            echo "::error::staan niet in deze repository. Zonder die twee kan het"
-            echo "::error::resultaat niet worden gepubliceerd. Zie README.md."
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::Het secret SUPABASE_SERVICE_ROLE_KEY staat niet in deze"
+            echo "::error::repository, dus het resultaat kan niet worden gepubliceerd."
+            echo "::error::Zet hem bij Settings > Secrets and variables > Actions."
+            echo "::error::De waarde staat in het Supabase-dashboard onder"
+            echo "::error::Project Settings > API Keys. Zie ook README.md."
             exit 1
           fi
           python3 scripts/publiceer.py --in resultaten.json
