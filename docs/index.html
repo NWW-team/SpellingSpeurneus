@@ -249,7 +249,10 @@ const isNaam = b => b.soort === "naam";
 function ontsnap(tekst) {
   const hulp = document.createElement("div");
   hulp.textContent = tekst;
-  return hulp.innerHTML;
+  // textContent -> innerHTML ontsnapt &, < en >, maar geen aanhalingstekens.
+  // Die gebruiken we hier ook binnen dubbel-aangehaalde attributen (data-woord, href),
+  // dus die ontsnappen we zelf, anders breekt een woord met " uit het attribuut.
+  return hulp.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 function markeer(zin, woord) {
