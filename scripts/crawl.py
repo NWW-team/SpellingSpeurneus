@@ -40,6 +40,23 @@ SPLITSERS = re.compile(r"[\s/()\[\]]+")
 # Een punt middenin een woord wijst op een vergeten spatie, behalve bij een
 # webadres. Deze staarten laten we daarom met rust.
 DOMEINEN = (".com", ".nl", ".org", ".net", ".eu", ".gov", ".int")
+# Resten van het sjabloon of het CMS die zichtbaar in de tekst staan. Op
+# reisadvies/estland stond zo het woord "undefined" boven aan de pagina.
+#
+# Deze zoeken we apart op, want de gewone spellingtoets ziet ze niet allemaal:
+# "[object Object]" en "{{titel}}" worden op de haakjes stukgeknipt en leveren
+# dan "object" en "titel" op, en dat zijn gewone Nederlandse woorden. Zo'n rest
+# glipt er dus geruisloos doorheen, terwijl een bezoeker hem wel ziet staan.
+#
+# Hoofdlettergevoelig: JavaScript schrijft undefined, null, NaN en Infinity
+# precies zo, en dat scheelt treffers op Nederlandse woorden die erop lijken.
+SJABLOONRESTEN = re.compile(
+    r"\[object [A-Za-z]+\]"
+    r"|\{\{[^{}]{0,60}\}\}"
+    r"|\$\{[^{}]{0,60}\}"
+    r"|&(?:nbsp|amp|quot|lt|gt|#\d+);"
+    r"|\b(?:undefined|null|NaN|Infinity)\b"
+)
 
 
 # --- ophalen ---------------------------------------------------------------
@@ -211,7 +228,20 @@ def zoek_fouten(tekst, toegestaan):
     bevindingen = []
     gezien = set()
     for zin in re.split(r"(?<=[.!?])\s+", tekst):
-        for ruw in SPLITSERS.split(zin):
+        # Eerst de sjabloonresten, en meteen in `gezien`: staat er "undefined",
+        # dan meldt de woordenloop hieronder hem niet nog een tweede keer.
+        for rest in SJABLOONRESTEN.findall(zin):
+            sleutel = (rest, zin)
+            if sleutel in gezien:
+                continue
+            gezien.add(sleutel)
+            bevindingen.append({"woord": rest, "soort": "spelfout",
+                                "context": kort(zin)})
+        # De gevonden resten knippen we uit de zin voordat we hem in woorden
+        # opdelen. Anders meldt de app "de&nbsp;grens" nog een keer naast het
+        # "&nbsp;" dat er de oorzaak van is. De zin zelf blijft heel: die gaat
+        # ongewijzigd als context mee.
+        for ruw in SPLITSERS.split(SJABLOONRESTEN.sub(" ", zin)):
             woord = ruw.translate(ONZICHTBAAR).replace("’", "'").strip(LEESTEKENS)
             if not woord or not any(teken.isalpha() for teken in woord):
                 continue

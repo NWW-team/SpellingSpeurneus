@@ -39,6 +39,42 @@ namen zijn naar een tweede tabblad verhuisd. Zie "Spelfouten en namen" in
 [README.md](README.md) voor de regel, en `soort_van` in `scripts/crawl.py` voor
 de code.
 
+## Alle 226 reisadviezen (15 september)
+
+3.376 bevindingen: **427 spelfouten en 2.949 naammeldingen** (1.398 unieke
+namen), over 226 pagina's in 4 min 47 s. Besluit 1 houdt stand op 4,5× de
+steekproef: 87% van de meldingen gaat naar het namentabblad.
+
+**24 echte redactionele fouten**, stuk voor stuk in hun zin nagekeken. Naast de
+zeven bekende: `plaatvinden`, `prvincie`, `meenenemen`, `veiilgheidsrisico's`,
+`veiligsheidsrisico's`, `motorvoortuigen`, `niet-Ecudoraans`, `Vor`, `vande`,
+`ZDe`, `zoalsCruz`, `visumnodig`, `doenals`, `Bijvoorbeeldc`, `invullen.n`,
+`aardbevingcentrum` en `undefined`.
+
+Twee daarvan zijn geen spelfout maar iets anders, en die horen bij de
+sitebeheerder in plaats van bij de redactie:
+
+- **`undefined` staat letterlijk boven aan `reisadvies/estland`.** Dat is een
+  sjabloonfout in het CMS die zichtbaar is voor bezoekers.
+- Op `reisadvies/mali` staat "opgenomen in het ziekenhuisopname". Grammatica
+  vangt deze app niet; dit kwam boven water naast de tikfout `Bijvoorbeeldc`.
+
+### Let op bij het lezen van de ruiscijfers
+
+De 0,84 valse meldingen per pagina uit de eerste crawl was geflatteerd.
+`data/uitzonderingen.txt` is op 14 september in twee rondes gevuld met precies
+de ruis van díé 50 pagina's (zie de commits "Ruis wegnemen na de eerste echte
+crawl" en "Tweede ronde ruis"). De 176 pagina's die daarna voor het eerst
+langskwamen gaven **2,19 per pagina**.
+
+Reken dus met ~2,2 per ongeziene pagina, niet met 0,84. Elke nieuwe crawl over
+onbekend terrein begint hoog en zakt zodra de uitzonderingenlijst is
+bijgewerkt. Dat is geen fout in de app; het is de aard van zo'n lijst.
+
+De derde ronde uitzonderingen (30 woorden, 15 september) haalt 87 van de 427
+meldingen weg. Niet meer, omdat de Engelse woorden — het grootste blok, 81
+meldingen — er bewust buiten blijven.
+
 ## Genomen besluiten
 
 **1. De eigennamen — gescheiden, niet weggegooid.** (14 september 2026)
@@ -141,8 +177,8 @@ blijft (besluit 4) maakt dit punt niet kleiner.
   vast te stellen wat het hele woord had moeten zijn.
 - **Anderstalige woorden zonder hoofdletter** blijven bij de spelfouten
   staan: `and` uit "US Customs and Border Protection", `viajeros` uit "Para
-  viajeros", `floods`, `travel`. Na besluit 1 zijn dit de 34 meldingen die
-  naast de 8 echte fouten overblijven — dus veruit de grootste rest-ruis.
+  viajeros", `floods`, `travel`. Over alle 226 reisadviezen zijn dit 81 van de
+  427 spelfoutmeldingen — veruit de grootste rest-ruis, met `and` (34×) voorop.
   Ze staan bewust niet op de uitzonderingenlijst en vallen bewust niet onder
   de naam-regel: zie de toelichting onderaan `data/uitzonderingen.txt`. Ze
   goedkeuren zou betekenen dat een Engels woord middenin een Nederlandse zin
@@ -218,11 +254,13 @@ Twee dingen zijn licht, maar wel echt werk:
 
 **Voordat collega's hierop kunnen vertrouwen:**
 
-1. Het percentage vals alarm moet bekend zijn over meer dan 50 pagina's.
-   Na besluit 1 weten we: 8 echte fouten op 42 spelfoutmeldingen. Dat is één
-   op de vijf en dus na te lopen, maar het is één crawl. Een tweede crawl over
-   een ander deel van de site moet dat bevestigen — en laten zien of de
-   hoofdletterregel daar net zo goed uitpakt als op reisadviezen.
+1. ~~Het percentage vals alarm over meer dan 50 pagina's~~ — gemeten op alle
+   226 reisadviezen: 24 echte fouten op 427 spelfoutmeldingen, ofwel één op de
+   18. Dat is na te lopen, maar minder gunstig dan de één-op-vijf van de eerste
+   crawl deed vermoeden; zie "Let op bij het lezen van de ruiscijfers".
+   Wat nog open staat: de hoofdletterregel is **alleen op reisadviezen geijkt**.
+   Een plak van ~200 `paginas` (visum, paspoort, consulair) moet laten zien of
+   hij op ander taalgebruik net zo goed uitpakt.
 2. Afspraak met de beheerder van de website (besluit 2).
 3. ~~Besluit over publiek publiceren~~ — genomen, zie besluit 3.
 4. Iemand die het onderhoudt als de website van structuur verandert.

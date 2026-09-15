@@ -16,7 +16,7 @@
     --inkt: #1a1a1a; --gedempt: #535353; --lijn: #d4d9e0;
     --grond: #f0f2f5; --vlak: #ffffff;
     --accent: var(--donkerblauw); --tabrand: var(--hemelblauw);
-    --markering: #fcf3a5;
+    --markering: #fcf3a5; --waarschuwing: #D52B1E;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -24,6 +24,9 @@
       --grond: #1b1e22; --vlak: #24282e;
       --accent: var(--lichtblauw); --tabrand: var(--lichtblauw);
       --markering: #4a4318;
+      /* Het rood van de huisstijl haalt op een donker vlak geen AA-contrast;
+         deze lichtere tint wel (5,2:1). */
+      --waarschuwing: #F27166;
     }
   }
   * { box-sizing: border-box; }
@@ -60,7 +63,7 @@
   .tabblad .aantal { color: var(--gedempt); font-weight: 400; }
   .uitleg { color: var(--gedempt); font-size: .9rem; margin: 0 0 16px; }
   .tabelhouder { overflow-x: auto; }
-  td.telling { color: var(--gedempt); white-space: nowrap; }
+  .telling { display: block; color: var(--gedempt); }
   table { width: 100%; border-collapse: collapse; font-size: .95rem; }
   th { text-align: left; font-size: .8rem; text-transform: uppercase;
        letter-spacing: .04em; color: var(--gedempt); font-weight: 600;
@@ -68,6 +71,11 @@
   td { border-bottom: 1px solid var(--lijn); padding: 10px; vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
   .woord { font-weight: 600; white-space: nowrap; }
+  .merk { display: block; margin-top: 2px; font-size: .75rem; font-weight: 600;
+          white-space: nowrap; color: var(--waarschuwing); }
+  tr.sjabloon td { border-left: 3px solid var(--waarschuwing); }
+  tr.sjabloon td:not(:first-child) { border-left: 0; }
+  .feit strong.alarm { color: var(--waarschuwing); }
   .context mark { background: var(--markering); color: var(--inkt);
                   font-weight: 600; padding: 0 2px; border-radius: 2px; }
   .bron a { color: var(--accent); word-break: break-word; }
@@ -193,10 +201,11 @@
   <div id="paneel-namen" role="tabpanel" aria-labelledby="tab-namen" hidden>
     <p class="uitleg">Woorden met een hoofdletter middenin een zin: plaatsen,
       organisaties en anderstalige bronnen. De woordenlijst kent geen namen, dus
-      ze staan hier allemaal — ook de goede. Elke naam staat één keer.</p>
+      ze staan hier allemaal — ook de goede. Elke naam staat één keer, met een
+      voorbeeldzin en een link naar het reisadvies waar die zin staat.</p>
     <div class="kaart tabelhouder">
       <table>
-        <thead><tr><th>Naam</th><th>Pagina's</th><th>Voorbeeld</th><th></th></tr></thead>
+        <thead><tr><th>Naam</th><th>Voorbeeld</th><th>Pagina</th><th></th></tr></thead>
         <tbody id="naamrijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
       </table>
     </div>
@@ -246,6 +255,16 @@ let bevindingen = [];
 // spelfouten en namen. Die tonen we bij de spelfouten, zoals hij toen ook stond.
 const isNaam = b => b.soort === "naam";
 
+// Resten van het sjabloon of het CMS: "undefined", "[object Object]",
+// "{{titel}}". De crawler meldt ze als gewone spelfout, want de kolom `soort`
+// laat maar twee waarden toe. Hier herkennen we ze aan het woord zelf, zodat
+// ze bovenaan komen en opvallen tussen de tikfouten.
+//
+// LET OP: dit patroon hoort gelijk te blijven aan SJABLOONRESTEN in
+// scripts/crawl.py. Wijzig je daar iets, wijzig het hier dan ook.
+const SJABLOONREST = /^(?:\[object [A-Za-z]+\]|\{\{[^{}]{0,60}\}\}|\$\{[^{}]{0,60}\}|&(?:nbsp|amp|quot|lt|gt|#\d+);|undefined|null|NaN|Infinity)$/;
+const isSjabloonrest = b => SJABLOONREST.test(b.woord);
+
 function ontsnap(tekst) {
   const hulp = document.createElement("div");
   hulp.textContent = tekst;
@@ -257,7 +276,11 @@ function ontsnap(tekst) {
 
 function markeer(zin, woord) {
   const veilig = ontsnap(zin);
-  const patroon = new RegExp("(^|[^\\p{L}])(" + woord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")(?![\\p{L}])", "u");
+  // Het woord moet op dezelfde manier ontsnapt worden als de zin, anders zoekt
+  // de regexp naar iets dat er niet meer staat: "veiligheidsrisico's" wordt in
+  // de zin "veiligheidsrisico&#39;s", en dan mist hij zichzelf.
+  const gezocht = ontsnap(woord).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const patroon = new RegExp("(^|[^\\p{L}])(" + gezocht + ")(?![\\p{L}])", "u");
   return veilig.replace(patroon, "$1<mark>$2</mark>");
 }
 
@@ -271,12 +294,30 @@ function toonFeiten(gegevens) {
   const spelfouten = bevindingen.filter(b => !isNaam(b)).length;
   // Namen tellen we per uniek woord, want zo staan ze ook in de tabel.
   const namen = new Set(bevindingen.filter(isNaam).map(b => b.woord)).size;
+  // Alleen tonen als er iets is. Een vakje dat altijd "0" zegt leest niemand
+  // nog; een vakje dat er ineens staat, valt op.
+  const resten = bevindingen.filter(isSjabloonrest).length;
+  const restenVak = resten
+    ? `<div class="feit"><strong class="alarm">${resten}</strong>
+         <span>sjabloonresten</span></div>`
+    : "";
   feitenVak.innerHTML = `
     <div class="feit"><strong>${spelfouten}</strong><span>spelfouten</span></div>
+    ${restenVak}
     <div class="feit"><strong>${namen}</strong><span>namen apart gezet</span></div>
     <div class="feit"><strong>${gegevens.aantal_paginas}</strong><span>pagina's bekeken</span></div>
     <div class="feit"><strong>${ontsnap(gegevens.bron)}</strong><span>deel van de site</span></div>
     <div class="feit"><strong>${datum}</strong><span>laatste crawl</span></div>`;
+}
+
+// De cel met de link naar de pagina. Beide tabbladen gebruiken hem, zodat een
+// bevinding overal op dezelfde manier naar zijn bron wijst.
+function bronCel(b, extra = "") {
+  const link = b.url.startsWith("http")
+    ? `<a href="${ontsnap(b.url)}" target="_blank" rel="noopener">${ontsnap(korteUrl(b.url))}</a>`
+    : ontsnap(b.url);
+  return `<td class="bron">${link}
+    <small>${ontsnap(b.titel || "")}</small>${extra}</td>`;
 }
 
 function knopCel(woord) {
@@ -308,18 +349,22 @@ function tekenSpelfouten(rijen) {
     return;
   }
 
-  rijenLichaam.innerHTML = rijen.map(b => `
-    <tr>
-      <td class="woord">${ontsnap(b.woord)}</td>
+  // Sjabloonresten bovenaan: het zijn er zelden veel, en het is het soort
+  // melding dat niet in een lijst van honderden hoort te verdwijnen.
+  const geordend = [...rijen].sort(
+    (a, z) => (isSjabloonrest(z) ? 1 : 0) - (isSjabloonrest(a) ? 1 : 0));
+
+  rijenLichaam.innerHTML = geordend.map(b => {
+    const rest = isSjabloonrest(b);
+    const merk = rest ? `<span class="merk">sjabloonrest</span>` : "";
+    return `
+    <tr${rest ? ' class="sjabloon"' : ""}>
+      <td class="woord">${ontsnap(b.woord)}${merk}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
-      <td class="bron">
-        ${b.url.startsWith("http")
-          ? `<a href="${ontsnap(b.url)}" target="_blank" rel="noopener">${ontsnap(korteUrl(b.url))}</a>`
-          : ontsnap(b.url)}
-        <small>${ontsnap(b.titel || "")}</small>
-      </td>
+      ${bronCel(b)}
       ${knopCel(b.woord)}
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 }
 
 // Namen staan één keer in de lijst, met het aantal pagina's erbij. Dezelfde naam
@@ -340,13 +385,21 @@ function tekenNamen(rijen) {
     return;
   }
 
-  naamLichaam.innerHTML = namen.map(b => `
+  naamLichaam.innerHTML = namen.map(b => {
+    // De link wijst naar de pagina van het getoonde voorbeeld. Staat de naam
+    // op meer pagina's, dan zegt de cel erbij op hoeveel.
+    const meer = b.paginas.size - 1;
+    const erbij = meer > 0
+      ? `<small class="telling">en ${meer} andere pagina${meer > 1 ? "'s" : ""}</small>`
+      : "";
+    return `
     <tr>
       <td class="woord">${ontsnap(b.woord)}</td>
-      <td class="telling">${b.paginas.size}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
+      ${bronCel(b, erbij)}
       ${knopCel(b.woord)}
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 }
 
 function kiesTabblad(gekozen) {
