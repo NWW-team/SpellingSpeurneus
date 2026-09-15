@@ -21,8 +21,18 @@ Alle zes acceptatiecriteria uit het bouwplan zijn gehaald:
 | Geen sleutels of wachtwoorden in de repo | Er zijn er ook geen nodig |
 
 Op 50 reisadviespagina's vond de app **acht echte redactionele fouten**:
-`nieet`, `Registeer`, `doodstaf`, `metrologisch`, `doen.n.`, `III.Let`,
+`nieet`, `Registeer`, `doodstaf`, `metrologisch`, `doen.n`, `III.Let`,
 `demonstraties.Volg` en `autorisation`.
+
+Bij de crawl van 15 september staan er nog **zeven** van: `doodstaf` is van de
+pagina `reisadvies/congo-de-republiek` verdwenen, terwijl die pagina wel
+opnieuw is gecrawld. Daar is dus iets gerepareerd. Dat is de eerste keer dat
+aantoonbaar een melding van deze app tot een correctie heeft geleid — of in
+elk geval dat een gemelde fout weg is.
+
+Die crawl gaf 613 bevindingen (41 spelfouten, 572 namen, 315 uniek) tegen 614
+op 14 september. De site wijzigt dus tussen crawls; reken niet op exact
+gelijke aantallen.
 
 Sinds besluit 1 staan die acht in een lijst van 42 meldingen in plaats van 614:
 namen zijn naar een tweede tabblad verhuisd. Zie "Spelfouten en namen" in
