@@ -276,7 +276,11 @@ function ontsnap(tekst) {
 
 function markeer(zin, woord) {
   const veilig = ontsnap(zin);
-  const patroon = new RegExp("(^|[^\\p{L}])(" + woord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")(?![\\p{L}])", "u");
+  // Het woord moet op dezelfde manier ontsnapt worden als de zin, anders zoekt
+  // de regexp naar iets dat er niet meer staat: "veiligheidsrisico's" wordt in
+  // de zin "veiligheidsrisico&#39;s", en dan mist hij zichzelf.
+  const gezocht = ontsnap(woord).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const patroon = new RegExp("(^|[^\\p{L}])(" + gezocht + ")(?![\\p{L}])", "u");
   return veilig.replace(patroon, "$1<mark>$2</mark>");
 }
 
