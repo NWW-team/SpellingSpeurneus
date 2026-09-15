@@ -50,7 +50,6 @@ passagierskaart
 paspoortstempels
 Paspoortdienst
 visumaanvraagcentrum
-visumpagina
 visumzaken
 onderzoeksvergunning
 geslachtsvermelding
@@ -61,7 +60,6 @@ Koninkrijksdelen
 luchthaventaxi
 motortaxi
 radiotaxi
-motodop
 langeafstandsbussen
 expeditieschepen
 helikoptervervoer
@@ -172,8 +170,6 @@ riviergrenzen
 # Altijd met de plus. Zonder plus is het fout, en dat meldt de app nu ook:
 # de plus wordt niet meer weggestreept bij het opdelen van de zin.
 lhbtiq+
-lhbtiq+persoon
-lhbtiq+personen
 lhbtiq+-vriendelijke
 
 # Ziekten waarvan de site beide namen geeft: "Mpox-virus (apenpokken)".
