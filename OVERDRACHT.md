@@ -75,6 +75,44 @@ De derde ronde uitzonderingen (30 woorden, 15 september) haalt 87 van de 427
 meldingen weg. Niet meer, omdat de Engelse woorden — het grootste blok, 81
 meldingen — er bewust buiten blijven.
 
+**Bevestigd door de tweede crawl van 15 september (12:25):** 340 spelfouten
+(255 unieke woorden) en 2.946 naammeldingen. Precies de voorspelde 427 − 87.
+Alle 24 echte fouten staan er nog — nagekeken, want een uitzondering die per
+ongeluk een echte fout wegneemt, merk je anders pas als iemand hem mist.
+
+De sjabloondetectie vond in die crawl één rest: de al bekende `undefined` op
+Estland. Geen `[object Object]` of `{{titel}}` op de reisadviezen. Het is dus
+verzekering geworden, geen vondst; op de 4.436 `paginas` kan dat anders liggen.
+
+Reken niet op exact gelijke aantallen tussen crawls: 2.946 namen tegen 2.949
+'s ochtends. De site verandert gewoon tussendoor.
+
+## Wat er nu ligt
+
+Drie dingen, geen van alle techniek. Dit is wat er moet gebeuren voordat dit
+project iets heeft opgeleverd in plaats van alleen iets te hebben gevonden.
+
+**1. De 24 fouten naar de webredactie.** Dit is het enige stuk dat nog een mens
+nodig heeft om waarde op te leveren: de app heeft ze gevonden, maar niemand
+heeft ze gecorrigeerd. Zonder deze stap heeft de hele crawl niets veranderd
+aan de website.
+
+De woorden staan hierboven. Wie ze per land wil zien, mét de zin en een link
+naar de pagina: dat is precies het spelfoutentabblad in de app zelf. De
+bevindingen staan bewust niet in deze repository (besluit 3), dus er is geen
+lijst om hier in te plakken — je haalt hem uit het scherm.
+
+**2. `undefined` op `reisadvies/estland` naar de sitebeheerder.** Dat is geen
+tikfout maar een sjabloonfout in het CMS, zichtbaar voor bezoekers. Hoort niet
+bij de redactie thuis. Laat meteen nakijken of het op meer pagina's voorkomt —
+wij zien alleen de reisadviezen.
+
+**3. Besluit 2 (de sitebeheerder inlichten) is dringender geworden.** Op 15
+september zijn er twee volledige crawls van 226 pagina's overheen gegaan. Dat
+staat netjes in hun logboek, met onze User-Agent erbij, en het is beter dat ze
+het van ons horen dan dat ze het zelf ontdekken. Zeker als er ooit een crawl
+over de 4.436 `paginas` komt: dat is ruim twee uur aanhoudend verkeer.
+
 ## Genomen besluiten
 
 **1. De eigennamen — gescheiden, niet weggegooid.** (14 september 2026)
@@ -132,7 +170,8 @@ het is een keuze, niet een oplossing.
 www.nederlandwereldwijd.nl staat crawlen toe, en we houden ons aan de
 verboden paden, een halve seconde tussen pagina's en een herkenbare
 User-Agent. Toch is het netjes om de beheerder te laten weten dat dit
-draait. Dat is nog niet gebeurd.
+draait. Dat is nog niet gebeurd — zie punt 3 onder "Wat er nu ligt": er zijn
+inmiddels twee volledige crawls van 226 pagina's overheen gegaan.
 
 **4. Moet de pagina zelf ook privé?** Besluit 3 schermt de gegevens af, niet
 het scherm. Wil je dat een onbevoegde de pagina helemaal niet kan openen, dan
