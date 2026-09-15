@@ -88,8 +88,8 @@ staat row level security aan, met één expliciete policy: lezen mag als je een 
 hebt én je account op de allowlist staat. Zonder dat geeft de database nul rijen terug,
 wat je in de browser ook probeert. Schrijven kan de browser helemaal niet.
 
-**Zelf aanmelden kan niet.** Signups staan uit in de Auth-instellingen, dus de Auth-API
-weigert elke registratiepoging. Dat er geen registratieknop in het scherm staat is niet
+**Zelf aanmelden kan niet.** Signups staan uit in de Auth-instellingen: de Auth-API
+antwoordt op elke registratiepoging met `signup_disabled` (422). Nagetoetst over HTTP. Dat er geen registratieknop in het scherm staat is niet
 de maatregel — de maatregel is dat een onbekend account er domweg niet komt, en dat de
 allowlist bepaalt wie gegevens ziet.
 
