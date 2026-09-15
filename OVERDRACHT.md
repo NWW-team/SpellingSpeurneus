@@ -4,7 +4,7 @@ Wat een volgende sessie of collega moet weten om hier verder te kunnen.
 Voor hoe de app werkt: zie [README.md](README.md). Voor het waarom:
 [STRATEGY.md](STRATEGY.md).
 
-Laatst bijgewerkt: 14 september 2026.
+Laatst bijgewerkt: 15 september 2026.
 
 ## Stand van zaken
 
@@ -14,7 +14,7 @@ Alle zes acceptatiecriteria uit het bouwplan zijn gehaald:
 | Criterium | Uitkomst |
 |---|---|
 | Crawl van 50 pagina's binnen 10 minuten | 80 seconden |
-| Collega zonder account ziet de resultaten | Bevestigd in een privévenster |
+| ~~Collega zonder account ziet de resultaten~~ | **Met opzet omgedraaid, zie besluit 3** |
 | De drie ingebouwde fouten in `demo/` worden gevonden | 3 van 3 |
 | Een woord op de uitzonderingenlijst verdwijnt | Vastgelegd in de controles |
 | robots.txt wordt gevolgd, herkenbare User-Agent | Getoetst tegen de echte site |
@@ -50,13 +50,35 @@ bronnaam middenin een zin. Drie dingen gaven de doorslag:
 Gekozen is niet voor een schakelaar per crawl maar voor **twee lijsten in
 hetzelfde resultaat**, met spelfouten open bij binnenkomst. Namen staan er
 ontdubbeld (315 in plaats van 573) met het aantal pagina's erbij, dus ze
-blijven na te lopen. De indeling staat per bevinding in `resultaten.json`,
+blijven na te lopen. De indeling staat per bevinding in de kolom `soort`,
 dus de keuze is terug te draaien zonder opnieuw te crawlen.
 
 Wat nog niet is besloten: of de redactie een **lijst met goedgekeurde namen**
 wil gaan bijhouden, zoals `uitzonderingen.txt` nu voor woorden doet. Dan
 krimpt het namentabblad per crawl tot alleen nieuwe namen. Bewust uitgesteld
 tot duidelijk is of iemand dat onderhoud echt gaat doen.
+
+**3. De bevindingen gaan achter een inlog.** (15 september 2026)
+
+Dit was het openstaande besluit hieronder; nu beslist. De resultaten stonden als
+`docs/resultaten.json` in deze publieke repository en op de Pages-link. Ze zijn
+een werklijst van de redactie, dus ze horen niet openbaar.
+
+Ze staan nu in Supabase, met row level security en een allowlist. **Let op wat
+dit wel en niet doet:** het schermt de gegevens af, niet het scherm. `docs/`
+staat op GitHub Pages in een publieke repository en blijft voor iedereen op te
+vragen. Een inlogformulier in een statisch bestand is geen toegangscontrole; die
+zit in de policies. Zie "Toegang" in [README.md](README.md).
+
+Hiermee vervalt het tweede acceptatiecriterium uit het bouwplan ("collega zonder
+account ziet de resultaten"). Dat was een bewuste keuze en geen regressie: zonder
+account zie je nu het inlogformulier. Wie het oude gedrag terug wil, moet besluit
+3 heropenen.
+
+Wat nog niet is opgelost: `docs/resultaten.json` zit nog in de git-geschiedenis en
+is daar publiek leesbaar. Het bestand is verwijderd, de geschiedenis niet
+herschreven. Het gaat om al openbare citaten, dus het is bewust zo gelaten — maar
+het is een keuze, niet een oplossing.
 
 ## Openstaande besluiten
 
@@ -66,18 +88,26 @@ verboden paden, een halve seconde tussen pagina's en een herkenbare
 User-Agent. Toch is het netjes om de beheerder te laten weten dat dit
 draait. Dat is nog niet gebeurd.
 
-**3. Mogen de bevindingen publiek blijven staan?** De repository is publiek,
-dus `docs/resultaten.json` en de Pages-link zijn voor iedereen zichtbaar.
-Het gaat alleen om citaten uit pagina's die al openbaar zijn, maar het is
-wel een bewuste keuze. Zodra iemand hier interne pagina's of conceptteksten
-in wil, klopt deze opzet niet meer.
+**4. Moet de pagina zelf ook privé?** Besluit 3 schermt de gegevens af, niet
+het scherm. Wil je dat een onbevoegde de pagina helemaal niet kan openen, dan
+kan GitHub Pages dat niet: het levert statische bestanden uit zonder enige
+voorwaarde, en Pages met beperkte zichtbaarheid bestaat alleen bij GitHub
+Enterprise Cloud met een privérepo. Dan is andere hosting nodig — bijvoorbeeld
+Cloudflare Access ervoor, of het scherm laten uitleveren door een Edge Function
+die eerst de sessie controleert. Nog niet nodig geacht, wel goed om te weten
+voordat iemand aanneemt dat de hele site dicht zit.
 
-Dit besluit werd op 15 september scherper: het scherm heeft nu de kleuren van
-de Rijkshuisstijl. Logo, woordmerk en het Rijksoverheid-lettertype zitten er
+**5. Wie beheert de allowlist?** Iemand moet accounts aanmaken en op
+`toegestane_gebruikers` zetten, en eraf halen als iemand weggaat. Dat is nu
+niemand. Hoort bij dezelfde eigenaar als de uitzonderingenlijst.
+
+Besluit 3 werd op 15 september scherper doordat het scherm de kleuren van
+de Rijkshuisstijl kreeg. Logo, woordmerk en het Rijksoverheid-lettertype zitten er
 bewust níét in, juist om te voorkomen dat een publieke pagina voor een
 officiële pagina van de Rijksoverheid wordt aangezien. Wie de vormgeving
 verder officieel wil maken, moet dit eerst met de huisstijlbeheerder bij BZ
-afstemmen. Zie "Vormgeving" in [README.md](README.md).
+afstemmen. Zie "Vormgeving" in [README.md](README.md). Dat de pagina zelf publiek
+blijft (besluit 4) maakt dit punt niet kleiner.
 
 ## Bekende beperkingen
 
@@ -106,8 +136,9 @@ maar beleid, en het kost tijd als je het niet weet:
 | Wel bereikbaar | Niet bereikbaar |
 |---|---|
 | www.nederlandwereldwijd.nl | github.com en raw.githubusercontent.com |
-| | nww-team.github.io (de eigen Pages-link) |
-| | npm en PyPI (dus geen pakketten installeren) |
+| De Supabase Management API (via MCP) | nww-team.github.io (de eigen Pages-link) |
+| | de project-URL `*.supabase.co` en poort 5432 |
+| | npm, PyPI en cdn.jsdelivr.net |
 
 Gevolgen:
 
@@ -117,19 +148,31 @@ Gevolgen:
   echte spellingtoets draait alleen in de workflow.
 - De Pages-link kun je **niet zelf controleren**. Dat moet iemand in een
   gewone browser doen.
-- `scripts/crawl.py` en `scripts/test.py` gebruiken daarom alleen de
-  standaardbibliotheek van Python. Houd dat zo.
+- `scripts/crawl.py`, `scripts/test.py` en `scripts/publiceer.py` gebruiken daarom
+  alleen de standaardbibliotheek van Python. Houd dat zo.
+- **Inloggen is hier niet te testen.** `*.supabase.co` is onbereikbaar en
+  supabase-js komt van een CDN dat ook dicht staat. Het schema en de policies
+  zijn wel te toetsen via MCP, met `set role` en een nagebootst
+  `request.jwt.claims`. De frontend-logica is te toetsen door supabase-js te
+  vervangen door een nagemaakte cliënt en `docs/index.html` in Chromium te
+  laden. Het echte inloggen moet iemand in een gewone browser doen.
 - Chromium staat wel voorgeïnstalleerd op
   `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` en is bruikbaar met
   `--headless --dump-dom` om `docs/index.html` echt in een browser te testen.
 
-## Ontwerppunt voor later
+## Ontwerppunt: opgelost
 
-`docs/resultaten.json` staat in de repository en wordt door de workflow
-teruggeschreven. Dat botst zodra er op twee branches een crawl draait — dat
-gebeurde op 14 september en leverde een merge-conflict op. Werkbaar voor een
-prototype, maar zodra er twee mensen aan werken moet het resultaat als los
-artefact gepubliceerd worden in plaats van gecommit.
+`docs/resultaten.json` stond in de repository en werd door de workflow
+teruggeschreven. Dat botste zodra er op twee branches een crawl draaide — dat
+gebeurde op 14 september en leverde een merge-conflict op.
+
+Dat is met besluit 3 verdwenen: het resultaat gaat nu naar Supabase in plaats
+van de repository in. Elke crawl maakt een nieuwe rij in `crawls` met zijn eigen
+bevindingen; het scherm toont de nieuwste. Twee crawls botsen dus niet meer, en
+de workflow heeft geen schrijfrecht op de repository meer nodig.
+
+Wat er voor terugkomt: oude crawls blijven staan en worden nooit opgeruimd. Bij
+tienduizenden bevindingen per crawl is dat iets om naar te kijken.
 
 ## Beheer
 
@@ -139,6 +182,9 @@ verdwijnt zo'n prototype.
 
 Twee dingen zijn licht, maar wel echt werk:
 
+- **De allowlist en de accounts.** Wie mag de resultaten zien? Accounts maak je
+  aan in het Supabase-dashboard en zet je daarna op `toegestane_gebruikers`.
+  Gaat iemand weg, dan moet hij eraf. Zie besluit 5.
 - **De uitzonderingenlijst** (`data/uitzonderingen.txt`) groeit met elk vals
   alarm en hoort bij de redactie, niet bij de techniek. Er staan
   huisstijlkeuzes in, zoals dat NederlandWereldwijd altijd `lhbtiq+` schrijft.
@@ -153,12 +199,16 @@ Twee dingen zijn licht, maar wel echt werk:
    een ander deel van de site moet dat bevestigen — en laten zien of de
    hoofdletterregel daar net zo goed uitpakt als op reisadviezen.
 2. Afspraak met de beheerder van de website (besluit 2).
-3. Besluit over publiek publiceren (besluit 3).
+3. ~~Besluit over publiek publiceren~~ — genomen, zie besluit 3.
 4. Iemand die het onderhoudt als de website van structuur verandert.
+5. Iemand die de accounts en de allowlist beheert (besluit 5).
 
 ## Wat er bewust niet in zit
 
 Grammatica, stijl en d/t-fouten · alle 4.660 pagina's in één run · continu of
-gepland scannen · meerdere talen · terugschrijven naar het CMS · inloggen of
-rollen · een startknop in de app zelf · bevindingen bewaren om trends over
-tijd te zien · afgeschermde of interne pagina's.
+gepland scannen · meerdere talen · terugschrijven naar het CMS · **rollen of
+rechten per gebruiker** (toegang is alles of niets) · zelf aanmelden ·
+wachtwoord vergeten · een startknop in de app zelf · bevindingen bewaren om
+trends over tijd te zien · afgeschermde of interne pagina's.
+
+Inloggen zat tot 15 september in dit lijstje. Zie besluit 3.

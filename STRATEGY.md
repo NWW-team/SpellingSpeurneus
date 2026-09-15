@@ -1,6 +1,6 @@
 ---
 name: SpellingSpeurneus
-last_updated: 2026-09-14
+last_updated: 2026-09-15
 ---
 
 # SpellingSpeurneus — Strategie
@@ -36,3 +36,12 @@ _Waarom het de aanpak dient:_ levert de daadwerkelijke spelfouten op die de reda
 Resultaten presenteren aan de redacteur, met filtering op URL.
 
 _Waarom het de aanpak dient:_ maakt de bevindingen bruikbaar voor de redacteur om gericht te controleren.
+
+### Toegang beperken tot de redactie
+
+Alleen vooraf toegestane accounts krijgen de bevindingen te zien.
+
+_Waarom het de aanpak dient:_ de bevindingenlijst is een werklijst van de redactie —
+half nagekeken, met vals alarm erin. Openbaar leest dat als een lijst fouten op de
+site van het ministerie, wat het niet is. De afscherming geldt de gegevens; de pagina
+zelf staat op GitHub Pages en blijft publiek.
