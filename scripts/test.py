@@ -105,6 +105,35 @@ def main():
              all(b["soort"] in ("spelfout", "naam")
                  for b in zoek_fouten("Reis nieet naar Cochabamba.", set())))
 
+    print("\nSjabloonresten (rommel uit het CMS)")
+    # "undefined" stond zichtbaar boven aan reisadvies/estland. Deze meldingen
+    # mogen nooit wegvallen: een bezoeker ziet ze wel.
+    schoon = {"reist", "u", "naar", "voor", "het", "reisadvies", "is", "geel",
+              "de", "grens", "bij", "aankomst", "en", "aantal", "nul",
+              "nulmeting", "object", "gedaan", "zijn", "terrorisme", "er", "niet"}
+    def resten(zin):
+        return [b["woord"] for b in zoek_fouten(zin, schoon)]
+    controle("undefined wordt gemeld",
+             "undefined" in resten("undefined Terrorisme is er niet."))
+    controle("[object Object] wordt heel gemeld, niet stukgeknipt",
+             resten("Reist u naar [object Object] voor het reisadvies.") == ["[object Object]"])
+    controle("onvervangen sjabloonveld met accolades",
+             "{{land}}" in resten("Het reisadvies voor {{land}} is geel."))
+    controle("onvervangen sjabloonveld met dollarteken",
+             "${land}" in resten("Het reisadvies voor ${land} is geel."))
+    controle("dubbel ontsnapte HTML",
+             resten("De grens bij&nbsp;aankomst.") == ["&nbsp;"])
+    controle("de rest wordt niet dubbel gemeld",
+             resten("De grens bij&nbsp;aankomst.").count("&nbsp;") == 1)
+    controle("de zin blijft ongewijzigd als context",
+             all(b["context"] == "Het reisadvies voor {{land}} is geel."
+                 for b in zoek_fouten("Het reisadvies voor {{land}} is geel.", schoon)))
+    controle("gewoon Nederlands blijft met rust",
+             resten("De nul en de nulmeting zijn gedaan.") == [])
+    controle("een sjabloonrest telt als spelfout, niet als naam",
+             all(b["soort"] == "spelfout"
+                 for b in zoek_fouten("Reist u naar [object Object] voor het reisadvies.", schoon)))
+
     print("\nPatronen uit robots.txt")
     for patroon, pad, verwacht in [
         ("/api/*", "/api/iets", True), ("/api/*", "/apart", False),

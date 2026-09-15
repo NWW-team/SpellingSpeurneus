@@ -16,7 +16,7 @@
     --inkt: #1a1a1a; --gedempt: #535353; --lijn: #d4d9e0;
     --grond: #f0f2f5; --vlak: #ffffff;
     --accent: var(--donkerblauw); --tabrand: var(--hemelblauw);
-    --markering: #fcf3a5;
+    --markering: #fcf3a5; --waarschuwing: #D52B1E;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -24,6 +24,9 @@
       --grond: #1b1e22; --vlak: #24282e;
       --accent: var(--lichtblauw); --tabrand: var(--lichtblauw);
       --markering: #4a4318;
+      /* Het rood van de huisstijl haalt op een donker vlak geen AA-contrast;
+         deze lichtere tint wel (5,2:1). */
+      --waarschuwing: #F27166;
     }
   }
   * { box-sizing: border-box; }
@@ -68,6 +71,11 @@
   td { border-bottom: 1px solid var(--lijn); padding: 10px; vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
   .woord { font-weight: 600; white-space: nowrap; }
+  .merk { display: block; margin-top: 2px; font-size: .75rem; font-weight: 600;
+          white-space: nowrap; color: var(--waarschuwing); }
+  tr.sjabloon td { border-left: 3px solid var(--waarschuwing); }
+  tr.sjabloon td:not(:first-child) { border-left: 0; }
+  .feit strong.alarm { color: var(--waarschuwing); }
   .context mark { background: var(--markering); color: var(--inkt);
                   font-weight: 600; padding: 0 2px; border-radius: 2px; }
   .bron a { color: var(--accent); word-break: break-word; }
@@ -247,6 +255,16 @@ let bevindingen = [];
 // spelfouten en namen. Die tonen we bij de spelfouten, zoals hij toen ook stond.
 const isNaam = b => b.soort === "naam";
 
+// Resten van het sjabloon of het CMS: "undefined", "[object Object]",
+// "{{titel}}". De crawler meldt ze als gewone spelfout, want de kolom `soort`
+// laat maar twee waarden toe. Hier herkennen we ze aan het woord zelf, zodat
+// ze bovenaan komen en opvallen tussen de tikfouten.
+//
+// LET OP: dit patroon hoort gelijk te blijven aan SJABLOONRESTEN in
+// scripts/crawl.py. Wijzig je daar iets, wijzig het hier dan ook.
+const SJABLOONREST = /^(?:\[object [A-Za-z]+\]|\{\{[^{}]{0,60}\}\}|\$\{[^{}]{0,60}\}|&(?:nbsp|amp|quot|lt|gt|#\d+);|undefined|null|NaN|Infinity)$/;
+const isSjabloonrest = b => SJABLOONREST.test(b.woord);
+
 function ontsnap(tekst) {
   const hulp = document.createElement("div");
   hulp.textContent = tekst;
@@ -272,8 +290,16 @@ function toonFeiten(gegevens) {
   const spelfouten = bevindingen.filter(b => !isNaam(b)).length;
   // Namen tellen we per uniek woord, want zo staan ze ook in de tabel.
   const namen = new Set(bevindingen.filter(isNaam).map(b => b.woord)).size;
+  // Alleen tonen als er iets is. Een vakje dat altijd "0" zegt leest niemand
+  // nog; een vakje dat er ineens staat, valt op.
+  const resten = bevindingen.filter(isSjabloonrest).length;
+  const restenVak = resten
+    ? `<div class="feit"><strong class="alarm">${resten}</strong>
+         <span>sjabloonresten</span></div>`
+    : "";
   feitenVak.innerHTML = `
     <div class="feit"><strong>${spelfouten}</strong><span>spelfouten</span></div>
+    ${restenVak}
     <div class="feit"><strong>${namen}</strong><span>namen apart gezet</span></div>
     <div class="feit"><strong>${gegevens.aantal_paginas}</strong><span>pagina's bekeken</span></div>
     <div class="feit"><strong>${ontsnap(gegevens.bron)}</strong><span>deel van de site</span></div>
@@ -319,13 +345,22 @@ function tekenSpelfouten(rijen) {
     return;
   }
 
-  rijenLichaam.innerHTML = rijen.map(b => `
-    <tr>
-      <td class="woord">${ontsnap(b.woord)}</td>
+  // Sjabloonresten bovenaan: het zijn er zelden veel, en het is het soort
+  // melding dat niet in een lijst van honderden hoort te verdwijnen.
+  const geordend = [...rijen].sort(
+    (a, z) => (isSjabloonrest(z) ? 1 : 0) - (isSjabloonrest(a) ? 1 : 0));
+
+  rijenLichaam.innerHTML = geordend.map(b => {
+    const rest = isSjabloonrest(b);
+    const merk = rest ? `<span class="merk">sjabloonrest</span>` : "";
+    return `
+    <tr${rest ? ' class="sjabloon"' : ""}>
+      <td class="woord">${ontsnap(b.woord)}${merk}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
       ${bronCel(b)}
       ${knopCel(b.woord)}
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 }
 
 // Namen staan één keer in de lijst, met het aantal pagina's erbij. Dezelfde naam
