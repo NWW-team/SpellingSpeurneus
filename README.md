@@ -87,6 +87,24 @@ altijd een harde bovengrens op het aantal pagina's.
 | `OVERDRACHT.md` | Stand van zaken, openstaande besluiten, beperkingen en beheer |
 | `.github/workflows/crawl.yml` | De knop die een crawl start |
 
+## Vormgeving
+
+Het scherm benadert de Rijkshuisstijl in de **kleuren**: donkerblauw `#154273` voor de
+kopbalk en de links, hemelblauw `#007BC7` als accent, lichtblauw `#8FCAE7` op donkere
+vlakken en een geel markeerveld. Elke tekstkleur is tegen zijn achtergrond op WCAG
+AA-contrast getoetst, in de lichte én de donkere stand.
+
+Het is met opzet een benadering en geen kopie. Er zit **geen logo, woordmerk of het
+Rijksoverheid-lettertype** in: dit is een hulpmiddel voor de redactie en moet niet voor
+een officiële pagina van de Rijksoverheid worden aangezien — zeker niet zolang de
+resultaten publiek staan (zie besluit 3 in [OVERDRACHT.md](OVERDRACHT.md)).
+
+De echte tokens staan in
+[nl-design-system/rijkshuisstijl-community](https://github.com/nl-design-system/rijkshuisstijl-community).
+Die zijn hier niet uit overgenomen: dat pakket komt via npm en dit scherm is bewust één
+bestand zonder buildstap. Wil je het exact maken, neem dan de tokenwaarden over in de
+CSS-variabelen bovenaan `docs/index.html`; alles hangt aan die variabelen.
+
 ## Gegevens
 
 Deze app leest alleen openbare webpagina's en een openbare woordenlijst. Er gaat geen

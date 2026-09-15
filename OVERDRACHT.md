@@ -72,6 +72,13 @@ Het gaat alleen om citaten uit pagina's die al openbaar zijn, maar het is
 wel een bewuste keuze. Zodra iemand hier interne pagina's of conceptteksten
 in wil, klopt deze opzet niet meer.
 
+Dit besluit werd op 15 september scherper: het scherm heeft nu de kleuren van
+de Rijkshuisstijl. Logo, woordmerk en het Rijksoverheid-lettertype zitten er
+bewust níét in, juist om te voorkomen dat een publieke pagina voor een
+officiële pagina van de Rijksoverheid wordt aangezien. Wie de vormgeving
+verder officieel wil maken, moet dit eerst met de huisstijlbeheerder bij BZ
+afstemmen. Zie "Vormgeving" in [README.md](README.md).
+
 ## Bekende beperkingen
 
 - **`persoons-` uit "persoons- en bagagecontrole"** wordt getoetst als

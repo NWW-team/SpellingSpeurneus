@@ -5,26 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SpellingSpeurneus</title>
 <style>
+  /* Kleuren in de trant van de Rijkshuisstijl: donkerblauw, hemelblauw,
+     lichtblauw en het gele accent. Benaderd, niet de officiële tokens - die
+     staan in nl-design-system/rijkshuisstijl-community. Bewust géén logo,
+     woordmerk of het Rijksoverheid-lettertype: dit is een hulpmiddel voor de
+     redactie, geen officiële pagina van de Rijksoverheid.
+     Elke tekstkleur is op WCAG AA-contrast getoetst tegen zijn achtergrond. */
   :root {
-    --inkt: #1a1a1a; --gedempt: #5b6570; --lijn: #d8dde3;
-    --grond: #f7f8fa; --vlak: #ffffff; --accent: #154273; --markering: #fdf3d7;
+    --donkerblauw: #154273; --hemelblauw: #007BC7; --lichtblauw: #8FCAE7;
+    --inkt: #1a1a1a; --gedempt: #535353; --lijn: #d4d9e0;
+    --grond: #f0f2f5; --vlak: #ffffff;
+    --accent: var(--donkerblauw); --tabrand: var(--hemelblauw);
+    --markering: #fcf3a5;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --inkt: #e8eaed; --gedempt: #9aa4b0; --lijn: #333a42;
-      --markering: #3a341f;
+      --inkt: #e8eaed; --gedempt: #a7b0ba; --lijn: #3a4048;
+      --grond: #1b1e22; --vlak: #24282e;
+      --accent: var(--lichtblauw); --tabrand: var(--lichtblauw);
+      --markering: #4a4318;
     }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--grond); color: var(--inkt);
          font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
   .omhulsel { max-width: 1000px; margin: 0 auto; padding: 24px 16px 64px; }
+  /* De donkerblauwe balk is het meest herkenbare element van de huisstijl. */
+  .kop { background: var(--donkerblauw); color: #fff;
+         border-bottom: 4px solid var(--hemelblauw); }
+  .kop .omhulsel { padding-block: 20px; }
   h1 { font-size: 1.6rem; margin: 0 0 4px; }
-  .ondertitel { color: var(--gedempt); margin: 0 0 24px; }
+  .ondertitel { color: var(--lichtblauw); margin: 0; }
   .kaart { background: var(--vlak); border: 1px solid var(--lijn);
            border-radius: 8px; padding: 16px; margin-bottom: 20px; }
   .feiten { display: flex; flex-wrap: wrap; gap: 24px; }
-  .feit strong { display: block; font-size: 1.5rem; line-height: 1.2; }
+  .feit strong { display: block; font-size: 1.5rem; line-height: 1.2;
+                 color: var(--accent); }
   .feit span { color: var(--gedempt); font-size: .85rem; }
   .filters { display: flex; flex-wrap: wrap; gap: 12px; }
   .filter { flex: 1 1 220px; }
@@ -37,7 +53,8 @@
   .tabblad { font-size: .95rem; padding: 8px 14px; border-radius: 6px;
     background: transparent; border: 1px solid transparent; color: var(--gedempt); }
   .tabblad[aria-selected="true"] { background: var(--vlak); border-color: var(--lijn);
-    color: var(--inkt); font-weight: 600; }
+    color: var(--inkt); font-weight: 600;
+    border-bottom: 3px solid var(--tabrand); border-radius: 6px 6px 0 0; }
   .tabblad .aantal { color: var(--gedempt); font-weight: 400; }
   .uitleg { color: var(--gedempt); font-size: .9rem; margin: 0 0 16px; }
   .tabelhouder { overflow-x: auto; }
@@ -49,14 +66,14 @@
   td { border-bottom: 1px solid var(--lijn); padding: 10px; vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
   .woord { font-weight: 600; white-space: nowrap; }
-  .context mark { background: var(--markering); color: inherit;
+  .context mark { background: var(--markering); color: var(--inkt);
                   font-weight: 600; padding: 0 2px; border-radius: 2px; }
   .bron a { color: var(--accent); word-break: break-word; }
   .bron small { display: block; color: var(--gedempt); }
   button { font: inherit; font-size: .8rem; padding: 4px 8px; cursor: pointer;
     border: 1px solid var(--lijn); border-radius: 5px;
-    background: var(--grond); color: var(--gedempt); white-space: nowrap; }
-  button:hover { color: var(--inkt); border-color: var(--gedempt); }
+    background: var(--grond); color: var(--accent); white-space: nowrap; }
+  button:hover { border-color: var(--accent); background: var(--vlak); }
   .melding { color: var(--gedempt); padding: 24px 10px; text-align: center; }
   footer { color: var(--gedempt); font-size: .85rem; margin-top: 32px;
            border-top: 1px solid var(--lijn); padding-top: 16px; }
@@ -64,10 +81,15 @@
 </style>
 </head>
 <body>
-<div class="omhulsel">
 
-  <h1>SpellingSpeurneus</h1>
-  <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
+<header class="kop">
+  <div class="omhulsel">
+    <h1>SpellingSpeurneus</h1>
+    <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
+  </div>
+</header>
+
+<div class="omhulsel">
 
   <div class="kaart feiten" id="feiten"><span class="melding">Bezig met laden…</span></div>
 
