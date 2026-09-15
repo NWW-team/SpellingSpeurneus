@@ -18,7 +18,7 @@ on:
         default: "master"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: crawl-${{ github.ref }}
@@ -68,20 +68,23 @@ jobs:
           BRON: ${{ inputs.bron }}
           MAX_PAGINAS: ${{ inputs.max_paginas }}
         run: |
-          python3 scripts/crawl.py --bron "$BRON" --max-paginas "$MAX_PAGINAS"
+          # Bewust buiten docs/: alles in die map wordt door GitHub Pages
+          # publiek uitgeleverd. Het resultaat gaat naar Supabase.
+          python3 scripts/crawl.py --bron "$BRON" --max-paginas "$MAX_PAGINAS" \
+            --uit resultaten.json
 
-      - name: Resultaat vastleggen
+      # Het resultaat werd hier eerder in deze publieke repository gecommit en
+      # was daarmee voor iedereen te lezen. Nu gaat het naar Supabase, waar de
+      # RLS-policies het alleen aan toegestane accounts vrijgeven.
+      - name: Resultaat naar Supabase
         env:
-          BRON: ${{ inputs.bron }}
-          MAX_PAGINAS: ${{ inputs.max_paginas }}
-          TAK: ${{ github.ref_name }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/resultaten.json
-          if git diff --staged --quiet; then
-            echo "Geen wijziging in de resultaten."
-          else
-            git commit -m "Crawl $BRON ($MAX_PAGINAS pagina's)"
-            git push origin "HEAD:$TAK"
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::De secrets SUPABASE_URL en SUPABASE_SERVICE_ROLE_KEY"
+            echo "::error::staan niet in deze repository. Zonder die twee kan het"
+            echo "::error::resultaat niet worden gepubliceerd. Zie README.md."
+            exit 1
           fi
+          python3 scripts/publiceer.py --in resultaten.json
