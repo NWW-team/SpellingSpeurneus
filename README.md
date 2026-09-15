@@ -115,12 +115,13 @@ worden herschreven of de repository privé.
 
 | Wat | Waar | Waarom |
 |---|---|---|
-| Project-URL en **publishable key** | in `docs/index.html`, publiek | Daarvoor bedoeld. Verleent alleen wat de policies toestaan |
+| Project-URL en **publishable key** | in `docs/index.html` en in de workflow, publiek | Daarvoor bedoeld. Verleent alleen wat de policies toestaan |
 | **Service-role key** | alleen als GitHub Actions secret `SUPABASE_SERVICE_ROLE_KEY` | Zet RLS buiten werking. Nooit in de frontend, de repository of een prompt |
 | Databasewachtwoord | nergens | Niet nodig |
 
-De workflow heeft naast die twee secrets (`SUPABASE_URL` en `SUPABASE_SERVICE_ROLE_KEY`)
-geen schrijfrecht op de repository meer nodig.
+Dat is dus **één** secret om te beheren. De project-URL staat gewoon in de
+workflow, want die is niet geheim. De workflow heeft verder geen schrijfrecht op
+de repository meer nodig.
 
 ## Fatsoenlijk crawlen
 
