@@ -25,17 +25,18 @@ Er draait niets automatisch op de achtergrond. Een crawl gebeurt alleen als iema
 ## Spelfouten en namen
 
 De woordenlijst kent geen plaats- en organisatienamen. Op reisadviespagina's staan die
-overal, dus zonder scheiding verdrinken de echte fouten erin: de eerste crawl van 50
-pagina's gaf 614 meldingen, waarvan er 8 een echte fout waren.
+overal, dus zonder scheiding verdrinken de echte fouten erin: de crawl over alle 226
+reisadviezen gaf 3.376 meldingen, waarvan er 2.949 een naam waren.
 
 Daarom deelt de app elke melding in. **Een woord met een hoofdletter middenin een zin is
 een naam**; aan het zinsbegin zegt een hoofdletter niets, dus daar toetsen we gewoon door.
 Een vergeten spatie gaat voor: `III.Let op dat u` begint met een hoofdletter maar is een
-echte fout. Dezelfde crawl levert zo 42 spelfouten op — met alle 8 echte fouten erbij — en
-315 namen op een tweede tabblad.
+echte fout. Dezelfde crawl levert zo 427 spelfouten op en 1.398 namen op een tweede
+tabblad: 87% van de meldingen verdwijnt uit beeld zonder verloren te gaan.
 
-Namen worden dus **niet weggegooid**. Ze staan er één keer per naam, met het aantal
-pagina's erbij, zodat een verkeerd gespelde plaatsnaam op te zoeken blijft. De indeling
+Namen worden dus **niet weggegooid**. Ze staan er één keer per naam, met een voorbeeldzin
+en een link naar het reisadvies waar die zin staat — en als de naam op meer pagina's
+voorkomt, staat erbij op hoeveel. Zo blijft een verkeerd gespelde plaatsnaam op te zoeken. De indeling
 staat per bevinding in de kolom `soort`, dus wie de regel anders wil (hij staat in
 `soort_van` in `scripts/crawl.py`) kan het scherm omgooien zonder opnieuw te crawlen.
 
@@ -48,6 +49,11 @@ woordenlijst. Dat nakijken blijft mensenwerk.
 Meldt de app een woord dat gewoon goed is? Klik op **Kopieer als uitzondering**, plak het
 woord in [`data/uitzonderingen.txt`](data/uitzonderingen.txt) en draai de crawl opnieuw.
 Die lijst hoort bij de webredactie, niet bij de techniek — hij groeit met het gebruik.
+
+Eén ding om te weten bij het lezen van de cijfers: die lijst wordt bijgewerkt op basis van
+de pagina's die al gecrawld zijn. Op **nieuwe** pagina's ligt het aantal valse meldingen
+daarom hoger. Gemeten: 0,84 per pagina op de al opgeschoonde eerste 50, tegen 2,19 op de
+176 pagina's die daarna voor het eerst langskwamen. Reken met het hoogste getal.
 
 ## Zelf draaien
 

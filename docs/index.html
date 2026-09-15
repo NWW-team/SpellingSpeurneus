@@ -60,7 +60,7 @@
   .tabblad .aantal { color: var(--gedempt); font-weight: 400; }
   .uitleg { color: var(--gedempt); font-size: .9rem; margin: 0 0 16px; }
   .tabelhouder { overflow-x: auto; }
-  td.telling { color: var(--gedempt); white-space: nowrap; }
+  .telling { display: block; color: var(--gedempt); }
   table { width: 100%; border-collapse: collapse; font-size: .95rem; }
   th { text-align: left; font-size: .8rem; text-transform: uppercase;
        letter-spacing: .04em; color: var(--gedempt); font-weight: 600;
@@ -193,10 +193,11 @@
   <div id="paneel-namen" role="tabpanel" aria-labelledby="tab-namen" hidden>
     <p class="uitleg">Woorden met een hoofdletter middenin een zin: plaatsen,
       organisaties en anderstalige bronnen. De woordenlijst kent geen namen, dus
-      ze staan hier allemaal — ook de goede. Elke naam staat één keer.</p>
+      ze staan hier allemaal — ook de goede. Elke naam staat één keer, met een
+      voorbeeldzin en een link naar het reisadvies waar die zin staat.</p>
     <div class="kaart tabelhouder">
       <table>
-        <thead><tr><th>Naam</th><th>Pagina's</th><th>Voorbeeld</th><th></th></tr></thead>
+        <thead><tr><th>Naam</th><th>Voorbeeld</th><th>Pagina</th><th></th></tr></thead>
         <tbody id="naamrijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
       </table>
     </div>
@@ -279,6 +280,16 @@ function toonFeiten(gegevens) {
     <div class="feit"><strong>${datum}</strong><span>laatste crawl</span></div>`;
 }
 
+// De cel met de link naar de pagina. Beide tabbladen gebruiken hem, zodat een
+// bevinding overal op dezelfde manier naar zijn bron wijst.
+function bronCel(b, extra = "") {
+  const link = b.url.startsWith("http")
+    ? `<a href="${ontsnap(b.url)}" target="_blank" rel="noopener">${ontsnap(korteUrl(b.url))}</a>`
+    : ontsnap(b.url);
+  return `<td class="bron">${link}
+    <small>${ontsnap(b.titel || "")}</small>${extra}</td>`;
+}
+
 function knopCel(woord) {
   return `<td><button type="button" data-woord="${ontsnap(woord)}"
             title="Kopieer dit woord, om het in data/uitzonderingen.txt te plakken">
@@ -312,12 +323,7 @@ function tekenSpelfouten(rijen) {
     <tr>
       <td class="woord">${ontsnap(b.woord)}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
-      <td class="bron">
-        ${b.url.startsWith("http")
-          ? `<a href="${ontsnap(b.url)}" target="_blank" rel="noopener">${ontsnap(korteUrl(b.url))}</a>`
-          : ontsnap(b.url)}
-        <small>${ontsnap(b.titel || "")}</small>
-      </td>
+      ${bronCel(b)}
       ${knopCel(b.woord)}
     </tr>`).join("");
 }
@@ -340,13 +346,21 @@ function tekenNamen(rijen) {
     return;
   }
 
-  naamLichaam.innerHTML = namen.map(b => `
+  naamLichaam.innerHTML = namen.map(b => {
+    // De link wijst naar de pagina van het getoonde voorbeeld. Staat de naam
+    // op meer pagina's, dan zegt de cel erbij op hoeveel.
+    const meer = b.paginas.size - 1;
+    const erbij = meer > 0
+      ? `<small class="telling">en ${meer} andere pagina${meer > 1 ? "'s" : ""}</small>`
+      : "";
+    return `
     <tr>
       <td class="woord">${ontsnap(b.woord)}</td>
-      <td class="telling">${b.paginas.size}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
+      ${bronCel(b, erbij)}
       ${knopCel(b.woord)}
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 }
 
 function kiesTabblad(gekozen) {

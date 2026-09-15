@@ -162,6 +162,7 @@ regeringskantoren
 # de plus wordt niet meer weggestreept bij het opdelen van de zin.
 lhbtiq+
 lhbtiq+persoon
+lhbtiq+personen
 lhbtiq+-vriendelijke
 
 # Ziekten waarvan de site beide namen geeft: "Mpox-virus (apenpokken)".
@@ -169,6 +170,57 @@ lhbtiq+-vriendelijke
 mpox
 mpox-virus
 apenpokken
+
+# --- Derde ronde, na de volledige crawl van 226 reisadviezen ---
+#
+# Alleen woorden die op meer dan één reisadvies voorkwamen. Woorden die maar
+# op één pagina staan zijn bewust blijven staan: juist daar zitten de echte
+# tikfouten, want een tikfout komt één keer voor. Deze ronde haalt 87 van de
+# 427 meldingen weg; de rest is de staart, en die hoort er te zijn.
+
+# Reizen, documenten en bagage
+inreisvoorwaarden
+visumregels
+visumstempel
+zakenvisum
+eVisa
+gezondheidsformulier
+reizigersverklaring
+grensautoriteiten
+nooddocumenten
+hoteltaxi
+navulverpakkingen
+varkensvleesproducten
+
+# Gezondheid en verzekering
+ziektekostenverzekeringskaart
+zorgverzekeringspas
+methylfenidaat
+bilharzia
+
+# Veiligheid en natuur
+alarmberichten
+tsunamiwaarschuwingen
+droneaanvallen
+bergreddingsdienst
+fijnstofconcentratie
+milieustickers
+bootvervoer
+
+# Criminaliteit
+liefdesfraude
+smokkelactiviteiten
+namaakproducten
+
+# Organisaties en gebieden
+Al-Shabaab
+oblasten
+
+# "etc." is goed; onze zinsopdeling haalt de laatste punt weg, waardoor "etc"
+# overblijft. Hier goedgekeurd, want het is geen spelfout. Datzelfde geldt voor
+# "o.a."; die stond maar op één pagina en valt dus buiten deze ronde.
+etc
+
 
 # --- Nog te beslissen door de webredactie ---
 #
