@@ -17,6 +17,7 @@ standaardbibliotheek van Python, zoals de rest van dit project.
 """
 
 import argparse
+import base64
 import json
 import os
 import sys
@@ -63,6 +64,47 @@ def verzoek(basis, sleutel, pad, lichaam, extra_kop=None):
         sys.exit(f"Kan {basis} niet bereiken: {fout.reason}")
 
 
+def rol_uit_jwt(sleutel):
+    """De rol uit een JWT-sleutel, of None als het er geen is.
+
+    Een JWT is base64; de rol staat er niet leesbaar in. Een sleutel van het
+    nieuwe formaat (sb_secret_...) is geen JWT en levert None op.
+    """
+    delen = sleutel.split(".")
+    if len(delen) != 3:
+        return None
+    lading = delen[1]
+    try:
+        opvulling = "=" * (-len(lading) % 4)
+        ruw = base64.urlsafe_b64decode(lading + opvulling)
+        return json.loads(ruw).get("role")
+    except Exception:
+        return None
+
+
+def controleer_sleutel(sleutel):
+    """Zegt het meteen als dit geen sleutel is, in plaats van een kale 401.
+
+    Twee keer eerder misgegaan: het label `service_role` uit het dashboard
+    gekopieerd in plaats van de sleutel ernaast, en de publishable key gebruikt
+    die geen schrijfrechten heeft.
+    """
+    if sleutel.startswith("sb_publishable_") or rol_uit_jwt(sleutel) == "anon":
+        sys.exit("Dit is de publishable key of de anon key, niet de service-role "
+                 "key. Die eerste mag publiek zijn en mag niets schrijven. Pak in "
+                 "het Supabase-dashboard onder Project Settings > API Keys de "
+                 "geheime sleutel.")
+
+    lijkt_op_jwt = sleutel.count(".") == 2 and sleutel.startswith("eyJ")
+    lijkt_op_secret = sleutel.startswith("sb_secret_")
+    if not (lijkt_op_jwt or lijkt_op_secret):
+        sys.exit(f"De waarde in SUPABASE_SERVICE_ROLE_KEY is {len(sleutel)} tekens "
+                 f"lang en ziet niet uit als een sleutel. Verwacht is een lange "
+                 f"tekst die begint met 'eyJ' of 'sb_secret_'. Let op: in het "
+                 f"dashboard staat het woord 'service_role' naast de sleutel; je "
+                 f"hebt de sleutel nodig, niet dat label. Gebruik de kopieerknop.")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -72,10 +114,13 @@ def main():
     argumenten = parser.parse_args()
 
     basis = os.environ.get("SUPABASE_URL", "").rstrip("/")
-    sleutel = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    # .strip(): een sleutel die via de klembord in een secret is geplakt sleept
+    # makkelijk een newline mee, en dan is hij ongeldig zonder dat je ziet waarom.
+    sleutel = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     if not basis or not sleutel:
         sys.exit("SUPABASE_URL en SUPABASE_SERVICE_ROLE_KEY moeten in de "
                  "omgeving staan. Zet ze als GitHub Actions secret.")
+    controleer_sleutel(sleutel)
 
     pad = Path(argumenten.bestand)
     if not pad.exists():
