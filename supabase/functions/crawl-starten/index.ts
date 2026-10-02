@@ -61,7 +61,8 @@ Deno.serve(async (verzoek) => {
       "User-Agent": "SpellingSpeurneus",
     },
     // GitHub wil alle inputs als tekst. opentaal_ref blijft op de standaardwaarde.
-    body: JSON.stringify({ ref: "main", inputs: { bron, max_paginas: String(max_paginas) } }),
+    // aanvraag_id laat de crawler zijn voortgang aan deze rij melden.
+    body: JSON.stringify({ ref: "main", inputs: { bron, max_paginas: String(max_paginas), aanvraag_id: String(rij.id) } }),
   });
 
   if (!gh.ok) {

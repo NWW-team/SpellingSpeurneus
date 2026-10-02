@@ -6,13 +6,17 @@
 """
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from crawl import (SITE, is_bekend, lees_goedgekeurd, lees_woordenlijst as lijst_woorden,  # noqa: E402
+from voortgang import meld  # noqa: E402
+from crawl import (SITE, is_bekend, lees_goedgekeurd,  # noqa: E402
                    maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
                    zoek_fouten)
 
@@ -25,15 +29,22 @@ def controle(naam, gelukt, toelichting=""):
     print(f"  {'OK  ' if gelukt else 'FOUT'} {naam}" + (f" — {toelichting}" if toelichting else ""))
 
 
-def draai_crawl(uitvoer, uitzonderingen=None, goedgekeurd=None):
+def _faalt(functie):
+    """True als de functie een fout gooit (hier: een ongeldig id)."""
+    try:
+        functie()
+    except Exception:
+        return True
+    return False
+
+
+def draai_crawl(uitvoer, goedgekeurd=None):
     # Zonder --goedgekeurd zoekt crawl.py naar een goedgekeurd.json in de wortel
     # van de repository. Wijs daarom altijd een bestand aan, zodat een los
     # achtergebleven bestand de controles niet beinvloedt.
     opdracht = [sys.executable, str(WORTEL / "scripts" / "crawl.py"),
                 "--bron", "demo", "--max-paginas", "5", "--uit", str(uitvoer),
                 "--goedgekeurd", str(goedgekeurd or "bestaat-niet.json")]
-    if uitzonderingen:
-        opdracht += ["--uitzonderingen", str(uitzonderingen)]
     subprocess.run(opdracht, check=True, capture_output=True)
     return json.loads(Path(uitvoer).read_text(encoding="utf-8"))
 
@@ -62,14 +73,6 @@ def main():
     for nepwoord in ("kwaliteitt", "navigatiefoutt", "voetfoutt"):
         controle(f"{nepwoord} uit menu/voettekst genegeerd", nepwoord not in gevonden)
 
-    print("\nUitzonderingenlijst")
-    lijst = tijdelijk / "uitzonderingen.txt"
-    lijst.write_text("gelegenhied\n", encoding="utf-8")
-    met_uitzondering = draai_crawl(tijdelijk / "uitz.json", lijst)
-    woorden = {b["woord"] for b in met_uitzondering["bevindingen"]}
-    controle("uitgezonderd woord verdwijnt", "gelegenhied" not in woorden)
-    controle("de rest blijft staan", len(woorden) == 2, f"over: {sorted(woorden)}")
-
     print("\nIn het scherm goedgekeurd")
     gk = tijdelijk / "goedgekeurd.json"
     gk.write_text(json.dumps([{"woord": "aanvraeg", "soort": "woord"},
@@ -86,14 +89,82 @@ def main():
     controle("zonder bestand is er niets goedgekeurd",
              lees_goedgekeurd(tijdelijk / "bestaat-niet.json") == set())
 
-    print("\nUitzonderingen met een apostrof")
-    krullijst = tijdelijk / "krul.txt"
-    krullijst.write_text("natuurrisico's\nradiotaxi\n", encoding="utf-8")
+    print("\nVoortgang melden")
+    ontvangen = []
+
+    class Nepsupabase(BaseHTTPRequestHandler):
+        def do_PATCH(self):
+            lengte = int(self.headers.get("Content-Length", 0))
+            ontvangen.append((self.path, json.loads(self.rfile.read(lengte)),
+                              self.headers.get("apikey")))
+            self.send_response(204)
+            self.end_headers()
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Nepsupabase)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    oud_omgeving = {k: os.environ.get(k) for k in ("SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY")}
+    try:
+        os.environ["SUPABASE_URL"] = f"http://127.0.0.1:{server.server_port}"
+        os.environ["SUPABASE_SERVICE_ROLE_KEY"] = "sleutel"
+        controle("een melding geeft True", meld("12", status="crawlen", paginas_klaar=5) is True)
+        pad, lichaam, apikey = ontvangen[-1]
+        controle("de melding gaat naar de juiste rij", pad.endswith("/crawl_aanvragen?id=eq.12"), pad)
+        controle("de velden komen aan, plus een tijdstip",
+                 lichaam["status"] == "crawlen" and lichaam["paginas_klaar"] == 5
+                 and "bijgewerkt_op" in lichaam)
+        controle("de sleutel gaat mee als apikey", apikey == "sleutel")
+        voor = len(ontvangen)
+        controle("zonder aanvraag-id wordt niets gemeld",
+                 meld("", status="klaar") is False and len(ontvangen) == voor)
+        controle("een id met rommel wordt geweigerd, niet doorgegeven",
+                 _faalt(lambda: meld("1;drop", status="klaar")) and len(ontvangen) == voor)
+        # Een crawl met aanvraag-id draait door en meldt zijn tellingen
+        ontvangen.clear()
+        subprocess.run([sys.executable, str(WORTEL / "scripts" / "crawl.py"), "--bron", "demo",
+                        "--max-paginas", "5", "--uit", str(tijdelijk / "v.json"),
+                        "--goedgekeurd", "bestaat-niet.json", "--aanvraag-id", "7"],
+                       check=True, capture_output=True, env=os.environ.copy())
+        statussen = [m[1] for m in ontvangen]
+        controle("de crawl meldt eerst het totaal",
+                 statussen and statussen[0].get("status") == "crawlen"
+                 and statussen[0].get("paginas_totaal") == 5, f"{statussen[:1]}")
+        controle("de crawl meldt zijn laatste stand",
+                 statussen[-1].get("paginas_klaar") == 5, f"{statussen[-1:]}")
+        os.environ["SUPABASE_URL"] = "http://127.0.0.1:1"
+        controle("een onbereikbare server stopt niets, het geeft False",
+                 meld("12", status="crawlen") is False)
+    finally:
+        server.shutdown()
+        for k, v in oud_omgeving.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+    print("\nGoedgekeurde woorden ophalen")
+    # Dit is de enige lijst. Lukt het ophalen niet, dan moet de run stoppen en geen
+    # leeg bestand achterlaten waarmee de crawl stilletjes doorgaat.
+    uit = tijdelijk / "gk-ophalen.json"
+    omgeving = {**os.environ, "SUPABASE_URL": "http://127.0.0.1:1",
+                "SUPABASE_SERVICE_ROLE_KEY": "sleutel"}
+    mislukt_run = subprocess.run([sys.executable, str(WORTEL / "scripts" / "haal_goedgekeurd.py"),
+                                  str(uit)], capture_output=True, env=omgeving)
+    controle("onbereikbaar Supabase laat de run stoppen", mislukt_run.returncode != 0)
+    controle("en laat geen leeg bestand achter", not uit.exists())
+    zonder = {k: v for k, v in os.environ.items() if not k.startswith("SUPABASE_")}
+    mislukt_run = subprocess.run([sys.executable, str(WORTEL / "scripts" / "haal_goedgekeurd.py"),
+                                  str(uit)], capture_output=True, env=zonder)
+    controle("een ontbrekende sleutel laat de run ook stoppen", mislukt_run.returncode != 0)
+
+    print("\nGoedgekeurde woorden met een apostrof")
+    uitz = {"natuurrisico's", "radiotaxi"}
     zin = "Let op natuurrisico\u2019s en radiotaxi\u2019s in het land."
-    uitz = {w.lower() for w in lijst_woorden(krullijst)}
     over = [b["woord"] for b in zoek_fouten(zin, uitz)]
     controle("gekrulde apostrof telt als rechte", "natuurrisico's" not in over, f"over: {over}")
-    controle("uitzondering dekt het meervoud", "radiotaxi's" not in over, f"over: {over}")
+    controle("goedgekeurd woord dekt het meervoud", "radiotaxi's" not in over, f"over: {over}")
 
     print("\nHuisstijl met een plus")
     huis = {"lhbtiq+", "vriendelijke"}

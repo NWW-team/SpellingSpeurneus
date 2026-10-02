@@ -4,8 +4,9 @@
 Schrijft goedgekeurd.json, dat crawl.py leest. Draait op de GitHub-runner vlak
 voor de crawl. Alleen de standaardbibliotheek van Python.
 
-Een mislukte aanroep is geen reden om de crawl te stoppen: dan staat er een lege
-lijst en komen goedgekeurde woorden opnieuw voorbij. Dat zeggen we hardop.
+Dit is de enige lijst met goedgekeurde woorden. Lukt het ophalen niet, dan stopt de
+run: een crawl zonder die lijst meldt honderden goede woorden als fout, en dat resultaat
+komt dan in het scherm als ware het een gewone crawl.
 """
 
 import json
@@ -37,16 +38,14 @@ def main():
     uit = Path(sys.argv[1]) if len(sys.argv) > 1 else WORTEL / "goedgekeurd.json"
     basis = os.environ.get("SUPABASE_URL", "").rstrip("/")
     sleutel = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
-    rijen = []
     if not basis or not sleutel:
-        print("::warning::SUPABASE_URL of SUPABASE_SERVICE_ROLE_KEY ontbreekt; "
-              "ik haal geen goedgekeurde woorden op.")
-    else:
-        try:
-            rijen = haal(basis, sleutel)
-        except (urllib.error.URLError, TimeoutError, ValueError) as fout:
-            print(f"::warning::Goedgekeurde woorden ophalen mislukte ({fout}). "
-                  f"De crawl gaat door zonder; goedgekeurde woorden komen opnieuw voorbij.")
+        sys.exit("SUPABASE_URL of SUPABASE_SERVICE_ROLE_KEY ontbreekt, dus ik kan de "
+                 "goedgekeurde woorden niet ophalen.")
+    try:
+        rijen = haal(basis, sleutel)
+    except (urllib.error.URLError, TimeoutError, ValueError) as fout:
+        sys.exit(f"Goedgekeurde woorden ophalen mislukte ({fout}). De crawl stopt: zonder "
+                 f"die lijst zou het resultaat vol staan met woorden die goed zijn.")
     uit.write_text(json.dumps(rijen, ensure_ascii=False), encoding="utf-8")
     woorden = sum(1 for r in rijen if r["soort"] == "woord")
     print(f"{len(rijen)} goedgekeurd ({woorden} woorden, {len(rijen) - woorden} namen) -> {uit}")

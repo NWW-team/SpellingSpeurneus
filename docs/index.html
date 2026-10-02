@@ -100,6 +100,19 @@
   .crawlkaart .knop { font-size: .95rem; padding: 9px 14px; font-weight: 600;
     background: var(--accent); color: var(--vlak); border-color: var(--accent); }
   .crawlkaart .knop:hover { background: var(--accent); opacity: .9; }
+  .voortgang { margin-top: 12px; }
+  .balk { height: 12px; border-radius: 6px; background: var(--grond);
+          border: 1px solid var(--lijn); overflow: hidden; }
+  .vulling { height: 100%; width: 0; background: var(--tabrand);
+             transition: width .6s ease; }
+  .vulling.onbepaald { width: 35%; animation: schuif 1.4s ease-in-out infinite alternate; }
+  @keyframes schuif { from { margin-left: 0; } to { margin-left: 65%; } }
+  @media (prefers-reduced-motion: reduce) {
+    .vulling.onbepaald { animation: none; width: 100%; opacity: .5; }
+    .vulling { transition: none; }
+  }
+  .voortgangtekst { margin: 6px 0 0; font-size: .9rem; }
+  .voortgangtekst a { color: var(--accent); }
   .crawlstatus { margin: 0; color: var(--gedempt); font-size: .9rem; }
   button[disabled] { opacity: .6; cursor: default; }
   .acties { white-space: nowrap; }
@@ -140,6 +153,13 @@
         <input type="number" id="crawlaantal" value="50" min="1" max="5000" step="1">
       </div>
       <button type="button" class="knop" id="crawlknop">Crawl starten</button>
+    </div>
+    <div class="voortgang" id="voortgang" hidden>
+      <div class="balk" role="progressbar" aria-label="Voortgang van de crawl"
+           aria-valuemin="0" aria-valuemax="100" id="balk">
+        <div class="vulling" id="vulling"></div>
+      </div>
+      <p class="voortgangtekst" id="voortgangtekst" aria-live="polite"></p>
     </div>
     <p class="crawlstatus" id="crawlstatus">Even kijken of er vandaag al een crawl is gestart…</p>
   </div>
@@ -195,9 +215,10 @@
   </div>
 
   <div id="paneel-goedgekeurd" role="tabpanel" aria-labelledby="tab-goedgekeurd" hidden>
-    <p class="uitleg">Woorden en namen die de redactie heeft goedgekeurd. Ze
-      verdwijnen uit de lijsten en de volgende crawl slaat ze over. Intrekken
-      zet ze terug.</p>
+    <p class="uitleg">De enige lijst met goedgekeurde woorden en namen: alles wat
+      de crawler als goed beschouwt, behalve de woordenlijst van OpenTaal. Ze
+      verdwijnen uit de lijsten hierboven en de volgende crawl slaat ze over.
+      Intrekken zet ze terug. Zoek met <em>Filter op woord</em>.</p>
     <div class="kaart tabelhouder">
       <table>
         <thead><tr><th>Woord</th><th>Soort</th><th>Goedgekeurd op</th><th></th></tr></thead>
@@ -346,7 +367,16 @@ function tekenGoedgekeurd() {
     leeg(lichaam, "Nog niets goedgekeurd.");
     return;
   }
-  lichaam.innerHTML = goedgekeurd.map(g => `
+  // Alfabetisch, en gefilterd op het woordfilter, zodat een woord snel te vinden is.
+  const term = woordFilter.value.trim().toLowerCase();
+  const rijen = goedgekeurd
+    .filter(g => g.woord.toLowerCase().includes(term))
+    .sort((a, z) => a.woord.localeCompare(z.woord, "nl", { sensitivity: "base" }));
+  if (!rijen.length) {
+    leeg(lichaam, "Geen goedgekeurde woorden die aan het filter voldoen.");
+    return;
+  }
+  lichaam.innerHTML = rijen.map(g => `
     <tr>
       <td class="woord">${ontsnap(g.woord)}</td>
       <td>${g.soort === "naam" ? "naam" : "woord"}</td>
@@ -488,14 +518,22 @@ function wisGegevens() {
 // ---------------------------------------------------------------------------
 
 async function laadGoedgekeurd() {
-  const { data, error } = await sb
-    .from("goedgekeurd")
-    .select("woord, soort, goedgekeurd_op")
-    .is("ingetrokken_op", null)
-    .order("goedgekeurd_op", { ascending: false });
-  if (error) throw error;
-  goedgekeurd = data;
-  goedgekeurdSleutels = new Set(data.map(g => g.woord.toLowerCase()));
+  // In blokken: de API geeft er standaard maximaal duizend per verzoek.
+  const blok = 1000;
+  const alles = [];
+  for (let van = 0; ; van += blok) {
+    const { data, error } = await sb
+      .from("goedgekeurd")
+      .select("woord, soort, goedgekeurd_op")
+      .is("ingetrokken_op", null)
+      .order("id")
+      .range(van, van + blok - 1);
+    if (error) throw error;
+    alles.push(...data);
+    if (data.length < blok) break;
+  }
+  goedgekeurd = alles;
+  goedgekeurdSleutels = new Set(alles.map(g => g.woord.toLowerCase()));
 }
 
 // ---------------------------------------------------------------------------
@@ -508,10 +546,81 @@ const crawlStatus = document.getElementById("crawlstatus");
 const NL_TIJD = { timeZone: "Europe/Amsterdam" };
 const nlDatum = d => new Date(d).toLocaleDateString("sv-SE", NL_TIJD);  // jjjj-mm-dd
 
+// Een crawl die nog loopt toont een balk. Het scherm vraagt elke paar seconden
+// de stand op; de crawler zelf meldt hem aan Supabase (scripts/voortgang.py).
+const VOORTGANG_INTERVAL = 4000;
+const ACTIEF = ["aangevraagd", "crawlen", "publiceren"];
+const VASTGELOPEN_NA = 15 * 60 * 1000;   // zo lang geen levensteken is verdacht
+const MAX_DUUR = 8 * 3600 * 1000;        // oudere aanvragen tonen we niet meer
+let pollTimer = null;
+let wasActief = false;
+
+const voortgangVak = document.getElementById("voortgang");
+const balk = document.getElementById("balk");
+const vulling = document.getElementById("vulling");
+const voortgangTekst = document.getElementById("voortgangtekst");
+
+function minuten(seconden) {
+  if (seconden < 90) return "minder dan 2 minuten";
+  return `ongeveer ${Math.round(seconden / 60)} minuten`;
+}
+
+function runLink(a) {
+  return a.run_url
+    ? ` <a href="${ontsnap(a.run_url)}" target="_blank" rel="noopener">Bekijk de run in GitHub</a>.`
+    : "";
+}
+
+function tekenVoortgang(a) {
+  const actief = a && ACTIEF.includes(a.status) &&
+    Date.now() - new Date(a.aangevraagd_op) < MAX_DUUR;
+
+  if (!actief && !(a && a.status === "mislukt" && nlDatum(a.aangevraagd_op) === nlDatum(new Date()))) {
+    voortgangVak.hidden = true;
+    return;
+  }
+  voortgangVak.hidden = false;
+  vulling.classList.remove("onbepaald");
+  balk.removeAttribute("aria-valuenow");
+
+  if (a.status === "mislukt") {
+    vulling.style.width = "0";
+    voortgangTekst.innerHTML = `De crawl is mislukt. Er is niets gepubliceerd en je mag opnieuw starten.${runLink(a)}`;
+    return;
+  }
+
+  const laatsteLevensteken = new Date(a.bijgewerkt_op || a.aangevraagd_op);
+  const vast = Date.now() - laatsteLevensteken > VASTGELOPEN_NA;
+  const waarschuwing = vast
+    ? ` Er is sinds ${laatsteLevensteken.toLocaleTimeString("nl-NL",
+        { ...NL_TIJD, hour: "2-digit", minute: "2-digit" })} niets meer gemeld; kijk in GitHub of de crawl nog loopt.${runLink(a)}`
+    : "";
+
+  if (a.status === "crawlen" && a.paginas_totaal) {
+    const klaar = a.paginas_klaar || 0;
+    const percentage = Math.min(100, Math.round(100 * klaar / a.paginas_totaal));
+    vulling.style.width = percentage + "%";
+    balk.setAttribute("aria-valuenow", String(percentage));
+    // De resttijd uit het tempo tot nu toe, pas als er een paar pagina's zijn.
+    let rest = "de resttijd wordt berekend…";
+    const verstreken = (Date.now() - new Date(a.crawl_gestart_op)) / 1000;
+    if (klaar >= 3 && verstreken > 0) {
+      rest = `nog ${minuten(((a.paginas_totaal - klaar) * verstreken) / klaar)}, plus het opslaan`;
+    }
+    voortgangTekst.innerHTML = `Pagina ${klaar} van ${a.paginas_totaal} (${percentage}%) — ${rest}.${waarschuwing}`;
+  } else {
+    vulling.classList.add("onbepaald");
+    vulling.style.width = "";
+    voortgangTekst.innerHTML = a.status === "publiceren"
+      ? `Het resultaat wordt opgeslagen…${waarschuwing}`
+      : `De crawl wordt voorbereid (woordenlijst ophalen)…${waarschuwing}`;
+  }
+}
+
 async function laadAanvragen() {
   const { data, error } = await sb
     .from("crawl_aanvragen")
-    .select("aangevraagd_op, bron, max_paginas")
+    .select("aangevraagd_op, bron, max_paginas, status, paginas_klaar, paginas_totaal, crawl_gestart_op, bijgewerkt_op, run_url")
     .order("aangevraagd_op", { ascending: false })
     .limit(1);
   if (error) {
@@ -520,7 +629,10 @@ async function laadAanvragen() {
     return;
   }
   const laatste = data[0];
-  if (laatste && nlDatum(laatste.aangevraagd_op) === nlDatum(new Date())) {
+  // Een mislukte crawl telt niet mee: de dag komt dan vrij.
+  const vandaagGebruikt = laatste && laatste.status !== "mislukt" &&
+    nlDatum(laatste.aangevraagd_op) === nlDatum(new Date());
+  if (vandaagGebruikt) {
     const tijd = new Date(laatste.aangevraagd_op).toLocaleTimeString("nl-NL",
       { ...NL_TIJD, hour: "2-digit", minute: "2-digit" });
     crawlStatus.textContent =
@@ -533,6 +645,28 @@ async function laadAanvragen() {
       : "Er mag één crawl per dag.";
     crawlKnop.disabled = false;
   }
+
+  tekenVoortgang(laatste);
+
+  // Zolang er een crawl loopt blijven we de stand opvragen. Zodra hij klaar is
+  // laden we de nieuwe resultaten, zonder dat de pagina ververst hoeft te worden.
+  const actief = !!laatste && ACTIEF.includes(laatste.status) &&
+    Date.now() - new Date(laatste.aangevraagd_op) < MAX_DUUR;
+  if (actief && !pollTimer) {
+    pollTimer = setInterval(() => laadAanvragen().catch(() => {}), VOORTGANG_INTERVAL);
+  } else if (!actief && pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+  if (wasActief && !actief && laatste && laatste.status === "klaar") {
+    voortgangVak.hidden = false;
+    vulling.classList.remove("onbepaald");
+    vulling.style.width = "100%";
+    balk.setAttribute("aria-valuenow", "100");
+    voortgangTekst.textContent = "De crawl is klaar. De nieuwe resultaten staan hieronder.";
+    laadResultaten();
+  }
+  wasActief = actief;
 }
 
 crawlKnop.addEventListener("click", async () => {
@@ -558,9 +692,8 @@ crawlKnop.addEventListener("click", async () => {
       try { melding = (await antwoord.json()).fout || melding; } catch { /* geen JSON */ }
       throw new Error(melding);
     }
+    // De rij heeft nu status "aangevraagd": laadAanvragen toont de balk en begint met pollen.
     await laadAanvragen();
-    crawlStatus.textContent = "De crawl is gestart. Dat duurt een paar minuten; ververs daarna deze pagina. "
-      + crawlStatus.textContent;
   } catch (fout) {
     // Eerst de toestand opnieuw ophalen (misschien is de dag net gebruikt),
     // dan de melding erbij, zodat die niet wordt overschreven.
