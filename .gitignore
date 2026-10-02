@@ -8,3 +8,6 @@ __pycache__/
 
 # Het crawlresultaat gaat naar Supabase, niet in deze publieke repository.
 resultaten.json
+
+# Per crawl uit Supabase gehaald: wat in het scherm is goedgekeurd.
+goedgekeurd.json

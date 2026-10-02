@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from crawl import (SITE, is_bekend, lees_woordenlijst as lijst_woorden,  # noqa: E402
+from crawl import (SITE, is_bekend, lees_goedgekeurd, lees_woordenlijst as lijst_woorden,  # noqa: E402
                    maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
                    zoek_fouten)
 
@@ -25,9 +25,13 @@ def controle(naam, gelukt, toelichting=""):
     print(f"  {'OK  ' if gelukt else 'FOUT'} {naam}" + (f" — {toelichting}" if toelichting else ""))
 
 
-def draai_crawl(uitvoer, uitzonderingen=None):
+def draai_crawl(uitvoer, uitzonderingen=None, goedgekeurd=None):
+    # Zonder --goedgekeurd zoekt crawl.py naar een goedgekeurd.json in de wortel
+    # van de repository. Wijs daarom altijd een bestand aan, zodat een los
+    # achtergebleven bestand de controles niet beinvloedt.
     opdracht = [sys.executable, str(WORTEL / "scripts" / "crawl.py"),
-                "--bron", "demo", "--max-paginas", "5", "--uit", str(uitvoer)]
+                "--bron", "demo", "--max-paginas", "5", "--uit", str(uitvoer),
+                "--goedgekeurd", str(goedgekeurd or "bestaat-niet.json")]
     if uitzonderingen:
         opdracht += ["--uitzonderingen", str(uitzonderingen)]
     subprocess.run(opdracht, check=True, capture_output=True)
@@ -65,6 +69,22 @@ def main():
     woorden = {b["woord"] for b in met_uitzondering["bevindingen"]}
     controle("uitgezonderd woord verdwijnt", "gelegenhied" not in woorden)
     controle("de rest blijft staan", len(woorden) == 2, f"over: {sorted(woorden)}")
+
+    print("\nIn het scherm goedgekeurd")
+    gk = tijdelijk / "goedgekeurd.json"
+    gk.write_text(json.dumps([{"woord": "aanvraeg", "soort": "woord"},
+                              {"woord": "Cochabamba", "soort": "naam"}]), encoding="utf-8")
+    na_goedkeuren = draai_crawl(tijdelijk / "gk.json", goedgekeurd=gk)
+    over = {b["woord"] for b in na_goedkeuren["bevindingen"]}
+    controle("goedgekeurd woord verdwijnt", "aanvraeg" not in over)
+    controle("de rest blijft staan", over == {"gelegenhied", "buitenladn"}, f"over: {sorted(over)}")
+    toegestaan = lees_goedgekeurd(gk) | {"reis", "naar", "of"}
+    controle("goedgekeurde naam verdwijnt, ook met andere hoofdletters",
+             woorden_in_met("Reis naar Cochabamba of COCHABAMBA.", toegestaan) == [])
+    controle("een andere naam blijft gemeld",
+             woorden_in_met("Reis naar Cochabambo.", toegestaan) == ["Cochabambo"])
+    controle("zonder bestand is er niets goedgekeurd",
+             lees_goedgekeurd(tijdelijk / "bestaat-niet.json") == set())
 
     print("\nUitzonderingen met een apostrof")
     krullijst = tijdelijk / "krul.txt"

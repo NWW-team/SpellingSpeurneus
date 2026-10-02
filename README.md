@@ -44,9 +44,16 @@ woordenlijst. Dat nakijken blijft mensenwerk.
 
 ## Vals alarm wegwerken
 
-Meldt de app een woord dat gewoon goed is? Klik op **Kopieer als uitzondering**, plak het
-woord in [`data/uitzonderingen.txt`](data/uitzonderingen.txt) en draai de crawl opnieuw.
-Die lijst hoort bij de webredactie, niet bij de techniek — hij groeit met het gebruik.
+Meldt de app een woord of naam die gewoon goed is? Klik op **Goedkeuren**. Het verdwijnt uit
+de lijst en komt op het tabblad **Goedgekeurd** te staan; de volgende crawl slaat het over.
+Een vergissing maak je daar ongedaan met **Intrekken**. Goedkeuringen staan in de Supabase-tabel
+`goedgekeurd` en worden nooit verwijderd, alleen met een datum ingetrokken.
+
+Goedkeuren en intrekken gaan via de Edge Function
+[`supabase/functions/goedkeuren`](supabase/functions/goedkeuren/index.ts) en zijn begrensd tot
+300 wijzigingen per uur. Zie [Toegang](#toegang): omdat er geen inlog is, kan iedereen met de
+link dit doen. De basislijst in [`data/uitzonderingen.txt`](data/uitzonderingen.txt) blijft
+gelden naast wat in het scherm is goedgekeurd.
 
 Eén ding om te weten bij het lezen van de cijfers: die lijst wordt bijgewerkt op basis van
 de pagina's die al gecrawld zijn. Op **nieuwe** pagina's ligt het aantal valse meldingen
@@ -120,7 +127,9 @@ altijd een harde bovengrens op het aantal pagina's.
 | `scripts/test.py` | Controles: vindt de app de ingebouwde fouten, en volgt hij robots.txt |
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `scripts/publiceer.py` | Zet het resultaat in Supabase, achter de toegangscontrole |
-| `data/uitzonderingen.txt` | Goedgekeurde woorden die niet in de woordenlijst staan |
+| `data/uitzonderingen.txt` | Basislijst van goedgekeurde woorden. Wat in het scherm wordt goedgekeurd staat in Supabase |
+| `supabase/` | Migraties (in de SQL Editor te plakken) en de Edge Function `goedkeuren` |
+| `scripts/haal_goedgekeurd.py` | Haalt de in het scherm goedgekeurde woorden op, vlak voor de crawl |
 | `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |
 | `demo/` | Vijf fictieve pagina's met drie ingebouwde fouten, om op te testen |
 | `OVERDRACHT.md` | Stand van zaken, openstaande besluiten, beperkingen en beheer |

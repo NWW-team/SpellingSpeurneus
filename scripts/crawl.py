@@ -160,6 +160,20 @@ def lees_woordenlijst(pad):
     return woorden
 
 
+def lees_goedgekeurd(pad):
+    """De in het scherm goedgekeurde woorden en namen, kleine letters.
+
+    Komt uit goedgekeurd.json, dat de workflow vlak voor de crawl uit Supabase
+    haalt (scripts/haal_goedgekeurd.py). Ontbreekt het bestand, dan is er niets
+    goedgekeurd. Namen en woorden gaan in dezelfde set: een goedgekeurde naam is
+    ook goed aan het begin van een zin.
+    """
+    pad = Path(pad)
+    if not pad.exists():
+        return set()
+    return {rij["woord"].lower() for rij in json.loads(pad.read_text(encoding="utf-8"))}
+
+
 def is_bekend(woord, woorden):
     """Bekend als het woord in de lijst staat, of als alle delen dat doen.
 
@@ -307,6 +321,8 @@ def main():
                         help="harde bovengrens op het aantal pagina's")
     parser.add_argument("--woordenlijst", default=str(WORTEL / "data" / "woordenlijst.txt"))
     parser.add_argument("--uitzonderingen", default=str(WORTEL / "data" / "uitzonderingen.txt"))
+    parser.add_argument("--goedgekeurd", default=str(WORTEL / "goedgekeurd.json"),
+                        help="JSON met de in het scherm goedgekeurde woorden en namen")
     parser.add_argument("--uit", default=str(WORTEL / "docs" / "resultaten.json"))
     parser.add_argument("--pauze", type=float, default=0.5,
                         help="seconden wachten tussen twee pagina's")
@@ -320,9 +336,11 @@ def main():
         lijst_pad = reserve
     woorden = lees_woordenlijst(lijst_pad)
     uitzonderingen = {woord.lower() for woord in lees_woordenlijst(argumenten.uitzonderingen)}
-    toegestaan = woorden | uitzonderingen
+    goedgekeurd = lees_goedgekeurd(argumenten.goedgekeurd)
+    toegestaan = woorden | uitzonderingen | goedgekeurd
     print(f"Woordenlijst: {lijst_pad.name} ({len(woorden)} vormen), "
-          f"{len(uitzonderingen)} uitzonderingen.")
+          f"{len(uitzonderingen)} uitzonderingen, "
+          f"{len(goedgekeurd)} goedgekeurd in het scherm.")
 
     bevindingen = []
     aantal_paginas = 0

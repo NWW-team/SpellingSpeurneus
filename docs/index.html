@@ -89,6 +89,14 @@
            border-top: 1px solid var(--lijn); padding-top: 16px; }
   footer a { color: var(--accent); }
   h2 { font-size: 1.15rem; margin: 0 0 8px; }
+  .fout { color: #a3110f; background: #fdeceb; border: 1px solid #f5c2c0;
+          border-radius: 6px; padding: 9px 11px; margin: 0 0 16px;
+          font-size: .9rem; }
+  @media (prefers-color-scheme: dark) {
+    .fout { color: #ffb3b0; background: #3a1f1e; border-color: #6b2f2c; }
+  }
+  button[disabled] { opacity: .6; cursor: default; }
+  .acties { white-space: nowrap; }
   code { font-size: .85em; background: var(--grond); padding: 1px 4px;
          border-radius: 4px; }
 </style>
@@ -107,6 +115,8 @@
 <div class="omhulsel">
 
   <div id="app">
+
+  <p class="fout" id="fout" role="alert" hidden></p>
 
   <div class="kaart feiten" id="feiten"><span class="melding">Bezig met laden…</span></div>
 
@@ -130,6 +140,10 @@
             aria-controls="paneel-namen" aria-selected="false" tabindex="-1">
       Namen <span class="aantal" id="aantal-namen"></span>
     </button>
+    <button type="button" class="tabblad" role="tab" id="tab-goedgekeurd"
+            aria-controls="paneel-goedgekeurd" aria-selected="false" tabindex="-1">
+      Goedgekeurd <span class="aantal" id="aantal-goedgekeurd"></span>
+    </button>
   </div>
 
   <div id="paneel-spelfouten" role="tabpanel" aria-labelledby="tab-spelfouten">
@@ -150,6 +164,18 @@
       <table>
         <thead><tr><th>Naam</th><th>Voorbeeld</th><th>Pagina</th><th></th></tr></thead>
         <tbody id="naamrijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="paneel-goedgekeurd" role="tabpanel" aria-labelledby="tab-goedgekeurd" hidden>
+    <p class="uitleg">Woorden en namen die de redactie heeft goedgekeurd. Ze
+      verdwijnen uit de lijsten en de volgende crawl slaat ze over. Intrekken
+      zet ze terug.</p>
+    <div class="kaart tabelhouder">
+      <table>
+        <thead><tr><th>Woord</th><th>Soort</th><th>Goedgekeurd op</th><th></th></tr></thead>
+        <tbody id="goedgekeurdrijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -186,6 +212,8 @@ const urlFilter = document.getElementById("urlfilter");
 const woordFilter = document.getElementById("woordfilter");
 const tabbladen = [...document.querySelectorAll(".tabblad")];
 let bevindingen = [];
+let goedgekeurd = [];                 // actieve goedkeuringen uit Supabase
+let goedgekeurdSleutels = new Set();  // dezelfde woorden, kleine letters
 
 // Een bevinding zonder soort komt uit een crawl van voor de scheiding tussen
 // spelfouten en namen. Die tonen we bij de spelfouten, zoals hij toen ook stond.
@@ -256,10 +284,12 @@ function bronCel(b, extra = "") {
     <small>${ontsnap(b.titel || "")}</small>${extra}</td>`;
 }
 
-function knopCel(woord) {
-  return `<td><button type="button" data-woord="${ontsnap(woord)}"
-            title="Kopieer dit woord, om het in data/uitzonderingen.txt te plakken">
-            Kopieer als uitzondering</button></td>`;
+// De soort goedkeuring: een woord uit het spelfoutentabblad, of een naam.
+function knopCel(woord, soort) {
+  return `<td class="acties"><button type="button" data-actie="goedkeuren"
+            data-woord="${ontsnap(woord)}" data-soort="${soort}"
+            title="Dit woord is goed: het verdwijnt hier en de volgende crawl slaat het over">
+            Goedkeuren</button></td>`;
 }
 
 function leeg(lichaam, tekst) {
@@ -269,7 +299,10 @@ function leeg(lichaam, tekst) {
 function teken() {
   const urlTerm = urlFilter.value.trim().toLowerCase();
   const woordTerm = woordFilter.value.trim().toLowerCase();
+  // Goedgekeurde woorden en namen blijven uit beeld, in beide tabbladen: de
+  // crawler laat een goedgekeurde naam ook aan het zinsbegin door.
   const zichtbaar = bevindingen.filter(b =>
+    !goedgekeurdSleutels.has(b.woord.toLowerCase()) &&
     b.url.toLowerCase().includes(urlTerm) && b.woord.toLowerCase().includes(woordTerm));
 
   const spelfouten = zichtbaar.filter(b => !isNaam(b));
@@ -277,6 +310,25 @@ function teken() {
   tekenNamen(zichtbaar.filter(isNaam));
 
   document.getElementById("aantal-spelfouten").textContent = spelfouten.length;
+  tekenGoedgekeurd();
+}
+
+function tekenGoedgekeurd() {
+  document.getElementById("aantal-goedgekeurd").textContent = goedgekeurd.length;
+  const lichaam = document.getElementById("goedgekeurdrijen");
+  if (!goedgekeurd.length) {
+    leeg(lichaam, "Nog niets goedgekeurd.");
+    return;
+  }
+  lichaam.innerHTML = goedgekeurd.map(g => `
+    <tr>
+      <td class="woord">${ontsnap(g.woord)}</td>
+      <td>${g.soort === "naam" ? "naam" : "woord"}</td>
+      <td>${new Date(g.goedgekeurd_op).toLocaleString("nl-NL",
+        { dateStyle: "medium", timeStyle: "short" })}</td>
+      <td class="acties"><button type="button" data-actie="intrekken"
+          data-woord="${ontsnap(g.woord)}" data-soort="${g.soort}">Intrekken</button></td>
+    </tr>`).join("");
 }
 
 function tekenSpelfouten(rijen) {
@@ -298,7 +350,7 @@ function tekenSpelfouten(rijen) {
       <td class="woord">${ontsnap(b.woord)}${merk}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
       ${bronCel(b)}
-      ${knopCel(b.woord)}
+      ${knopCel(b.woord, "woord")}
     </tr>`;
   }).join("");
 }
@@ -333,7 +385,7 @@ function tekenNamen(rijen) {
       <td class="woord">${ontsnap(b.woord)}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
       ${bronCel(b, erbij)}
-      ${knopCel(b.woord)}
+      ${knopCel(b.woord, "naam")}
     </tr>`;
   }).join("");
 }
@@ -358,14 +410,38 @@ for (const [nummer, tab] of tabbladen.entries()) {
   });
 }
 
-document.addEventListener("click", event => {
-  const knop = event.target.closest("button[data-woord]");
-  if (!knop) return;
-  navigator.clipboard.writeText(knop.dataset.woord).then(() => {
-    const oud = knop.textContent;
-    knop.textContent = "Gekopieerd";
-    setTimeout(() => { knop.textContent = oud; }, 1500);
+const foutVak = document.getElementById("fout");
+
+// Goedkeuren en intrekken gaan via een Edge Function; de browser zelf mag niets
+// schrijven. De functie begrenst het aantal wijzigingen per uur.
+async function wijzig(actie, woord, soort) {
+  const antwoord = await fetch(`${SUPABASE_URL}/functions/v1/goedkeuren`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY },
+    body: JSON.stringify({ actie, woord, soort }),
   });
+  if (!antwoord.ok) {
+    let melding = `Er ging iets mis (${antwoord.status}).`;
+    try { melding = (await antwoord.json()).fout || melding; } catch { /* geen JSON */ }
+    throw new Error(melding);
+  }
+}
+
+document.addEventListener("click", async event => {
+  const knop = event.target.closest("button[data-actie]");
+  if (!knop) return;
+  const { actie, woord, soort } = knop.dataset;
+  foutVak.hidden = true;
+  knop.disabled = true;
+  try {
+    await wijzig(actie, woord, soort);
+    await laadGoedgekeurd();
+    teken();
+  } catch (fout) {
+    knop.disabled = false;
+    foutVak.textContent = `${actie === "intrekken" ? "Intrekken" : "Goedkeuren"} van "${woord}" is niet gelukt: ${fout.message}`;
+    foutVak.hidden = false;
+  }
 });
 
 urlFilter.addEventListener("input", teken);
@@ -385,9 +461,22 @@ function wisGegevens() {
 // De gegevens ophalen
 // ---------------------------------------------------------------------------
 
+async function laadGoedgekeurd() {
+  const { data, error } = await sb
+    .from("goedgekeurd")
+    .select("woord, soort, goedgekeurd_op")
+    .is("ingetrokken_op", null)
+    .order("goedgekeurd_op", { ascending: false });
+  if (error) throw error;
+  goedgekeurd = data;
+  goedgekeurdSleutels = new Set(data.map(g => g.woord.toLowerCase()));
+}
+
 async function laadResultaten() {
   const mijn = ++ronde;
   try {
+    await laadGoedgekeurd();
+    if (mijn !== ronde) return;
     const { data: crawls, error: crawlfout } = await sb
       .from("crawls")
       .select("id, gestart_op, bron, aantal_paginas")
@@ -402,6 +491,7 @@ async function laadResultaten() {
       document.getElementById("aantal-namen").textContent = "0";
       leeg(rijenLichaam, "Start een crawl via de Crawl-workflow in GitHub.");
       leeg(naamLichaam, "Nog niets te zien.");
+      tekenGoedgekeurd();
       return;
     }
 
