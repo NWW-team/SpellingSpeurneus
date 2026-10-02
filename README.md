@@ -9,8 +9,10 @@ en wat je moet weten als je hieraan verder werkt.
 
 ## Hoe het werkt
 
-1. Je drukt op **Run workflow** bij [de Crawl-workflow](../../actions/workflows/crawl.yml)
-   en kiest een deel van de site plus een maximumaantal pagina's.
+1. Je drukt in het scherm op **Crawl starten** en kiest een deel van de site plus een
+   maximumaantal pagina's. Er mag één crawl per dag. (De knop **Run workflow** bij
+   [de Crawl-workflow](../../actions/workflows/crawl.yml) in GitHub werkt nog steeds, voor wie
+   daar een account voor heeft; die valt buiten de limiet van één per dag.)
 2. Een GitHub-runner leest de sitemap, haalt die pagina's op en pakt de tekst uit het
    `<main>`-element. Menu's en voetteksten blijven buiten beeld.
 3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan onze eigen
@@ -19,6 +21,13 @@ en wat je moet weten als je hieraan verder werkt.
 5. Het resultaat gaat naar Supabase en verschijnt op de pagina hierboven.
 
 Er draait niets automatisch op de achtergrond. Een crawl gebeurt alleen als iemand erom vraagt.
+
+De knop roept de Edge Function [`crawl-starten`](supabase/functions/crawl-starten/index.ts)
+aan, die de workflow in GitHub start. Het GitHub-token staat als secret `GITHUB_TOKEN` in
+Supabase en heeft alleen *Actions: read and write* op deze repository. De limiet van één per
+dag zit in de database (tabel `crawl_aanvragen`, unieke index op de datum in Nederlandse
+tijd), dus twee gelijktijdige aanvragen komen er niet allebei door. Mislukt het starten bij
+GitHub, dan wordt de aanvraag weer verwijderd en blijft de dag beschikbaar.
 
 ## Spelfouten en namen
 

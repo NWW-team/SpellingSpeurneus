@@ -179,6 +179,13 @@ Dit is bewust zo gekozen, met het risico erbij. De migratie staat in
 Gevolg: goedkeuren en een crawl starten schrijven vanuit een open pagina. Ze lopen daarom
 via een Edge Function met limieten, en elke goedkeuring is terug te draaien en vastgelegd.
 
+**Crawl starten (2 oktober).** Knop in het scherm, Edge Function `crawl-starten`, tabel
+`crawl_aanvragen` (migratie `20261002020000_crawl_aanvragen.sql`): één crawl per dag, afgedwongen
+door een unieke index. Het token staat als Supabase-secret `GITHUB_TOKEN` (fine-grained, alleen
+*Actions: read and write* op deze repository). **Risico:** iedereen met de publieke key kan
+de dagelijkse crawl "opmaken", bijvoorbeeld met een grote bron, of de redactie ervan afhouden.
+Een crawl over `paginas` is ruim twee uur aanhoudend verkeer naar de site; zie besluit 2.
+
 **Goedkeuren (2 oktober).** Tabel `goedgekeurd` (migratie
 `20261002010000_goedgekeurd.sql`), Edge Function `goedkeuren` (maximaal 300 wijzigingen per
 uur, `verify_jwt = false`). De workflow haalt de lijst vlak voor de crawl op
@@ -333,7 +340,7 @@ Twee dingen zijn licht, maar wel echt werk:
 Grammatica, stijl en d/t-fouten · alle 4.660 pagina's in één run · continu of
 gepland scannen · meerdere talen · terugschrijven naar het CMS · **rollen of
 rechten per gebruiker** (toegang is alles of niets) · zelf aanmelden ·
-wachtwoord vergeten · een startknop in de app zelf (komt, zie besluit 6) · bevindingen bewaren om
+wachtwoord vergeten ·  bevindingen bewaren om
 trends over tijd te zien · afgeschermde of interne pagina's.
 
 Inloggen zat tot 15 september in dit lijstje. Zie besluit 3.
