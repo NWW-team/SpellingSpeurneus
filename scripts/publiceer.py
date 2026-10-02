@@ -157,6 +157,9 @@ def main():
             # zijn spelfouten, want zo stonden ze toen ook in het scherm.
             "soort": b.get("soort", "spelfout"),
             "context": b.get("context"),
+            # Alleen bij namen, en alleen als de plaatsnamenlijst beschikbaar was.
+            "plaats_status": b.get("plaats_status"),
+            "suggestie": b.get("suggestie"),
         } for b in bevindingen[begin:begin + BLOK]]
         verzoek(basis, sleutel, "bevindingen", blok,
                 {"Prefer": "return=minimal"})

@@ -47,9 +47,27 @@ voorkomt, staat erbij op hoeveel. Zo blijft een verkeerd gespelde plaatsnaam op 
 staat per bevinding in de kolom `soort`, dus wie de regel anders wil (hij staat in
 `soort_van` in `scripts/crawl.py`) kan het scherm omgooien zonder opnieuw te crawlen.
 
-Wat de app hierbij níét kan: beoordelen of een naam goed gespeld is. `Cochabamba` en een
-verkeerd gespelde variant krijgen dezelfde melding, want geen van beide staat in de
-woordenlijst. Dat nakijken blijft mensenwerk.
+### Plaatsnamen nakijken
+
+De woordenlijst kent geen namen, dus `Cochabamba` en een verkeerd gespelde variant krijgen
+dezelfde melding. Daarom krijgt elke naam een oordeel op basis van
+[GeoNames](https://www.geonames.org) (plaatsen vanaf 1000 inwoners, regio's en landen):
+
+| Oordeel | Betekenis |
+|---|---|
+| **bekende plaatsnaam** | Staat in GeoNames, ook met andere accenten (`Cordoba` = `Córdoba`). Geen aandacht nodig |
+| **lijkt op …** | Staat er niet in, maar lijkt op één of twee letters na op een bekende plaats. Dit zijn de namen om eerst na te kijken; de suggestie staat erbij |
+| *(niets)* | Staat er niet in en lijkt op niets: een organisatie, een persoon of een woord uit een andere taal. De lijst zegt hier niets over |
+
+Boven de lijst staat een keuzelijst om alleen de namen van één groep te tonen. **Lijkt op** is
+een hint, geen oordeel: het kan ook een organisatie zijn die toevallig op een plaats lijkt.
+Is een naam goed, klik dan op **Goedkeuren**, dan komt hij er niet meer in terug.
+
+Wat dit niet kan: een naam beoordelen die wél in GeoNames staat maar op die pagina niet de
+plaats bedoelt, een verkeerde plaats die toevallig als andere plaats bestaat, of een naam die
+meer dan twee letters afwijkt. Hoe het matcht staat in
+[`scripts/plaatsnamen.py`](scripts/plaatsnamen.py). De workflow haalt de bestanden per run op;
+lukt dat niet, dan krijgen namen geen oordeel en gaat de crawl gewoon door.
 
 ## Vals alarm wegwerken
 
@@ -142,6 +160,7 @@ altijd een harde bovengrens op het aantal pagina's.
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `scripts/publiceer.py` | Zet het resultaat in Supabase, achter de toegangscontrole |
 | `supabase/` | Migraties (in de SQL Editor te plakken) en de Edge Function `goedkeuren` |
+| `scripts/plaatsnamen.py` | Beoordeelt namen tegen GeoNames: bekend, lijkt op een bekende plaats, of geen oordeel |
 | `scripts/haal_goedgekeurd.py` | Haalt de in het scherm goedgekeurde woorden op, vlak voor de crawl |
 | `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |
 | `demo/` | Vijf fictieve pagina's met drie ingebouwde fouten, om op te testen |
@@ -180,6 +199,9 @@ testaccount een e-mailadres en een wachtwoordhash. Deze app slaat zelf geen wach
 op en vergelijkt er geen.
 
 ## Bronvermelding
+
+Plaatsnamen worden beoordeeld met gegevens van [GeoNames](https://www.geonames.org), licentie
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 De spelling wordt getoetst aan de
 [OpenTaal-woordenlijst](https://github.com/OpenTaal/opentaal-wordlist) van stichting

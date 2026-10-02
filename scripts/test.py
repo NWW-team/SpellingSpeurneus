@@ -15,6 +15,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from plaatsnamen import Plaatsnamen, afstand, samenvatting, tokens  # noqa: E402
 from voortgang import meld  # noqa: E402
 from crawl import (SITE, is_bekend, lees_goedgekeurd,  # noqa: E402
                    maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
@@ -143,6 +144,78 @@ def main():
                 os.environ.pop(k, None)
             else:
                 os.environ[k] = v
+
+    print("\nPlaatsnamen beoordelen")
+    # Een klein bestand in het echte GeoNames-formaat (tabs, 19 kolommen).
+    import zipfile
+
+    def stad(naam, ascii_naam, alt, inwoners):
+        kolommen = ["1", naam, ascii_naam, alt, "0", "0", "P", "PPL", "XX", "", "", "", "", "",
+                    str(inwoners), "", "", "", ""]
+        return "\t".join(kolommen)
+
+    kaarten = tijdelijk / "geonames"
+    kaarten.mkdir()
+    with zipfile.ZipFile(kaarten / "cities1000.zip", "w") as z:
+        z.writestr("cities1000.txt", "\n".join([
+            stad("Cochabamba", "Cochabamba", "Kochabamba,Cercado", 630000),
+            stad("Córdoba", "Cordoba", "Cordova", 1300000),
+            stad("Valparaíso", "Valparaiso", "", 280000),
+            stad("La Paz", "La Paz", "", 790000),
+            stad("Bukavu", "Bukavu", "", 800000),
+            stad("Heath", "Heath", "", 2000),          # klein: bekend, geen suggestie
+            stad("Tanguiéta", "Tanguieta", "", 12000),   # klein: bekend, geen suggestie
+        ]))
+    (kaarten / "admin1CodesASCII.txt").write_text(
+        "CO.02\tAntioquia\tAntioquia\t1\nCD.10\tHaut-Mbomou\tHaut-Mbomou\t2\n", encoding="utf-8")
+    (kaarten / "countryInfo.txt").write_text(
+        "#ISO\tISO3\tNum\tFIPS\tCountry\tCapital\n"
+        "BO\tBOL\t68\tBL\tBolivia\tSucre\n", encoding="utf-8")
+    pl = Plaatsnamen.laad(kaarten)
+    status = lambda naam: pl.beoordeel(naam)["plaats_status"]
+    sugg = lambda naam: pl.beoordeel(naam)["suggestie"]
+    controle("een bekende plaats is bekend", status("Cochabamba") == "bekend")
+    controle("accenten tellen niet mee", status("Cordoba") == "bekend" and status("Córdoba") == "bekend")
+    controle("een bekende alternatieve schrijfwijze is bekend", status("Kochabamba") == "bekend")
+    controle("een plaats van meerdere woorden", status("La Paz") == "bekend")
+    controle("een regio met koppelteken", status("Haut-Mbomou") == "bekend")
+    controle("een land", status("Bolivia") == "bekend")
+    controle("een kleine plaats is bekend", status("Tanguiéta") == "bekend")
+    controle("één letter fout wordt twijfel, met suggestie",
+             status("Cochabamva") == "twijfel" and sugg("Cochabamva") == "Cochabamba",
+             str(pl.beoordeel("Cochabamva")))
+    controle("omgewisselde letters tellen als één fout",
+             sugg("Cochabmaba") == "Cochabamba", str(pl.beoordeel("Cochabmaba")))
+    controle("de suggestie heeft zijn accenten", sugg("Valparasio") in (None, "Valparaíso")
+             and sugg("Valparaisso") == "Valparaíso", str(pl.beoordeel("Valparaisso")))
+    controle("een fout in een deel van een naam telt", status("Haut-Mbomuo") == "twijfel")
+    controle("kleine plaatsen dienen niet als suggestie",
+             status("Hearth") == "onbekend" and status("Tanguieta") == "bekend")
+    controle("korte woorden krijgen geen suggestie", status("AOA") == "onbekend" and status("Cala") == "onbekend")
+    controle("een woord dat nergens op lijkt is onbekend", status("Evercare") == "onbekend")
+    controle("een naam zonder letters is onbekend", status("2024") == "onbekend")
+    controle("zonder bestand geen oordeel", Plaatsnamen.laad(tijdelijk / "bestaat-niet") is None)
+    controle("afstand telt een omwisseling als één", afstand("abcd", "abdc", 2) == 1)
+    controle("afstand stopt boven de grens", afstand("abcdef", "uvwxyz", 1) == 2)
+    controle("tokens splitsen op koppelteken en apostrof", tokens("Haut-Mbomou l'Ouest") == ["haut", "mbomou", "ouest"])
+    gemeld = samenvatting([{"woord": "Cochabamva", "plaats_status": "twijfel", "suggestie": "Cochabamba"},
+                           {"woord": "Cochabamva", "plaats_status": "twijfel", "suggestie": "Cochabamba"},
+                           {"woord": "Bukavu", "plaats_status": "bekend", "suggestie": None}])
+    controle("het logboek telt unieke namen", "1 bekend" in gemeld and "1 twijfel" in gemeld, gemeld)
+    # Een kapot bestand mag de crawl niet laten falen
+    kapot = tijdelijk / "kapot"
+    kapot.mkdir()
+    (kapot / "cities1000.zip").write_bytes(b"dit is geen zipbestand")
+    kapot_run = subprocess.run(
+        [sys.executable, str(WORTEL / "scripts" / "crawl.py"), "--bron", "demo", "--max-paginas", "5",
+         "--uit", str(tijdelijk / "kapot.json"), "--goedgekeurd", "bestaat-niet.json",
+         "--plaatsnamen", str(kapot)], capture_output=True, text=True)
+    controle("een kapotte plaatsnamenlijst laat de crawl niet falen",
+             kapot_run.returncode == 0 and "onbruikbaar" in kapot_run.stdout, kapot_run.stderr[-200:])
+    # Een volledige crawl met de lijst eraan: spelfouten blijven zonder oordeel
+    pl_run = draai_crawl(tijdelijk / "pl.json")
+    controle("de crawl draait ook zonder plaatsnamenlijst",
+             all("plaats_status" not in b for b in pl_run["bevindingen"]))
 
     print("\nGoedgekeurde woorden ophalen")
     # Dit is de enige lijst. Lukt het ophalen niet, dan moet de run stoppen en geen

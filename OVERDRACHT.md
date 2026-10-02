@@ -192,6 +192,29 @@ door een unieke index. Het token staat als Supabase-secret `GITHUB_TOKEN` (fine-
 de dagelijkse crawl "opmaken", bijvoorbeeld met een grote bron, of de redactie ervan afhouden.
 Een crawl over `paginas` is ruim twee uur aanhoudend verkeer naar de site; zie besluit 2.
 
+**Plaatsnamen (2 oktober).** Elke naam krijgt een oordeel uit GeoNames (`scripts/plaatsnamen.py`,
+migratie `20261002060000_plaatsnamen.sql`): `bekend`, `twijfel` (lijkt op een bekende plaats,
+met suggestie) of `onbekend`. Alleen buitenland, zoals gekozen. Het matchen is Damerau-
+Levenshtein met de grens 1 fout (woorden van 5 tot 8 letters) of 2 (vanaf 9 letters); woorden
+korter dan 5 letters krijgen geen suggestie. Suggesties komen alleen uit plaatsen vanaf 15.000
+inwoners, regio's en landen; "bekend" telt alle plaatsen vanaf 1000 inwoners, met alle
+alternatieve namen. Het scherm zet de twijfelgevallen bovenaan en heeft een keuzelijst per groep.
+
+**Nog niet gemeten op echte data.** De sandbox waarin dit is gebouwd mag
+`download.geonames.org` niet bereiken, dus de drempels zijn getoetst op een nagemaakt bestand
+in het GeoNames-formaat en op willekeurige data (snelheid: 140.000 plaatsen laden duurt 5
+seconden, 1500 namen beoordelen 16 seconden, 156 MB). Na de eerste echte crawl met deze versie
+staat in het logboek van de stap "Crawlen en spelling toetsen" een regel `Plaatsnamen (unieke
+namen): …` met de eerste 40 twijfelgevallen. **Kijk die na** voordat je de uitkomst vertrouwt:
+- te veel valse twijfel (gewone Engelse of Spaanse woorden die op een plaats lijken, zoals
+  `Health` ~ `Heath`)? Verhoog `MIN_INWONERS_SUGGESTIE` of verlaag `toegestane_afstand`;
+- echte tikfouten die niet worden gevonden? Verlaag de drempel van 5 letters, of laat de eerste
+  letter ook mogen verschillen (nu moet die gelijk zijn).
+
+Bekende beperking: een naam die alleen in het buitenland bestaat maar op de pagina een andere
+plaats bedoelt, valt niet op. En `Cordoba` naast `Córdoba` zijn beide "bekend": een verschil
+in accenten tussen pagina's meldt de app niet.
+
 **Eén lijst (2 oktober).** `data/uitzonderingen.txt` (280 woorden) is in `goedgekeurd` ingeladen
 (`20261002050000_uitzonderingen_importeren.sql`) en uit de repository gehaald. De crawler leest
 alleen nog Supabase en de run stopt als dat ophalen mislukt. De toelichting uit het bestand,
