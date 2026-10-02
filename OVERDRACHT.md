@@ -179,12 +179,38 @@ Dit is bewust zo gekozen, met het risico erbij. De migratie staat in
 Gevolg: goedkeuren en een crawl starten schrijven vanuit een open pagina. Ze lopen daarom
 via een Edge Function met limieten, en elke goedkeuring is terug te draaien en vastgelegd.
 
+**Let op bij RLS (2 oktober).** Een policy alleen is niet genoeg: de rol heeft ook het
+recht op de tabel nodig (`grant select`). Stap 1 zette alleen policies, waardoor het scherm
+"permission denied for table crawls" gaf tot het recht voor `anon` erbij kwam
+(`20261002040000_rechten.sql`). Controleer na een nieuwe tabel altijd beide: de policy én de
+grants, en toets als `anon` (`set local role anon`) in plaats van alleen te lezen wat er staat.
+
 **Crawl starten (2 oktober).** Knop in het scherm, Edge Function `crawl-starten`, tabel
 `crawl_aanvragen` (migratie `20261002020000_crawl_aanvragen.sql`): één crawl per dag, afgedwongen
 door een unieke index. Het token staat als Supabase-secret `GITHUB_TOKEN` (fine-grained, alleen
 *Actions: read and write* op deze repository). **Risico:** iedereen met de publieke key kan
 de dagelijkse crawl "opmaken", bijvoorbeeld met een grote bron, of de redactie ervan afhouden.
 Een crawl over `paginas` is ruim twee uur aanhoudend verkeer naar de site; zie besluit 2.
+
+**Eén lijst (2 oktober).** `data/uitzonderingen.txt` (280 woorden) is in `goedgekeurd` ingeladen
+(`20261002050000_uitzonderingen_importeren.sql`) en uit de repository gehaald. De crawler leest
+alleen nog Supabase en de run stopt als dat ophalen mislukt. De toelichting uit het bestand,
+voor wie een woord wil nalopen:
+
+- **Rondes.** Eerste en tweede ronde (14 september) haalden de ruis van de eerste 50 reisadviezen
+  weg; de derde ronde (15 september) alleen woorden die op meer dan één reisadvies voorkwamen:
+  woorden van één pagina bleven bewust staan, want daar zitten de echte tikfouten. De vierde en
+  vijfde ronde kwamen van de redactie.
+- **Huisstijl.** `lhbtiq+` altijd met de plus; zonder plus is het fout en meldt de app dat. `mpox`
+  en `apenpokken` staan allebei erin omdat de site beide gebruikt ("Mpox-virus (apenpokken)").
+- **Engelse en andere vreemde woorden** zoals `and`, `for`, `travel`, `female`, `control` zijn
+  op 15 september door de redactie goedgekeurd. Gevolg: ze vallen nergens meer op, ook niet los
+  in een Nederlandse zin. Voor vergelijkbare nieuwe gevallen geldt nog steeds: goedkeuren betekent
+  dat zo'n woord middenin een Nederlandse zin nooit meer opvalt; dat is aan de redactie.
+- **`etc`** is goed: de zinsopdeling haalt de laatste punt van "etc." weg. `o.a.` valt buiten
+  de lijst, omdat die maar op één pagina stond.
+- `motodop` werd op 15 september verwijderd en op uitdrukkelijk verzoek van de redactie weer
+  toegevoegd.
 
 **Goedkeuren (2 oktober).** Tabel `goedgekeurd` (migratie
 `20261002010000_goedgekeurd.sql`), Edge Function `goedkeuren` (maximaal 300 wijzigingen per
@@ -248,9 +274,8 @@ blijft (besluit 4) maakt dit punt niet kleiner.
   staan: `and` uit "US Customs and Border Protection", `viajeros` uit "Para
   viajeros", `floods`, `travel`. Over alle 226 reisadviezen zijn dit 81 van de
   427 spelfoutmeldingen — veruit de grootste rest-ruis, met `and` (34×) voorop.
-  Ze staan bewust niet op de uitzonderingenlijst en vallen bewust niet onder
-  de naam-regel: zie de toelichting onderaan `data/uitzonderingen.txt`. Ze
-  goedkeuren zou betekenen dat een Engels woord middenin een Nederlandse zin
+  Ze stonden bewust niet op de lijst met goedgekeurde woorden en vallen bewust niet
+  onder de naam-regel. Ze goedkeuren zou betekenen dat een Engels woord middenin een Nederlandse zin
   nooit meer opvalt, en dat kostte bijna de vondst van `autorisation`.
 - **Alleen de tekst in `<main>`** wordt gelezen. Menu's, voetteksten en
   cookiemeldingen blijven buiten beeld. Verandert de site van structuur, dan
@@ -315,8 +340,8 @@ Twee dingen zijn licht, maar wel echt werk:
 - **De allowlist en de accounts.** Wie mag de resultaten zien? Accounts maak je
   aan in het Supabase-dashboard en zet je daarna op `toegestane_gebruikers`.
   Gaat iemand weg, dan moet hij eraf. Zie besluit 5.
-- **De uitzonderingenlijst** (`data/uitzonderingen.txt`) groeit met elk vals
-  alarm en hoort bij de redactie, niet bij de techniek. Er staan
+- **De lijst met goedgekeurde woorden** (tabel `goedgekeurd`, tabblad Goedgekeurd) groeit
+  met elk vals alarm en hoort bij de redactie, niet bij de techniek. Er staan
   huisstijlkeuzes in, zoals dat NederlandWereldwijd altijd `lhbtiq+` schrijft.
   Wie daar een woord aan toevoegt, beslist wat "goed" is.
 - **Iemand start de crawl** wanneer dat nodig is. Er gebeurt niets vanzelf.

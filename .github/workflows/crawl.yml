@@ -13,6 +13,9 @@ on:
       max_paginas:
         description: "Maximaal aantal pagina's"
         default: "50"
+      aanvraag_id:
+        description: "Id van de aanvraag in Supabase (door het scherm ingevuld, voor de voortgangsbalk)"
+        default: ""
       opentaal_ref:
         description: "Versie van de OpenTaal-woordenlijst (tag of commit)"
         default: "master"
@@ -63,8 +66,8 @@ jobs:
             exit 1
           fi
 
-      # Wat de redactie in het scherm heeft goedgekeurd. Mislukt dit, dan gaat de
-      # crawl door zonder: goedgekeurde woorden komen dan opnieuw voorbij.
+      # De enige lijst met goedgekeurde woorden en namen (tabel `goedgekeurd`). Mislukt
+      # dit, dan stopt de run: zonder die lijst is het resultaat niet te gebruiken.
       - name: Goedgekeurde woorden en namen ophalen
         env:
           SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
@@ -75,11 +78,15 @@ jobs:
         env:
           BRON: ${{ inputs.bron }}
           MAX_PAGINAS: ${{ inputs.max_paginas }}
+          AANVRAAG_ID: ${{ inputs.aanvraag_id }}
+          # Voor de voortgangsbalk. Zonder aanvraag-id meldt de crawl niets.
+          SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           # Bewust buiten docs/: alles in die map wordt door GitHub Pages
           # publiek uitgeleverd. Het resultaat gaat naar Supabase.
           python3 scripts/crawl.py --bron "$BRON" --max-paginas "$MAX_PAGINAS" \
-            --uit resultaten.json
+            --aanvraag-id "$AANVRAAG_ID" --uit resultaten.json
 
       # Het resultaat werd hier eerder in deze publieke repository gecommit en
       # was daarmee voor iedereen te lezen. Nu gaat het naar Supabase, waar de
@@ -91,6 +98,7 @@ jobs:
           # één ding echt geheim te beheren valt.
           SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AANVRAAG_ID: ${{ inputs.aanvraag_id }}
         run: |
           if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
             echo "::error::Het secret SUPABASE_SERVICE_ROLE_KEY staat niet in deze"
@@ -100,4 +108,13 @@ jobs:
             echo "::error::Project Settings > API Keys. Zie ook README.md."
             exit 1
           fi
-          python3 scripts/publiceer.py --in resultaten.json
+          python3 scripts/publiceer.py --in resultaten.json --aanvraag-id "$AANVRAAG_ID"
+
+      # Mislukt er iets, dan moet het scherm dat weten en de dag vrijkomen.
+      - name: Voortgang op mislukt zetten
+        if: failure() && inputs.aanvraag_id != ''
+        env:
+          SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AANVRAAG_ID: ${{ inputs.aanvraag_id }}
+        run: python3 scripts/voortgang.py --id "$AANVRAAG_ID" --status mislukt

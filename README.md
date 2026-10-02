@@ -15,8 +15,8 @@ en wat je moet weten als je hieraan verder werkt.
    daar een account voor heeft; die valt buiten de limiet van één per dag.)
 2. Een GitHub-runner leest de sitemap, haalt die pagina's op en pakt de tekst uit het
    `<main>`-element. Menu's en voetteksten blijven buiten beeld.
-3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan onze eigen
-   [`data/uitzonderingen.txt`](data/uitzonderingen.txt).
+3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan de goedgekeurde woorden
+   en namen in Supabase (tabel `goedgekeurd`, zie [Vals alarm wegwerken](#vals-alarm-wegwerken)).
 4. Wat overblijft wordt in tweeën gedeeld: **spelfouten** en **namen**. Zie hieronder.
 5. Het resultaat gaat naar Supabase en verschijnt op de pagina hierboven.
 
@@ -61,8 +61,13 @@ Een vergissing maak je daar ongedaan met **Intrekken**. Goedkeuringen staan in d
 Goedkeuren en intrekken gaan via de Edge Function
 [`supabase/functions/goedkeuren`](supabase/functions/goedkeuren/index.ts) en zijn begrensd tot
 300 wijzigingen per uur. Zie [Toegang](#toegang): omdat er geen inlog is, kan iedereen met de
-link dit doen. De basislijst in [`data/uitzonderingen.txt`](data/uitzonderingen.txt) blijft
-gelden naast wat in het scherm is goedgekeurd.
+link dit doen.
+
+**Er is maar één lijst met goedgekeurde woorden: de tabel `goedgekeurd`.** Het tabblad
+Goedgekeurd in het scherm toont hem helemaal, alfabetisch en doorzoekbaar. De vroegere
+`data/uitzonderingen.txt` is op 2 oktober 2026 in die tabel ingeladen en uit de repository
+gehaald; zijn geschiedenis staat in git. De workflow haalt de lijst vlak voor de crawl op en
+**stopt als dat niet lukt**: een crawl zonder die lijst meldt honderden goede woorden als fout.
 
 Eén ding om te weten bij het lezen van de cijfers: die lijst wordt bijgewerkt op basis van
 de pagina's die al gecrawld zijn. Op **nieuwe** pagina's ligt het aantal valse meldingen
@@ -136,7 +141,6 @@ altijd een harde bovengrens op het aantal pagina's.
 | `scripts/test.py` | Controles: vindt de app de ingebouwde fouten, en volgt hij robots.txt |
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `scripts/publiceer.py` | Zet het resultaat in Supabase, achter de toegangscontrole |
-| `data/uitzonderingen.txt` | Basislijst van goedgekeurde woorden. Wat in het scherm wordt goedgekeurd staat in Supabase |
 | `supabase/` | Migraties (in de SQL Editor te plakken) en de Edge Function `goedkeuren` |
 | `scripts/haal_goedgekeurd.py` | Haalt de in het scherm goedgekeurde woorden op, vlak voor de crawl |
 | `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |

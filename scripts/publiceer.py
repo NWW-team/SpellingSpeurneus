@@ -25,6 +25,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+from voortgang import meld
+
 WORTEL = Path(__file__).resolve().parent.parent
 
 # Per verzoek uploaden we een blok bevindingen. Groot genoeg om niet honderden
@@ -111,6 +113,8 @@ def main():
     parser.add_argument("--in", dest="bestand",
                         default=str(WORTEL / "resultaten.json"),
                         help="het JSON-bestand dat crawl.py heeft geschreven")
+    parser.add_argument("--aanvraag-id", default="",
+                        help="id van de aanvraag in Supabase, voor de voortgangsbalk")
     argumenten = parser.parse_args()
 
     basis = os.environ.get("SUPABASE_URL", "").rstrip("/")
@@ -130,7 +134,10 @@ def main():
     bevindingen = resultaat.get("bevindingen", [])
     if not bevindingen:
         print("Geen bevindingen in het bestand; er wordt niets gepubliceerd.")
+        meld(argumenten.aanvraag_id, status="klaar")
         return
+
+    meld(argumenten.aanvraag_id, status="publiceren")
 
     crawl_rij = {veld: resultaat[veld] for veld in CRAWL_VELDEN if veld in resultaat}
     gemaakt = verzoek(basis, sleutel, "crawls", crawl_rij,
@@ -156,8 +163,8 @@ def main():
         verstuurd += len(blok)
         print(f"  {verstuurd}/{len(bevindingen)} bevindingen geplaatst")
 
-    print(f"\nKlaar. {verstuurd} bevindingen staan in Supabase, alleen "
-          f"leesbaar voor toegestane accounts.")
+    meld(argumenten.aanvraag_id, status="klaar")
+    print(f"\nKlaar. {verstuurd} bevindingen staan in Supabase.")
 
 
 if __name__ == "__main__":

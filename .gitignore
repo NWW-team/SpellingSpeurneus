@@ -11,3 +11,6 @@ resultaten.json
 
 # Per crawl uit Supabase gehaald: wat in het scherm is goedgekeurd.
 goedgekeurd.json
+
+# Persoonlijke Claude Code-instellingen (toestemmingen), niet delen.
+.claude/settings.local.json

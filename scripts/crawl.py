@@ -19,6 +19,8 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+from voortgang import meld, run_url
+
 SITE = "https://www.nederlandwereldwijd.nl"
 PROJECT_URL = "https://github.com/NWW-team/SpellingSpeurneus"
 USER_AGENT = f"SpellingSpeurneus/0.1 (+{PROJECT_URL})"
@@ -161,12 +163,12 @@ def lees_woordenlijst(pad):
 
 
 def lees_goedgekeurd(pad):
-    """De in het scherm goedgekeurde woorden en namen, kleine letters.
+    """De goedgekeurde woorden en namen, kleine letters. Dit is de enige lijst.
 
-    Komt uit goedgekeurd.json, dat de workflow vlak voor de crawl uit Supabase
-    haalt (scripts/haal_goedgekeurd.py). Ontbreekt het bestand, dan is er niets
-    goedgekeurd. Namen en woorden gaan in dezelfde set: een goedgekeurde naam is
-    ook goed aan het begin van een zin.
+    Komt uit goedgekeurd.json, dat de workflow vlak voor de crawl uit de tabel
+    `goedgekeurd` in Supabase haalt (scripts/haal_goedgekeurd.py). Ontbreekt het
+    bestand, dan is er niets goedgekeurd. Namen en woorden gaan in dezelfde set: een
+    goedgekeurde naam is ook goed aan het begin van een zin.
     """
     pad = Path(pad)
     if not pad.exists():
@@ -234,7 +236,7 @@ def soort_van(woord, zin):
 def zoek_fouten(tekst, toegestaan):
     """Geeft per onbekend woord een bevinding met de zin eromheen.
 
-    `toegestaan` is de woordenlijst en de uitzonderingen bij elkaar. Door ze
+    `toegestaan` is de woordenlijst en de goedgekeurde woorden bij elkaar. Door ze
     samen te nemen klopt ook een samenstelling die beide combineert, zoals
     "lhbtiq+-vriendelijke": het eerste deel komt uit onze eigen lijst, het
     tweede uit de woordenlijst.
@@ -280,18 +282,25 @@ def kort(zin, lengte=200):
 
 # --- de crawl zelf ---------------------------------------------------------
 
-def verzamel_paginas(bron, max_paginas, pauze):
-    """Geeft (naam, html) per pagina, plus de URL's die we hebben overgeslagen."""
+def verzamel_paginas(bron, max_paginas, pauze, bij_totaal=lambda n: None):
+    """Geeft (naam, html) per pagina, plus de URL's die we hebben overgeslagen.
+
+    `bij_totaal` krijgt het aantal pagina's dat we verwachten te bekijken, zodra dat
+    bekend is. Daar hangt de voortgangsbalk in het scherm aan.
+    """
     overgeslagen = []
 
     if bron == "demo":
-        for pad in sorted((WORTEL / "demo").glob("*.html"))[:max_paginas]:
+        paden = sorted((WORTEL / "demo").glob("*.html"))[:max_paginas]
+        bij_totaal(len(paden))
+        for pad in paden:
             yield f"demo/{pad.name}", pad.read_text(encoding="utf-8")
         return overgeslagen
 
     mag_ophalen = maak_robots_controle()
     urls = lees_sitemap(SITEMAPS[bron], 0)
     print(f"Sitemap {bron}: {len(urls)} URL's gevonden.")
+    bij_totaal(min(len(urls), max_paginas))
 
     opgehaald = 0
     for url in urls:
@@ -320,9 +329,11 @@ def main():
     parser.add_argument("--max-paginas", type=int, default=50,
                         help="harde bovengrens op het aantal pagina's")
     parser.add_argument("--woordenlijst", default=str(WORTEL / "data" / "woordenlijst.txt"))
-    parser.add_argument("--uitzonderingen", default=str(WORTEL / "data" / "uitzonderingen.txt"))
     parser.add_argument("--goedgekeurd", default=str(WORTEL / "goedgekeurd.json"),
                         help="JSON met de in het scherm goedgekeurde woorden en namen")
+    parser.add_argument("--aanvraag-id", default="",
+                        help="id van de aanvraag in Supabase, voor de voortgangsbalk; "
+                             "zonder dit meldt de crawl geen voortgang")
     parser.add_argument("--uit", default=str(WORTEL / "docs" / "resultaten.json"))
     parser.add_argument("--pauze", type=float, default=0.5,
                         help="seconden wachten tussen twee pagina's")
@@ -335,16 +346,27 @@ def main():
               f"{reserve.name}; die is alleen bedoeld voor de demo-pagina's.")
         lijst_pad = reserve
     woorden = lees_woordenlijst(lijst_pad)
-    uitzonderingen = {woord.lower() for woord in lees_woordenlijst(argumenten.uitzonderingen)}
     goedgekeurd = lees_goedgekeurd(argumenten.goedgekeurd)
-    toegestaan = woorden | uitzonderingen | goedgekeurd
+    toegestaan = woorden | goedgekeurd
     print(f"Woordenlijst: {lijst_pad.name} ({len(woorden)} vormen), "
-          f"{len(uitzonderingen)} uitzonderingen, "
-          f"{len(goedgekeurd)} goedgekeurd in het scherm.")
+          f"{len(goedgekeurd)} goedgekeurde woorden en namen.")
+    if argumenten.bron != "demo" and not goedgekeurd:
+        print("LET OP: er zijn geen goedgekeurde woorden. Een gewone crawl heeft er honderden; "
+              "zonder die lijst staan ze allemaal als fout in het resultaat.")
 
     bevindingen = []
     aantal_paginas = 0
-    paginas = verzamel_paginas(argumenten.bron, argumenten.max_paginas, argumenten.pauze)
+    totaal = 0
+
+    def totaal_bekend(aantal):
+        nonlocal totaal
+        totaal = aantal
+        meld(argumenten.aanvraag_id, status="crawlen", paginas_klaar=0,
+             paginas_totaal=aantal, run_url=run_url(),
+             crawl_gestart_op=datetime.now(timezone.utc).isoformat(timespec="seconds"))
+
+    paginas = verzamel_paginas(argumenten.bron, argumenten.max_paginas, argumenten.pauze,
+                               totaal_bekend)
     overgeslagen = []
     while True:
         try:
@@ -353,6 +375,9 @@ def main():
             overgeslagen = einde.value or []
             break
         aantal_paginas += 1
+        # Niet na elke pagina melden: dat zijn honderden verzoeken voor niets.
+        if aantal_paginas % 5 == 0 or aantal_paginas == totaal:
+            meld(argumenten.aanvraag_id, paginas_klaar=aantal_paginas)
         tekst = tekst_uit_main(pagina_html)
         if not tekst:
             print(f"  geen <main> gevonden: {url}")
