@@ -39,9 +39,6 @@ _Waarom het de aanpak dient:_ maakt de bevindingen bruikbaar voor de redacteur o
 
 ### Toegang beperken tot de redactie
 
-Alleen vooraf toegestane accounts krijgen de bevindingen te zien.
-
-_Waarom het de aanpak dient:_ de bevindingenlijst is een werklijst van de redactie —
-half nagekeken, met vals alarm erin. Openbaar leest dat als een lijst fouten op de
-site van het ministerie, wat het niet is. De afscherming geldt de gegevens; de pagina
-zelf staat op GitHub Pages en blijft publiek.
+_Vervallen op 2 oktober 2026:_ er is geen inlog meer. De pagina is alleen via een
+niet-aangekondigde link te vinden; de gegevens zijn leesbaar voor wie de publieke key
+heeft. Zie besluit 6 in OVERDRACHT.md.

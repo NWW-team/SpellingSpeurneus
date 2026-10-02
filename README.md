@@ -5,8 +5,7 @@ wanneer de webredacteur daarom vraagt. Zie [STRATEGY.md](STRATEGY.md) voor het w
 en [OVERDRACHT.md](OVERDRACHT.md) voor de stand van zaken, de openstaande besluiten
 en wat je moet weten als je hieraan verder werkt.
 
-**Resultaten bekijken:** https://nww-team.github.io/SpellingSpeurneus/ — inloggen met een
-account dat de beheerder vooraf heeft toegestaan. Zie [Toegang](#toegang).
+**Resultaten bekijken:** https://nww-team.github.io/SpellingSpeurneus/ — zonder inlog. Zie [Toegang](#toegang).
 
 ## Hoe het werkt
 
@@ -17,8 +16,7 @@ account dat de beheerder vooraf heeft toegestaan. Zie [Toegang](#toegang).
 3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan onze eigen
    [`data/uitzonderingen.txt`](data/uitzonderingen.txt).
 4. Wat overblijft wordt in tweeën gedeeld: **spelfouten** en **namen**. Zie hieronder.
-5. Het resultaat gaat naar Supabase en verschijnt op de pagina hierboven, voor wie
-   is ingelogd met een toegestaan account.
+5. Het resultaat gaat naar Supabase en verschijnt op de pagina hierboven.
 
 Er draait niets automatisch op de achtergrond. Een crawl gebeurt alleen als iemand erom vraagt.
 
@@ -46,9 +44,16 @@ woordenlijst. Dat nakijken blijft mensenwerk.
 
 ## Vals alarm wegwerken
 
-Meldt de app een woord dat gewoon goed is? Klik op **Kopieer als uitzondering**, plak het
-woord in [`data/uitzonderingen.txt`](data/uitzonderingen.txt) en draai de crawl opnieuw.
-Die lijst hoort bij de webredactie, niet bij de techniek — hij groeit met het gebruik.
+Meldt de app een woord of naam die gewoon goed is? Klik op **Goedkeuren**. Het verdwijnt uit
+de lijst en komt op het tabblad **Goedgekeurd** te staan; de volgende crawl slaat het over.
+Een vergissing maak je daar ongedaan met **Intrekken**. Goedkeuringen staan in de Supabase-tabel
+`goedgekeurd` en worden nooit verwijderd, alleen met een datum ingetrokken.
+
+Goedkeuren en intrekken gaan via de Edge Function
+[`supabase/functions/goedkeuren`](supabase/functions/goedkeuren/index.ts) en zijn begrensd tot
+300 wijzigingen per uur. Zie [Toegang](#toegang): omdat er geen inlog is, kan iedereen met de
+link dit doen. De basislijst in [`data/uitzonderingen.txt`](data/uitzonderingen.txt) blijft
+gelden naast wat in het scherm is goedgekeurd.
 
 Eén ding om te weten bij het lezen van de cijfers: die lijst wordt bijgewerkt op basis van
 de pagina's die al gecrawld zijn. Op **nieuwe** pagina's ligt het aantal valse meldingen
@@ -66,8 +71,7 @@ python3 -m http.server --directory docs 8000             # scherm bekijken op lo
 python3 scripts/test.py                                  # 42 controles; --offline slaat het netwerk over
 ```
 
-Het scherm heeft Supabase nodig om iets te tonen; lokaal zie je zonder internet alleen
-het inlogformulier. Het resultaat van een lokale crawl in Supabase zetten kan met:
+Het scherm heeft Supabase nodig om iets te tonen; lokaal zie je zonder internet niets. Het resultaat van een lokale crawl in Supabase zetten kan met:
 
 ```bash
 export SUPABASE_URL=https://xxxxxxxx.supabase.co
@@ -86,36 +90,15 @@ workflow per run op bij OpenTaal.
 
 ## Toegang
 
-De crawlresultaten zijn niet openbaar. Ze staan in Supabase en komen alleen vrij voor
-een account dat op de allowlist staat.
+**Er is geen inlog meer.** De resultaten staan in Supabase en zijn leesbaar voor iedereen
+die de publishable key heeft. Die staat in `docs/index.html`, in een publieke repository.
+De "geheime link" naar de pagina is dus **geen toegangscontrole**: wie de repository leest,
+kan de bevindingen ophalen. Dat is een bewuste keuze van de redactie (besluit 3 in
+[OVERDRACHT.md](OVERDRACHT.md) is teruggedraaid). Schrijven kan de browser nog niet: alleen
+de crawl-workflow, met de service-role key.
 
-**De controle zit in de database, niet in het scherm.** Op `crawls` en `bevindingen`
-staat row level security aan, met één expliciete policy: lezen mag als je een sessie
-hebt én je account op de allowlist staat. Zonder dat geeft de database nul rijen terug,
-wat je in de browser ook probeert. Schrijven kan de browser helemaal niet.
-
-**Zelf aanmelden kan niet.** Signups staan uit in de Auth-instellingen: de Auth-API
-antwoordt op elke registratiepoging met `signup_disabled` (422). Nagetoetst over HTTP. Dat er geen registratieknop in het scherm staat is niet
-de maatregel — de maatregel is dat een onbekend account er domweg niet komt, en dat de
-allowlist bepaalt wie gegevens ziet.
-
-**De allowlist** is de tabel `toegestane_gebruikers`. Die draait op het gebruikers-id
-uit `auth.users`, niet op het e-mailadres: een gebruiker kan zijn e-mailadres wijzigen,
-zijn id niet. De tabel is vanuit de browser niet te lezen en niet te wijzigen, dus
-niemand kan zichzelf toevoegen. Beheer gaat via het Supabase-dashboard.
-
-**Wat hiermee níét is afgeschermd.** Dit scherm is een statisch bestand op GitHub Pages
-en deze repository is publiek. `docs/index.html`, de crawler en de uitzonderingenlijst
-blijven dus voor iedereen op te vragen — Supabase Auth schermt geen publieke HTML of
-JavaScript af, en het inlogformulier in het scherm is geen toegangscontrole. Wie zonder
-toegestaan account de pagina opent, ziet het formulier en verder niets. Wil je dat ook
-de pagina zelf onbereikbaar is, dan is een andere hosting nodig: GitHub Pages kan geen
-sessie controleren voordat het een bestand uitlevert.
-
-Ook niet afgeschermd: **de git-geschiedenis**. `docs/resultaten.json` is uit de repository
-gehaald, maar oude commits bevatten hem nog en die zijn publiek leesbaar. Het gaat om
-citaten uit pagina's die al openbaar zijn; wil je dat weg, dan moet de geschiedenis
-worden herschreven of de repository privé.
+De migratie die dit instelt staat in
+[`supabase/migrations/`](supabase/migrations/20261002000000_open_lezen.sql).
 
 ### Sleutels
 
@@ -144,7 +127,9 @@ altijd een harde bovengrens op het aantal pagina's.
 | `scripts/test.py` | Controles: vindt de app de ingebouwde fouten, en volgt hij robots.txt |
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `scripts/publiceer.py` | Zet het resultaat in Supabase, achter de toegangscontrole |
-| `data/uitzonderingen.txt` | Goedgekeurde woorden die niet in de woordenlijst staan |
+| `data/uitzonderingen.txt` | Basislijst van goedgekeurde woorden. Wat in het scherm wordt goedgekeurd staat in Supabase |
+| `supabase/` | Migraties (in de SQL Editor te plakken) en de Edge Function `goedkeuren` |
+| `scripts/haal_goedgekeurd.py` | Haalt de in het scherm goedgekeurde woorden op, vlak voor de crawl |
 | `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |
 | `demo/` | Vijf fictieve pagina's met drie ingebouwde fouten, om op te testen |
 | `OVERDRACHT.md` | Stand van zaken, openstaande besluiten, beperkingen en beheer |

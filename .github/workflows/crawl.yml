@@ -63,6 +63,14 @@ jobs:
             exit 1
           fi
 
+      # Wat de redactie in het scherm heeft goedgekeurd. Mislukt dit, dan gaat de
+      # crawl door zonder: goedgekeurde woorden komen dan opnieuw voorbij.
+      - name: Goedgekeurde woorden en namen ophalen
+        env:
+          SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 scripts/haal_goedgekeurd.py
+
       - name: Crawlen en spelling toetsen
         env:
           BRON: ${{ inputs.bron }}

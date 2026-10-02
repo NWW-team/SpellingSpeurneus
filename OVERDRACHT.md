@@ -137,12 +137,11 @@ ontdubbeld (315 in plaats van 573) met het aantal pagina's erbij, dus ze
 blijven na te lopen. De indeling staat per bevinding in de kolom `soort`,
 dus de keuze is terug te draaien zonder opnieuw te crawlen.
 
-Wat nog niet is besloten: of de redactie een **lijst met goedgekeurde namen**
-wil gaan bijhouden, zoals `uitzonderingen.txt` nu voor woorden doet. Dan
-krimpt het namentabblad per crawl tot alleen nieuwe namen. Bewust uitgesteld
-tot duidelijk is of iemand dat onderhoud echt gaat doen.
+Wat toen nog niet was besloten, is sinds 2 oktober wel geregeld: de redactie kan namen
+(en woorden) in het scherm goedkeuren, zie besluit 6. Het namentabblad krimpt daarmee per
+crawl tot alleen nieuwe namen. Wie dat bijhoudt, is nog niet aangewezen.
 
-**3. De bevindingen gaan achter een inlog.** (15 september 2026)
+**3. De bevindingen gaan achter een inlog.** *(teruggedraaid door besluit 6)* (15 september 2026)
 
 Dit was het openstaande besluit hieronder; nu beslist. De resultaten stonden als
 `docs/resultaten.json` in deze publieke repository en op de Pages-link. Ze zijn
@@ -163,6 +162,30 @@ Wat nog niet is opgelost: `docs/resultaten.json` zit nog in de git-geschiedenis 
 is daar publiek leesbaar. Het bestand is verwijderd, de geschiedenis niet
 herschreven. Het gaat om al openbare citaten, dus het is bewust zo gelaten — maar
 het is een keuze, niet een oplossing.
+
+**6. De inlog gaat weer weg.** (2 oktober 2026)
+
+Besluit 3 is teruggedraaid op verzoek van de redactie. Er is geen inlogscherm meer en
+de bevindingen zijn leesbaar voor iedereen met de publishable key, die in
+`docs/index.html` en dus in een publieke repository staat. De pagina is bereikbaar via
+een link die niet wordt aangekondigd, maar dat is **geen toegangscontrole**: wie de
+repository leest, vindt de link en de key.
+
+Dit is bewust zo gekozen, met het risico erbij. De migratie staat in
+`supabase/migrations/20261002000000_open_lezen.sql`. Daarmee vervallen besluit 4 en 5
+(pagina privé, beheer van de allowlist). De tabel `toegestane_gebruikers` en de functie
+`is_toegestaan()` blijven staan, ongebruikt, tot iemand ze opruimt.
+
+Gevolg: goedkeuren en een crawl starten schrijven vanuit een open pagina. Ze lopen daarom
+via een Edge Function met limieten, en elke goedkeuring is terug te draaien en vastgelegd.
+
+**Goedkeuren (2 oktober).** Tabel `goedgekeurd` (migratie
+`20261002010000_goedgekeurd.sql`), Edge Function `goedkeuren` (maximaal 300 wijzigingen per
+uur, `verify_jwt = false`). De workflow haalt de lijst vlak voor de crawl op
+(`scripts/haal_goedgekeurd.py`); lukt dat niet, dan crawlt hij door zonder. Een goedgekeurde
+naam wordt overal toegelaten, ook aan het zinsbegin. **Risico:** iedereen met de publieke key kan
+woorden goedkeuren en zo echte fouten uit beeld halen. Terugdraaien kan, en niets wordt
+verwijderd, maar controleer het tabblad Goedgekeurd af en toe.
 
 ## Openstaande besluiten
 
@@ -310,7 +333,7 @@ Twee dingen zijn licht, maar wel echt werk:
 Grammatica, stijl en d/t-fouten · alle 4.660 pagina's in één run · continu of
 gepland scannen · meerdere talen · terugschrijven naar het CMS · **rollen of
 rechten per gebruiker** (toegang is alles of niets) · zelf aanmelden ·
-wachtwoord vergeten · een startknop in de app zelf · bevindingen bewaren om
+wachtwoord vergeten · een startknop in de app zelf (komt, zie besluit 6) · bevindingen bewaren om
 trends over tijd te zien · afgeschermde of interne pagina's.
 
 Inloggen zat tot 15 september in dit lijstje. Zie besluit 3.
