@@ -16,9 +16,11 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from plaatsnamen import Plaatsnamen, samenvatting
 from voortgang import meld, run_url
 
 SITE = "https://www.nederlandwereldwijd.nl"
@@ -331,6 +333,9 @@ def main():
     parser.add_argument("--woordenlijst", default=str(WORTEL / "data" / "woordenlijst.txt"))
     parser.add_argument("--goedgekeurd", default=str(WORTEL / "goedgekeurd.json"),
                         help="JSON met de in het scherm goedgekeurde woorden en namen")
+    parser.add_argument("--plaatsnamen", default=str(WORTEL / "data" / "geonames"),
+                        help="map met de GeoNames-bestanden; zonder die map krijgen namen "
+                             "geen oordeel over hun spelling")
     parser.add_argument("--aanvraag-id", default="",
                         help="id van de aanvraag in Supabase, voor de voortgangsbalk; "
                              "zonder dit meldt de crawl geen voortgang")
@@ -385,6 +390,20 @@ def main():
         titel = titel_uit(pagina_html)
         for bevinding in zoek_fouten(tekst, toegestaan):
             bevindingen.append({"url": url, "titel": titel, **bevinding})
+
+    # Een hulp, geen voorwaarde: een kapotte of onvolledige download mag de crawl niet laten falen.
+    try:
+        plaatsen = Plaatsnamen.laad(argumenten.plaatsnamen)
+    except (OSError, ValueError, KeyError, StopIteration, zipfile.BadZipFile) as fout:
+        print(f"::warning::De plaatsnamenlijst is onbruikbaar ({fout}); namen krijgen geen oordeel.")
+        plaatsen = None
+    if plaatsen is None:
+        print(f"Geen plaatsnamenlijst in {argumenten.plaatsnamen}: namen krijgen geen oordeel.")
+    else:
+        for bevinding in bevindingen:
+            if bevinding["soort"] == "naam":
+                bevinding.update(plaatsen.beoordeel(bevinding["woord"]))
+        print(samenvatting(bevindingen))
 
     resultaat = {
         "gestart_op": datetime.now(timezone.utc).isoformat(timespec="seconds"),

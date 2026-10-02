@@ -74,6 +74,24 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python3 scripts/haal_goedgekeurd.py
 
+      # Plaatsnamen uit GeoNames (CC BY 4.0), om verkeerd gespelde plaatsen bij de namen
+      # te vinden. Mislukt dit, dan krijgen namen geen oordeel en gaat de crawl gewoon
+      # door: het is een hulp, geen voorwaarde.
+      - name: Plaatsnamen ophalen (GeoNames)
+        run: |
+          mkdir -p data/geonames
+          base=https://download.geonames.org/export/dump
+          if curl -sSfL "$base/cities1000.zip" -o data/geonames/cities1000.zip \
+             && curl -sSfL "$base/admin1CodesASCII.txt" -o data/geonames/admin1CodesASCII.txt \
+             && curl -sSfL "$base/countryInfo.txt" -o data/geonames/countryInfo.txt \
+             && [ "$(stat -c %s data/geonames/cities1000.zip)" -gt 1000000 ]; then
+            ls -l data/geonames
+          else
+            echo "::warning::GeoNames ophalen mislukte of gaf een te klein bestand."
+            echo "::warning::De crawl gaat door; namen krijgen geen oordeel over hun spelling."
+            rm -rf data/geonames
+          fi
+
       - name: Crawlen en spelling toetsen
         env:
           BRON: ${{ inputs.bron }}
