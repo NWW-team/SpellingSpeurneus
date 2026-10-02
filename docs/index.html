@@ -49,7 +49,7 @@
   .filters { display: flex; flex-wrap: wrap; gap: 12px; }
   .filter { flex: 1 1 220px; }
   label { display: block; font-size: .85rem; color: var(--gedempt); margin-bottom: 4px; }
-  input[type=search] {
+  input[type=search], input[type=number], select {
     width: 100%; padding: 9px 10px; font-size: 1rem;
     border: 1px solid var(--lijn); border-radius: 6px;
     background: var(--grond); color: var(--inkt); }
@@ -95,6 +95,12 @@
   @media (prefers-color-scheme: dark) {
     .fout { color: #ffb3b0; background: #3a1f1e; border-color: #6b2f2c; }
   }
+  .crawlkaart .filters { align-items: end; margin-bottom: 12px; }
+  .crawlkaart .filter { flex: 0 1 220px; }
+  .crawlkaart .knop { font-size: .95rem; padding: 9px 14px; font-weight: 600;
+    background: var(--accent); color: var(--vlak); border-color: var(--accent); }
+  .crawlkaart .knop:hover { background: var(--accent); opacity: .9; }
+  .crawlstatus { margin: 0; color: var(--gedempt); font-size: .9rem; }
   button[disabled] { opacity: .6; cursor: default; }
   .acties { white-space: nowrap; }
   code { font-size: .85em; background: var(--grond); padding: 1px 4px;
@@ -117,6 +123,26 @@
   <div id="app">
 
   <p class="fout" id="fout" role="alert" hidden></p>
+
+  <div class="kaart crawlkaart" id="crawlkaart">
+    <h2>Nieuwe crawl</h2>
+    <div class="filters">
+      <div class="filter">
+        <label for="crawlbron">Deel van de site</label>
+        <select id="crawlbron">
+          <option value="reisadvies">Reisadviezen (±226 pagina's)</option>
+          <option value="paginas">Overige pagina's (±4.400)</option>
+          <option value="ambassades">Ambassades en consulaten</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label for="crawlaantal">Maximaal aantal pagina's</label>
+        <input type="number" id="crawlaantal" value="50" min="1" max="5000" step="1">
+      </div>
+      <button type="button" class="knop" id="crawlknop">Crawl starten</button>
+    </div>
+    <p class="crawlstatus" id="crawlstatus">Even kijken of er vandaag al een crawl is gestart…</p>
+  </div>
 
   <div class="kaart feiten" id="feiten"><span class="melding">Bezig met laden…</span></div>
 
@@ -472,6 +498,77 @@ async function laadGoedgekeurd() {
   goedgekeurdSleutels = new Set(data.map(g => g.woord.toLowerCase()));
 }
 
+// ---------------------------------------------------------------------------
+// Een crawl starten
+// ---------------------------------------------------------------------------
+// Er mag er één per dag. De database dwingt dat af; hier tonen we alleen of de
+// dag al is gebruikt, zodat de knop niet naar een weigering leidt.
+const crawlKnop = document.getElementById("crawlknop");
+const crawlStatus = document.getElementById("crawlstatus");
+const NL_TIJD = { timeZone: "Europe/Amsterdam" };
+const nlDatum = d => new Date(d).toLocaleDateString("sv-SE", NL_TIJD);  // jjjj-mm-dd
+
+async function laadAanvragen() {
+  const { data, error } = await sb
+    .from("crawl_aanvragen")
+    .select("aangevraagd_op, bron, max_paginas")
+    .order("aangevraagd_op", { ascending: false })
+    .limit(1);
+  if (error) {
+    crawlStatus.textContent = "Kan niet nagaan of er vandaag al een crawl is gestart.";
+    crawlKnop.disabled = true;
+    return;
+  }
+  const laatste = data[0];
+  if (laatste && nlDatum(laatste.aangevraagd_op) === nlDatum(new Date())) {
+    const tijd = new Date(laatste.aangevraagd_op).toLocaleTimeString("nl-NL",
+      { ...NL_TIJD, hour: "2-digit", minute: "2-digit" });
+    crawlStatus.textContent =
+      `Vandaag is er al een crawl gestart (${tijd}, ${laatste.bron}, maximaal ${laatste.max_paginas} pagina's). Morgen kan er weer één.`;
+    crawlKnop.disabled = true;
+  } else {
+    crawlStatus.textContent = laatste
+      ? "Er mag één crawl per dag. De laatste was op " + new Date(laatste.aangevraagd_op)
+          .toLocaleDateString("nl-NL", { ...NL_TIJD, dateStyle: "medium" }) + "."
+      : "Er mag één crawl per dag.";
+    crawlKnop.disabled = false;
+  }
+}
+
+crawlKnop.addEventListener("click", async () => {
+  const bron = document.getElementById("crawlbron").value;
+  const aantal = Number(document.getElementById("crawlaantal").value);
+  if (!Number.isInteger(aantal) || aantal < 1 || aantal > 5000) {
+    crawlStatus.textContent = "Vul een geheel aantal pagina's in van 1 tot 5000.";
+    return;
+  }
+  // Een crawl kost de site verkeer en er mag er maar één per dag: vraag het na.
+  if (!confirm(`Crawl starten voor "${bron}", maximaal ${aantal} pagina's?\nEr mag er maar één per dag.`)) return;
+
+  crawlKnop.disabled = true;
+  crawlStatus.textContent = "Bezig met starten…";
+  try {
+    const antwoord = await fetch(`${SUPABASE_URL}/functions/v1/crawl-starten`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY },
+      body: JSON.stringify({ bron, max_paginas: aantal }),
+    });
+    if (!antwoord.ok) {
+      let melding = `Er ging iets mis (${antwoord.status}).`;
+      try { melding = (await antwoord.json()).fout || melding; } catch { /* geen JSON */ }
+      throw new Error(melding);
+    }
+    await laadAanvragen();
+    crawlStatus.textContent = "De crawl is gestart. Dat duurt een paar minuten; ververs daarna deze pagina. "
+      + crawlStatus.textContent;
+  } catch (fout) {
+    // Eerst de toestand opnieuw ophalen (misschien is de dag net gebruikt),
+    // dan de melding erbij, zodat die niet wordt overschreven.
+    await laadAanvragen();
+    crawlStatus.textContent = "Starten is niet gelukt: " + fout.message;
+  }
+});
+
 async function laadResultaten() {
   const mijn = ++ronde;
   try {
@@ -489,7 +586,7 @@ async function laadResultaten() {
       feitenVak.innerHTML = '<span class="melding">Er is nog geen crawl gedraaid.</span>';
       document.getElementById("aantal-spelfouten").textContent = "0";
       document.getElementById("aantal-namen").textContent = "0";
-      leeg(rijenLichaam, "Start een crawl via de Crawl-workflow in GitHub.");
+      leeg(rijenLichaam, "Start een crawl met de knop hierboven.");
       leeg(naamLichaam, "Nog niets te zien.");
       tekenGoedgekeurd();
       return;
@@ -528,6 +625,7 @@ async function haalBevindingen(crawlId) {
   }
 }
 
+laadAanvragen();
 laadResultaten();
 </script>
 </body>

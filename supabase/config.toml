@@ -2,3 +2,6 @@
 # beveiliging van deze functie is de invoercontrole en de limiet in de code zelf.
 [functions.goedkeuren]
 verify_jwt = false
+
+[functions.crawl-starten]
+verify_jwt = false
