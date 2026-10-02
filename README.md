@@ -5,8 +5,7 @@ wanneer de webredacteur daarom vraagt. Zie [STRATEGY.md](STRATEGY.md) voor het w
 en [OVERDRACHT.md](OVERDRACHT.md) voor de stand van zaken, de openstaande besluiten
 en wat je moet weten als je hieraan verder werkt.
 
-**Resultaten bekijken:** https://nww-team.github.io/SpellingSpeurneus/ — inloggen met een
-account dat de beheerder vooraf heeft toegestaan. Zie [Toegang](#toegang).
+**Resultaten bekijken:** https://nww-team.github.io/SpellingSpeurneus/ — zonder inlog. Zie [Toegang](#toegang).
 
 ## Hoe het werkt
 
@@ -17,8 +16,7 @@ account dat de beheerder vooraf heeft toegestaan. Zie [Toegang](#toegang).
 3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan onze eigen
    [`data/uitzonderingen.txt`](data/uitzonderingen.txt).
 4. Wat overblijft wordt in tweeën gedeeld: **spelfouten** en **namen**. Zie hieronder.
-5. Het resultaat gaat naar Supabase en verschijnt op de pagina hierboven, voor wie
-   is ingelogd met een toegestaan account.
+5. Het resultaat gaat naar Supabase en verschijnt op de pagina hierboven.
 
 Er draait niets automatisch op de achtergrond. Een crawl gebeurt alleen als iemand erom vraagt.
 
@@ -66,8 +64,7 @@ python3 -m http.server --directory docs 8000             # scherm bekijken op lo
 python3 scripts/test.py                                  # 42 controles; --offline slaat het netwerk over
 ```
 
-Het scherm heeft Supabase nodig om iets te tonen; lokaal zie je zonder internet alleen
-het inlogformulier. Het resultaat van een lokale crawl in Supabase zetten kan met:
+Het scherm heeft Supabase nodig om iets te tonen; lokaal zie je zonder internet niets. Het resultaat van een lokale crawl in Supabase zetten kan met:
 
 ```bash
 export SUPABASE_URL=https://xxxxxxxx.supabase.co
@@ -86,36 +83,15 @@ workflow per run op bij OpenTaal.
 
 ## Toegang
 
-De crawlresultaten zijn niet openbaar. Ze staan in Supabase en komen alleen vrij voor
-een account dat op de allowlist staat.
+**Er is geen inlog meer.** De resultaten staan in Supabase en zijn leesbaar voor iedereen
+die de publishable key heeft. Die staat in `docs/index.html`, in een publieke repository.
+De "geheime link" naar de pagina is dus **geen toegangscontrole**: wie de repository leest,
+kan de bevindingen ophalen. Dat is een bewuste keuze van de redactie (besluit 3 in
+[OVERDRACHT.md](OVERDRACHT.md) is teruggedraaid). Schrijven kan de browser nog niet: alleen
+de crawl-workflow, met de service-role key.
 
-**De controle zit in de database, niet in het scherm.** Op `crawls` en `bevindingen`
-staat row level security aan, met één expliciete policy: lezen mag als je een sessie
-hebt én je account op de allowlist staat. Zonder dat geeft de database nul rijen terug,
-wat je in de browser ook probeert. Schrijven kan de browser helemaal niet.
-
-**Zelf aanmelden kan niet.** Signups staan uit in de Auth-instellingen: de Auth-API
-antwoordt op elke registratiepoging met `signup_disabled` (422). Nagetoetst over HTTP. Dat er geen registratieknop in het scherm staat is niet
-de maatregel — de maatregel is dat een onbekend account er domweg niet komt, en dat de
-allowlist bepaalt wie gegevens ziet.
-
-**De allowlist** is de tabel `toegestane_gebruikers`. Die draait op het gebruikers-id
-uit `auth.users`, niet op het e-mailadres: een gebruiker kan zijn e-mailadres wijzigen,
-zijn id niet. De tabel is vanuit de browser niet te lezen en niet te wijzigen, dus
-niemand kan zichzelf toevoegen. Beheer gaat via het Supabase-dashboard.
-
-**Wat hiermee níét is afgeschermd.** Dit scherm is een statisch bestand op GitHub Pages
-en deze repository is publiek. `docs/index.html`, de crawler en de uitzonderingenlijst
-blijven dus voor iedereen op te vragen — Supabase Auth schermt geen publieke HTML of
-JavaScript af, en het inlogformulier in het scherm is geen toegangscontrole. Wie zonder
-toegestaan account de pagina opent, ziet het formulier en verder niets. Wil je dat ook
-de pagina zelf onbereikbaar is, dan is een andere hosting nodig: GitHub Pages kan geen
-sessie controleren voordat het een bestand uitlevert.
-
-Ook niet afgeschermd: **de git-geschiedenis**. `docs/resultaten.json` is uit de repository
-gehaald, maar oude commits bevatten hem nog en die zijn publiek leesbaar. Het gaat om
-citaten uit pagina's die al openbaar zijn; wil je dat weg, dan moet de geschiedenis
-worden herschreven of de repository privé.
+De migratie die dit instelt staat in
+[`supabase/migrations/`](supabase/migrations/20261002000000_open_lezen.sql).
 
 ### Sleutels
 

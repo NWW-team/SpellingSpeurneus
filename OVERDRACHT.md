@@ -142,7 +142,7 @@ wil gaan bijhouden, zoals `uitzonderingen.txt` nu voor woorden doet. Dan
 krimpt het namentabblad per crawl tot alleen nieuwe namen. Bewust uitgesteld
 tot duidelijk is of iemand dat onderhoud echt gaat doen.
 
-**3. De bevindingen gaan achter een inlog.** (15 september 2026)
+**3. De bevindingen gaan achter een inlog.** *(teruggedraaid door besluit 6)* (15 september 2026)
 
 Dit was het openstaande besluit hieronder; nu beslist. De resultaten stonden als
 `docs/resultaten.json` in deze publieke repository en op de Pages-link. Ze zijn
@@ -163,6 +163,23 @@ Wat nog niet is opgelost: `docs/resultaten.json` zit nog in de git-geschiedenis 
 is daar publiek leesbaar. Het bestand is verwijderd, de geschiedenis niet
 herschreven. Het gaat om al openbare citaten, dus het is bewust zo gelaten — maar
 het is een keuze, niet een oplossing.
+
+**6. De inlog gaat weer weg.** (2 oktober 2026)
+
+Besluit 3 is teruggedraaid op verzoek van de redactie. Er is geen inlogscherm meer en
+de bevindingen zijn leesbaar voor iedereen met de publishable key, die in
+`docs/index.html` en dus in een publieke repository staat. De pagina is bereikbaar via
+een link die niet wordt aangekondigd, maar dat is **geen toegangscontrole**: wie de
+repository leest, vindt de link en de key.
+
+Dit is bewust zo gekozen, met het risico erbij. De migratie staat in
+`supabase/migrations/20261002000000_open_lezen.sql`. Daarmee vervallen besluit 4 en 5
+(pagina privé, beheer van de allowlist). De tabel `toegestane_gebruikers` en de functie
+`is_toegestaan()` blijven staan, ongebruikt, tot iemand ze opruimt.
+
+Gevolg voor wat nog komt: een knop om woorden of namen goed te keuren en een knop om een
+crawl te starten schrijven vanuit een open pagina. Ze krijgen daarom een Edge Function met
+limieten (één crawl per dag), en elke goedkeuring is terug te draaien en vastgelegd.
 
 ## Openstaande besluiten
 
