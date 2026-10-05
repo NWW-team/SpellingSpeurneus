@@ -39,7 +39,6 @@
          border-bottom: 4px solid var(--hemelblauw); }
   .kop .omhulsel { padding-block: 20px; }
   h1 { font-size: 1.6rem; margin: 0 0 4px; }
-  .ondertitel { color: var(--lichtblauw); margin: 0; }
   .kaart { background: var(--vlak); border: 1px solid var(--lijn);
            border-radius: 8px; padding: 16px; margin-bottom: 20px; }
   .feiten { display: flex; flex-wrap: wrap; gap: 24px; }
@@ -131,7 +130,6 @@
   <div class="omhulsel">
     <div>
       <h1>SpellingSpeurneus</h1>
-      <p class="ondertitel">Woorden op de website die niet in de woordenlijst staan.</p>
     </div>
   </div>
 </header>
@@ -272,6 +270,19 @@ const SUPABASE_URL = "https://riwznqurcluudvyrkwxe.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8D0tbPlRD5eWqjIJDdQgKg_BxKn2Knx";
 
 // Geen sessie nodig: niets bewaren en geen tokens verversen.
+// Tijden schrijven we als "16.51 uur", zoals de redactie dat wil, niet als "16:51".
+// Altijd in Nederlandse tijd, ook als de lezer ergens anders is.
+const NL_TIJD = { timeZone: "Europe/Amsterdam" };
+function tijd(datum) {
+  return new Date(datum).toLocaleTimeString("nl-NL",
+    { ...NL_TIJD, hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+    .replace(":", ".") + " uur";
+}
+function datumTijd(datum) {
+  return new Date(datum).toLocaleDateString("nl-NL", { ...NL_TIJD, dateStyle: "medium" })
+    + ", " + tijd(datum);
+}
+
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY,
   { auth: { persistSession: false, autoRefreshToken: false } });
 
@@ -324,8 +335,7 @@ function korteUrl(url) {
 }
 
 function toonFeiten(gegevens) {
-  const datum = new Date(gegevens.gestart_op).toLocaleString("nl-NL",
-    { dateStyle: "medium", timeStyle: "short" });
+  const datum = datumTijd(gegevens.gestart_op);
   const spelfouten = bevindingen.filter(b => !isNaam(b)).length;
   // Namen tellen we per uniek woord, want zo staan ze ook in de tabel.
   const namen = new Set(bevindingen.filter(isNaam).map(b => b.woord)).size;
@@ -404,8 +414,7 @@ function tekenGoedgekeurd() {
     <tr>
       <td class="woord">${ontsnap(g.woord)}</td>
       <td>${g.soort === "naam" ? "naam" : "woord"}</td>
-      <td>${new Date(g.goedgekeurd_op).toLocaleString("nl-NL",
-        { dateStyle: "medium", timeStyle: "short" })}</td>
+      <td>${datumTijd(g.goedgekeurd_op)}</td>
       <td class="acties"><button type="button" data-actie="intrekken"
           data-woord="${ontsnap(g.woord)}" data-soort="${g.soort}">Intrekken</button></td>
     </tr>`).join("");
@@ -596,7 +605,6 @@ async function laadGoedgekeurd() {
 // dag al is gebruikt, zodat de knop niet naar een weigering leidt.
 const crawlKnop = document.getElementById("crawlknop");
 const crawlStatus = document.getElementById("crawlstatus");
-const NL_TIJD = { timeZone: "Europe/Amsterdam" };
 const nlDatum = d => new Date(d).toLocaleDateString("sv-SE", NL_TIJD);  // jjjj-mm-dd
 
 // Een crawl die nog loopt toont een balk. Het scherm vraagt elke paar seconden
@@ -645,8 +653,7 @@ function tekenVoortgang(a) {
   const laatsteLevensteken = new Date(a.bijgewerkt_op || a.aangevraagd_op);
   const vast = Date.now() - laatsteLevensteken > VASTGELOPEN_NA;
   const waarschuwing = vast
-    ? ` Er is sinds ${laatsteLevensteken.toLocaleTimeString("nl-NL",
-        { ...NL_TIJD, hour: "2-digit", minute: "2-digit" })} niets meer gemeld; kijk in GitHub of de crawl nog loopt.${runLink(a)}`
+    ? ` Er is sinds ${tijd(laatsteLevensteken)} niets meer gemeld; kijk in GitHub of de crawl nog loopt.${runLink(a)}`
     : "";
 
   if (a.status === "crawlen" && a.paginas_totaal) {
@@ -686,10 +693,9 @@ async function laadAanvragen() {
   const vandaagGebruikt = laatste && laatste.status !== "mislukt" &&
     nlDatum(laatste.aangevraagd_op) === nlDatum(new Date());
   if (vandaagGebruikt) {
-    const tijd = new Date(laatste.aangevraagd_op).toLocaleTimeString("nl-NL",
-      { ...NL_TIJD, hour: "2-digit", minute: "2-digit" });
+    const wanneer = tijd(laatste.aangevraagd_op);
     crawlStatus.textContent =
-      `Vandaag is er al een crawl gestart (${tijd}, ${laatste.bron}, maximaal ${laatste.max_paginas} pagina's). Morgen kan er weer één.`;
+      `Vandaag is er al een crawl gestart (${wanneer}, ${laatste.bron}, maximaal ${laatste.max_paginas} pagina's). Morgen kan er weer één.`;
     crawlKnop.disabled = true;
   } else {
     crawlStatus.textContent = laatste
