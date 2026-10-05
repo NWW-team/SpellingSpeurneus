@@ -10,7 +10,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const REPO = "NWW-team/SpellingSpeurneus";
 const WORKFLOW = "crawl.yml";
-const BRONNEN = ["reisadvies", "paginas", "ambassades"];
+const BRONNEN = ["reisadvies", "visum-nederland", "caribisch-visum", "ambassades"];
 const MAX_PAGINAS = 5000;
 const KOP = {
   "Access-Control-Allow-Origin": "*",

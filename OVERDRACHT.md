@@ -111,7 +111,7 @@ wij zien alleen de reisadviezen.
 september zijn er twee volledige crawls van 226 pagina's overheen gegaan. Dat
 staat netjes in hun logboek, met onze User-Agent erbij, en het is beter dat ze
 het van ons horen dan dat ze het zelf ontdekken. Zeker als er ooit een crawl
-over de 4.436 `paginas` komt: dat is ruim twee uur aanhoudend verkeer.
+over de 4.436 `paginas` komt: dat is ruim twee uur aanhoudend verkeer. (Sinds 5 oktober zijn de delen kleiner: de grootste, `/visum-nederland`, is ±1.015 pagina's.)
 
 ## Genomen besluiten
 
@@ -191,6 +191,21 @@ door een unieke index. Het token staat als Supabase-secret `GITHUB_TOKEN` (fine-
 *Actions: read and write* op deze repository). **Risico:** iedereen met de publieke key kan
 de dagelijkse crawl "opmaken", bijvoorbeeld met een grote bron, of de redactie ervan afhouden.
 Een crawl over `paginas` is ruim twee uur aanhoudend verkeer naar de site; zie besluit 2.
+
+**Delen van de site (5 oktober).** De keuzelijst is nu: Reisadviezen (`/reisadvies`), Visum voor
+Nederland (`/visum-nederland`), Visum voor Caribische Koninkrijksdelen (`/caribisch-visum`) en
+Ambassades en consulaten (`/contact/ambassades-consulaten-generaal`), telkens met alles daarachter.
+"Overige pagina's" (`paginas`) is geen keuze meer. De visumpagina's staan in de grote
+`paginas`-sitemap, dus een deel is een pad-voorvoegsel over alle sitemaps samen (`DELEN` in
+`crawl.py`). Gevolg: Reisadviezen telt nu 236 pagina's (de 226 landen plus tien overzichtspagina's
+uit de grote sitemap) en begint met die overzichtspagina's. Een crawl over een deel waar de site
+geen enkele URL meer voor heeft, stopt met een foutmelding. Migratie
+`20261002070000_delen_van_de_site.sql`.
+
+**De spellingtoets is alleen op reisadviezen geijkt.** Op visumpagina's (veel formulieren,
+afkortingen en landnamen) kan de ruis anders liggen: reken bij de eerste crawls op veel valse
+meldingen, en loop ze door met de redactie voordat je de aantallen vertrouwt. Een crawl over
+`/visum-nederland` is ruim een kwartier verkeer naar de site (1015 pagina's); zie besluit 2.
 
 **Plaatsnamen (2 oktober).** Elke naam krijgt een oordeel uit GeoNames (`scripts/plaatsnamen.py`,
 migratie `20261002060000_plaatsnamen.sql`): `bekend`, `twijfel` (lijkt op een bekende plaats,
