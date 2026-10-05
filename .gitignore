@@ -11,6 +11,7 @@ resultaten.json
 
 # Per crawl uit Supabase gehaald: wat in het scherm is goedgekeurd.
 goedgekeurd.json
+naam_is_spelfout.json
 
 # De GeoNames-plaatsnamen worden per run opgehaald (CC BY 4.0), niet bewaard.
 data/geonames/

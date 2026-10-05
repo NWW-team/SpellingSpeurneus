@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.crawl-stoppen]
 verify_jwt = false
+
+[functions.naam-verplaatsen]
+verify_jwt = false

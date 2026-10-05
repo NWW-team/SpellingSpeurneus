@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from plaatsnamen import Plaatsnamen, afstand, samenvatting, tokens  # noqa: E402
 from voortgang import meld  # noqa: E402
-from crawl import (DELEN, SITE, alle_sitemap_urls, is_bekend, urls_van_deel, valt_onder, lees_goedgekeurd,  # noqa: E402
+from crawl import (DELEN, SITE, alle_sitemap_urls, is_bekend, urls_van_deel, valt_onder, verplaats_namen, lees_goedgekeurd,  # noqa: E402
                    maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
                    zoek_fouten)
 
@@ -46,7 +46,8 @@ def draai_crawl(uitvoer, goedgekeurd=None):
     # achtergebleven bestand de controles niet beinvloedt.
     opdracht = [sys.executable, str(WORTEL / "scripts" / "crawl.py"),
                 "--bron", "demo", "--max-paginas", "5", "--uit", str(uitvoer),
-                "--goedgekeurd", str(goedgekeurd or "bestaat-niet.json")]
+                "--goedgekeurd", str(goedgekeurd or "bestaat-niet.json"),
+                "--naam-is-spelfout", "bestaat-niet.json"]
     subprocess.run(opdracht, check=True, capture_output=True)
     return json.loads(Path(uitvoer).read_text(encoding="utf-8"))
 
@@ -283,7 +284,7 @@ def main():
     controle("de crawl draait ook zonder plaatsnamenlijst",
              all("plaats_status" not in b for b in pl_run["bevindingen"]))
 
-    print("\nEen crawl stoppen (Edge Function)")
+    print("\nEdge Functions (stoppen en verplaatsen)")
     # De logica staat los van Supabase en GitHub en draait onder Node (22.18 of nieuwer).
     import shutil
     node = shutil.which("node")
@@ -299,14 +300,15 @@ def main():
             return False
 
     if node and node_kan_typescript():
-        uitkomst = subprocess.run([node, str(WORTEL / "supabase" / "functions" / "crawl-stoppen" / "stoppen.test.ts")],
-                                  capture_output=True, text=True)
-        regels = [r for r in uitkomst.stdout.splitlines() if r.strip().startswith(("OK", "FOUT"))]
-        controle(f"de {len(regels)} controles van stoppen.test.ts slagen",
-                 uitkomst.returncode == 0 and len(regels) > 0 and not any("FOUT" in r for r in regels),
-                 (uitkomst.stdout + uitkomst.stderr)[-300:] if uitkomst.returncode else "")
+        for functie, bestand in (("crawl-stoppen", "stoppen.test.ts"), ("naam-verplaatsen", "verplaatsen.test.ts")):
+            uitkomst = subprocess.run([node, str(WORTEL / "supabase" / "functions" / functie / bestand)],
+                                      capture_output=True, text=True)
+            regels = [r for r in uitkomst.stdout.splitlines() if r.strip().startswith(("OK", "FOUT"))]
+            controle(f"de {len(regels)} controles van {bestand} slagen",
+                     uitkomst.returncode == 0 and len(regels) > 0 and not any("FOUT" in r for r in regels),
+                     (uitkomst.stdout + uitkomst.stderr)[-300:] if uitkomst.returncode else "")
     else:
-        print("  (Node 22.18 of nieuwer ontbreekt: stoppen.test.ts overgeslagen)")
+        print("  (Node 22.18 of nieuwer ontbreekt: de tests van de Edge Functions zijn overgeslagen)")
 
     print("\nExcel-bestand (docs/xlsx.js)")
     # We maken een bestand onder Node en lezen het met een gewone XML-lezer terug. Een echte
@@ -370,6 +372,58 @@ def main():
                  blad.find("m:autoFilter", ns).get("ref") == "A1:D306")
     else:
         print("  (Node ontbreekt: de controles op het Excel-bestand zijn overgeslagen)")
+
+    print("\nNamen die als spelfout zijn aangewezen")
+    bev = [{"woord": "Hairi", "soort": "naam"}, {"woord": "hairi", "soort": "naam"},
+           {"woord": "Cochabamba", "soort": "naam"}, {"woord": "nieet", "soort": "spelfout"}]
+    aantal = verplaats_namen(bev, {"hairi"})
+    controle("een aangewezen naam wordt spelfout, ongeacht hoofdletters",
+             aantal == 2 and [b["soort"] for b in bev] == ["spelfout", "spelfout", "naam", "spelfout"], str(bev))
+    controle("zonder aanwijzingen verandert er niets", verplaats_namen([{"woord": "X", "soort": "naam"}], set()) == 0)
+    controle("een gewone spelfout blijft zoals hij was", bev[3]["soort"] == "spelfout")
+
+    print("\nDe lijsten van de redactie ophalen")
+    uitgereikt = {"/rest/v1/goedgekeurd": [{"woord": "mpox", "soort": "woord"}],
+                  "/rest/v1/naam_is_spelfout": [{"woord": "Hairi"}]}
+    verzoeken_gezien = []
+
+    class NepSupabase(BaseHTTPRequestHandler):
+        def do_GET(self):
+            pad = self.path.split("?")[0]
+            verzoeken_gezien.append(self.path)
+            self.send_response(200 if pad in uitgereikt else 404)
+            self.end_headers()
+            if pad in uitgereikt:
+                self.wfile.write(json.dumps(uitgereikt[pad]).encode())
+
+        def log_message(self, *args):
+            pass
+
+    nep = HTTPServer(("127.0.0.1", 0), NepSupabase)
+    threading.Thread(target=nep.serve_forever, daemon=True).start()
+    try:
+        lijsten = tijdelijk / "lijsten"
+        lijsten.mkdir()
+        run = subprocess.run([sys.executable, str(WORTEL / "scripts" / "haal_goedgekeurd.py"), str(lijsten / "goedgekeurd.json")],
+                             capture_output=True, text=True,
+                             env={**os.environ, "SUPABASE_URL": f"http://127.0.0.1:{nep.server_port}",
+                                  "SUPABASE_SERVICE_ROLE_KEY": "sleutel"})
+        controle("beide lijsten worden opgehaald en bewaard", run.returncode == 0 and
+                 json.loads((lijsten / "goedgekeurd.json").read_text()) == uitgereikt["/rest/v1/goedgekeurd"] and
+                 json.loads((lijsten / "naam_is_spelfout.json").read_text()) == [{"woord": "Hairi"}], run.stderr[-200:])
+        controle("alleen de actieve rijen worden gevraagd",
+                 any("ingetrokken_op=is.null" in v for v in verzoeken_gezien) and
+                 any("teruggezet_op=is.null" in v for v in verzoeken_gezien), str(verzoeken_gezien))
+        del uitgereikt["/rest/v1/naam_is_spelfout"]      # de tweede tabel antwoordt met een fout
+        (lijsten / "goedgekeurd.json").unlink()
+        run = subprocess.run([sys.executable, str(WORTEL / "scripts" / "haal_goedgekeurd.py"), str(lijsten / "goedgekeurd.json")],
+                             capture_output=True, text=True,
+                             env={**os.environ, "SUPABASE_URL": f"http://127.0.0.1:{nep.server_port}",
+                                  "SUPABASE_SERVICE_ROLE_KEY": "sleutel"})
+        controle("mislukt de tweede lijst, dan stopt de run en blijft er niets half achter",
+                 run.returncode != 0 and not (lijsten / "goedgekeurd.json").exists())
+    finally:
+        nep.shutdown()
 
     print("\nGoedgekeurde woorden ophalen")
     # Dit is de enige lijst. Lukt het ophalen niet, dan moet de run stoppen en geen

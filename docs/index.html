@@ -105,6 +105,7 @@
   @media (prefers-color-scheme: dark) {
     .fout { color: #ffb3b0; background: #3a1f1e; border-color: #6b2f2c; }
   }
+  .acties .knoppen { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
   .exportbalk { display: flex; justify-content: flex-end; margin: 0 0 8px; }
   .exportbalk button { font-size: .85rem; padding: 6px 12px; }
   .plaats { display: block; margin-top: 2px; font-size: .75rem; color: var(--gedempt); }
@@ -227,7 +228,9 @@
     <p class="uitleg">Woorden met een hoofdletter middenin een zin: plaatsen,
       organisaties en anderstalige bronnen. De woordenlijst kent geen namen, dus
       ze staan hier allemaal — ook de goede. Elke naam staat één keer, met een
-      voorbeeldzin en een link naar het reisadvies waar die zin staat.</p>
+      voorbeeldzin en een link naar het reisadvies waar die zin staat. Is een naam
+      verkeerd gespeld? Klik op <em>Is een spelfout</em>: hij staat dan bij de
+      Spelfouten, ook bij de volgende crawl.</p>
     <p class="uitleg" id="naamoordeel-uitleg" hidden>Onder de naam staat een oordeel uit
       <a href="https://www.geonames.org">GeoNames</a>: <em>bekende plaatsnaam</em>, of
       <em>lijkt op</em> een bekende plaats (mogelijk verkeerd gespeld, dus bekijk die
@@ -322,10 +325,14 @@ let huidigeCrawl = null;              // de crawl waarvan de bevindingen op het 
 const zichtbaarVoorExport = { spelfouten: [], namen: [] };
 let goedgekeurd = [];                 // actieve goedkeuringen uit Supabase
 let goedgekeurdSleutels = new Set();  // dezelfde woorden, kleine letters
+let verplaatstSleutels = new Set();   // namen die de redactie als spelfout heeft aangewezen, kleine letters
 
 // Een bevinding zonder soort komt uit een crawl van voor de scheiding tussen
 // spelfouten en namen. Die tonen we bij de spelfouten, zoals hij toen ook stond.
-const isNaam = b => b.soort === "naam";
+// Een naam die de redactie als verkeerd gespeld heeft aangewezen, telt als spelfout. De
+// bevinding zelf blijft een naam in de database; de volgende crawl bewaart hem als spelfout.
+const isVerplaatst = b => b.soort === "naam" && verplaatstSleutels.has(b.woord.toLowerCase());
+const isNaam = b => b.soort === "naam" && !isVerplaatst(b);
 
 // Resten van het sjabloon of het CMS: "undefined", "[object Object]",
 // "{{titel}}". De crawler meldt ze als gewone spelfout, want de kolom `soort`
@@ -392,11 +399,21 @@ function bronCel(b, extra = "") {
 }
 
 // De soort goedkeuring: een woord uit het spelfoutentabblad, of een naam.
-function knopCel(woord, soort) {
-  return `<td class="acties"><button type="button" data-actie="goedkeuren"
-            data-woord="${ontsnap(woord)}" data-soort="${soort}"
+// Goedkeuren staat overal. Bij een naam staat erbij "Is een spelfout"; bij een spelfout die van de
+// namen komt staat erbij "Terug naar Namen".
+function knopCel(woord, soort, extra = "") {
+  const w = ontsnap(woord);
+  const tweede = extra === "naam"
+    ? `<button type="button" data-actie="verplaatsen" data-woord="${w}"
+         title="Deze naam is verkeerd gespeld: hij gaat naar de spelfouten">Is een spelfout</button>`
+    : extra === "terug"
+      ? `<button type="button" data-actie="terugzetten" data-woord="${w}"
+           title="Dit is toch een naam: hij gaat terug naar de namen">Terug naar Namen</button>`
+      : "";
+  return `<td class="acties"><div class="knoppen"><button type="button" data-actie="goedkeuren"
+            data-woord="${w}" data-soort="${soort}"
             title="Dit woord is goed: het verdwijnt hier en de volgende crawl slaat het over">
-            Goedkeuren</button></td>`;
+            Goedkeuren</button>${tweede}</div></td>`;
 }
 
 function leeg(lichaam, tekst) {
@@ -464,13 +481,18 @@ function tekenSpelfouten(rijen) {
 
   rijenLichaam.innerHTML = geordend.map(b => {
     const rest = isSjabloonrest(b);
+    const verplaatst = isVerplaatst(b);
     const merk = rest ? `<span class="merk">sjabloonrest</span>` : "";
+    const herkomst = verplaatst
+      ? `<span class="plaats">verplaatst vanuit Namen</span>` +
+        (b.suggestie ? `<span class="plaats twijfel">lijkt op ${ontsnap(b.suggestie)}</span>` : "")
+      : "";
     return `
     <tr${rest ? ' class="sjabloon"' : ""}>
-      <td class="woord">${ontsnap(b.woord)}${merk}</td>
+      <td class="woord">${ontsnap(b.woord)}${merk}${herkomst}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
       ${bronCel(b)}
-      ${knopCel(b.woord, "woord")}
+      ${knopCel(b.woord, "woord", verplaatst ? "terug" : "")}
     </tr>`;
   }).join("");
 }
@@ -537,7 +559,7 @@ function tekenNamen(rijen) {
       <td class="woord">${ontsnap(b.woord)}${oordeel}</td>
       <td class="context">${markeer(b.context, b.woord)}</td>
       ${bronCel(b, erbij)}
-      ${knopCel(b.woord, "naam")}
+      ${knopCel(b.woord, "naam", "naam")}
     </tr>`;
   }).join("");
 }
@@ -579,19 +601,42 @@ async function wijzig(actie, woord, soort) {
   }
 }
 
+// Een naam naar de spelfouten verplaatsen of terugzetten, via een eigen Edge Function.
+async function wijzigVerplaatsing(actie, woord) {
+  const antwoord = await fetch(`${SUPABASE_URL}/functions/v1/naam-verplaatsen`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY },
+    body: JSON.stringify({ actie, woord }),
+  });
+  if (!antwoord.ok) {
+    let melding = `Er ging iets mis (${antwoord.status}).`;
+    try { melding = (await antwoord.json()).fout || melding; } catch { /* geen JSON */ }
+    throw new Error(melding);
+  }
+}
+
 document.addEventListener("click", async event => {
   const knop = event.target.closest("button[data-actie]");
   if (!knop) return;
   const { actie, woord, soort } = knop.dataset;
   foutVak.hidden = true;
   knop.disabled = true;
+  const verplaatsing = actie === "verplaatsen" || actie === "terugzetten";
+  const werkwoord = { goedkeuren: "Goedkeuren", intrekken: "Intrekken",
+                      verplaatsen: "Verplaatsen", terugzetten: "Terugzetten" }[actie];
   try {
-    await wijzig(actie, woord, soort);
-    await laadGoedgekeurd();
+    if (verplaatsing) {
+      await wijzigVerplaatsing(actie, woord);
+      await laadVerplaatst();
+      if (huidigeCrawl) toonFeiten(huidigeCrawl);   // de teller van de spelfouten verandert mee
+    } else {
+      await wijzig(actie, woord, soort);
+      await laadGoedgekeurd();
+    }
     teken();
   } catch (fout) {
     knop.disabled = false;
-    foutVak.textContent = `${actie === "intrekken" ? "Intrekken" : "Goedkeuren"} van "${woord}" is niet gelukt: ${fout.message}`;
+    foutVak.textContent = `${werkwoord} van "${woord}" is niet gelukt: ${fout.message}`;
     foutVak.hidden = false;
   }
 });
@@ -629,7 +674,8 @@ exportKnoppen.spelfouten.addEventListener("click", () => {
       { titel: "Soort", breedte: 14 },
     ],
     rijen: zichtbaarVoorExport.spelfouten.map(b => [
-      b.woord, b.context, b.url, b.titel || "", isSjabloonrest(b) ? "sjabloonrest" : "spelfout",
+      b.woord, b.context, b.url, b.titel || "",
+      isSjabloonrest(b) ? "sjabloonrest" : isVerplaatst(b) ? "spelfout (verplaatst vanuit Namen)" : "spelfout",
     ]),
   });
 });
@@ -668,6 +714,23 @@ function wisGegevens() {
 // ---------------------------------------------------------------------------
 // De gegevens ophalen
 // ---------------------------------------------------------------------------
+
+async function laadVerplaatst() {
+  const blok = 1000;
+  const alles = [];
+  for (let van = 0; ; van += blok) {
+    const { data, error } = await sb
+      .from("naam_is_spelfout")
+      .select("woord, verplaatst_op")
+      .is("teruggezet_op", null)
+      .order("id")
+      .range(van, van + blok - 1);
+    if (error) throw error;
+    alles.push(...data);
+    if (data.length < blok) break;
+  }
+  verplaatstSleutels = new Set(alles.map(n => n.woord.toLowerCase()));
+}
 
 async function laadGoedgekeurd() {
   // In blokken: de API geeft er standaard maximaal duizend per verzoek.
@@ -889,6 +952,7 @@ async function laadResultaten() {
   const mijn = ++ronde;
   try {
     await laadGoedgekeurd();
+    await laadVerplaatst();
     if (mijn !== ronde) return;
     const { data: crawls, error: crawlfout } = await sb
       .from("crawls")

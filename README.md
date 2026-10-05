@@ -92,6 +92,16 @@ Boven de lijst staat een keuzelijst om alleen de namen van één groep te tonen.
 een hint, geen oordeel: het kan ook een organisatie zijn die toevallig op een plaats lijkt.
 Is een naam goed, klik dan op **Goedkeuren**, dan komt hij er niet meer in terug.
 
+### Een naam die verkeerd gespeld is
+
+Zie je bij Namen een naam die fout is (`Hairi`, `Guyaquil`), klik dan op **Is een spelfout**. De
+naam verdwijnt bij Namen en staat bij **Spelfouten**, met de aanduiding *verplaatst vanuit Namen* en,
+als er een suggestie was, *lijkt op …*. Daar staat ook **Terug naar Namen** voor als je je vergist.
+Het blijft gelden bij de volgende crawl: de crawler meldt zo'n woord dan direct als spelfout. De
+verplaatste namen staan in de tabel `naam_is_spelfout`, apart van `goedgekeurd`: een foute naam mag
+nooit per ongeluk als goed tellen. In de Excel-download staat zo'n rij met de soort *spelfout
+(verplaatst vanuit Namen)*.
+
 Wat dit niet kan: een naam beoordelen die wél in GeoNames staat maar op die pagina niet de
 plaats bedoelt, een verkeerde plaats die toevallig als andere plaats bestaat, of een naam die
 meer dan twee letters afwijkt. Hoe het matcht staat in
@@ -210,6 +220,7 @@ altijd een harde bovengrens op het aantal pagina's.
 | `docs/icoon-groot.png` | Dezelfde hond in 256 × 256 pixels, voor de kopbalk (88 pixels hoog, dus scherp op schermen met hoge resolutie) |
 | `docs/icoon.png` | Het icoon naast de titel en in het browsertabblad (favicon): de hond met de neus omhoog, 128 × 128 pixels, met transparante hoeken |
 | `docs/xlsx.js` | Maakt de Excel-downloads in de browser, zonder bibliotheek |
+| `supabase/functions/naam-verplaatsen/` | Edge Function die een naam naar de spelfouten verplaatst of terugzet (de controle op het verzoek staat los, in `verplaatsen.ts`) |
 | `scripts/plaatsnamen.py` | Beoordeelt namen tegen GeoNames: bekend, lijkt op een bekende plaats, of geen oordeel |
 | `scripts/haal_goedgekeurd.py` | Haalt de in het scherm goedgekeurde woorden op, vlak voor de crawl |
 | `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |
