@@ -206,6 +206,21 @@ def lees_goedgekeurd(pad):
     return {rij["woord"].lower() for rij in json.loads(pad.read_text(encoding="utf-8"))}
 
 
+def verplaats_namen(bevindingen, verplaatst):
+    """Namen die de redactie als verkeerd gespeld heeft aangewezen, tellen als spelfout.
+
+    `verplaatst` is een set kleine letters (zie lees_goedgekeurd). De bevinding verliest zijn
+    plaatsoordeel niet: dat wordt pas daarna bepaald en alleen voor wat nog een naam is.
+    Geeft het aantal verplaatste bevindingen terug.
+    """
+    aantal = 0
+    for bevinding in bevindingen:
+        if bevinding["soort"] == "naam" and bevinding["woord"].lower() in verplaatst:
+            bevinding["soort"] = "spelfout"
+            aantal += 1
+    return aantal
+
+
 def is_bekend(woord, woorden):
     """Bekend als het woord in de lijst staat, of als alle delen dat doen.
 
@@ -365,6 +380,8 @@ def main():
     parser.add_argument("--woordenlijst", default=str(WORTEL / "data" / "woordenlijst.txt"))
     parser.add_argument("--goedgekeurd", default=str(WORTEL / "goedgekeurd.json"),
                         help="JSON met de in het scherm goedgekeurde woorden en namen")
+    parser.add_argument("--naam-is-spelfout", default=str(WORTEL / "naam_is_spelfout.json"),
+                        help="JSON met namen die als spelfout zijn aangewezen")
     parser.add_argument("--plaatsnamen", default=str(WORTEL / "data" / "geonames"),
                         help="map met de GeoNames-bestanden; zonder die map krijgen namen "
                              "geen oordeel over hun spelling")
@@ -422,6 +439,10 @@ def main():
         titel = titel_uit(pagina_html)
         for bevinding in zoek_fouten(tekst, toegestaan):
             bevindingen.append({"url": url, "titel": titel, **bevinding})
+
+    verplaatst = verplaats_namen(bevindingen, lees_goedgekeurd(argumenten.naam_is_spelfout))
+    if verplaatst:
+        print(f"{verplaatst} bevindingen van namen die de redactie als spelfout heeft aangewezen.")
 
     # Een hulp, geen voorwaarde: een kapotte of onvolledige download mag de crawl niet laten falen.
     try:

@@ -199,6 +199,39 @@ altijd het hele gekozen deel. `crawl.py` heeft nog `--max-paginas` voor lokaal t
 naar GitHub, dat een input die de workflow niet kent weigert; de kolom `crawl_aanvragen.max_paginas`
 blijft bestaan en staat dus altijd op 5000.
 
+**Een naam naar de spelfouten verplaatsen (5 oktober).** Bij Namen staat naast Goedkeuren de knop "Is een
+spelfout"; bij Spelfouten staat voor zo'n naam "Terug naar Namen". Tabel `naam_is_spelfout`
+(`20261005010000_naam_is_spelfout.sql`), Edge Function `naam-verplaatsen` (maximaal 300 wijzigingen
+per uur, de controle op het verzoek in `verplaatsen.ts` met tests). `haal_goedgekeurd.py` haalt de
+lijst vlak voor de crawl op naast `goedgekeurd` en **stopt de run als dat mislukt**; `crawl.py` zet
+een aangewezen naam om naar spelfout (`verplaats_namen`) vóórdat de plaatsnamen worden beoordeeld.
+- Het is bewust een aparte tabel naast `goedgekeurd`: de ene lijst is wat goed is en wordt overgeslagen,
+  de andere wat fout is en gemeld moet worden. In één tabel zou een vergissing een foute naam als goed
+  kunnen laten tellen.
+- Voor de crawl die al in de database staat, doet het scherm de omzetting zelf (op het woord, zonder
+  hoofdletters); de bevinding blijft daar `naam`. Pas een nieuwe crawl bewaart hem als `spelfout`.
+- Gaat een naam naar de spelfouten, dan is hij nog steeds goed te keuren: Goedkeuren wint van alles.
+- Omdat er geen inlog is, kan iedereen met de publieke key namen verplaatsen. Terugzetten kan, en niets
+  wordt verwijderd; zie besluit 6.
+
+**Eerste meting van de plaatsnamencheck (5 oktober, 236 reisadviezen).** 1380 unieke namen: 884 bekend,
+98 "lijkt op", 398 zonder oordeel. Ik heb de 98 doorgelezen: ongeveer een kwart zijn echte
+tikfouten of afwijkende schrijfwijzen van een plaats (`Bahamar`, `Guyaquil`, `Hairi`, `Mauritus`,
+`Noukachott`, `Snedai`, `Karakalkpakstan`). De rest is valse twijfel, in vier soorten:
+1. **Een Nederlands woord als deel van een naam**: `EHIC-kaart` en `Express-kaart` lijken op `Kaarst`,
+   `Paleski-reservaat` op `Reserva`, `Chaambi-gebergte`, `Gedeo-zone`, `Khamsin-wind`,
+   `Paraguana-schiereiland`. Oplossing die voor de hand ligt: delen die in de woordenlijst staan overslaan.
+2. **Gewone Engelse, Franse of Spaanse woorden**: `Survey` ~ `Surrey`, `Waiver` ~ `Waver`,
+   `Campaign` ~ `Champaign`, `Danger`, `Local`, `Markets`, `Prefectural`, `Observatory`, `Meteo`.
+3. **Echte plaatsen die ontbreken in de lijst** (kleiner dan 1000 inwoners, of geen stad): `Tikal`,
+   `Sinabung`, `Marapi`, `Wagah`, `Moorea` en dergelijke.
+4. **Landnamen in een andere taal of in het Nederlands met trema**: `Transnistrië` ~ `Transnistria`,
+   `Polynésie`, `Latvija`, `Paraguayo`.
+Dit is mijn lezing van de lijst, niet door de redactie nagelopen. Mogelijke verbeteringen, nog niet
+gedaan: Nederlandse woorden overslaan (soort 1), suggesties beperken tot plaatsen vanaf ±100.000 inwoners
+(`MIN_INWONERS_SUGGESTIE`, ruimt veel van soort 2 op) en een naam die al is goedgekeurd of verplaatst
+niet opnieuw beoordelen. Wat de redactie met Goedkeuren wegwerkt, komt niet terug.
+
 **Excel-downloads (5 oktober).** Op Spelfouten en Namen staat een knop "Download als Excel", zie
 "Downloaden als Excel" in [README.md](README.md). Het bestand wordt in de browser gemaakt door
 `docs/xlsx.js`, een eigen kleine schrijver (zip zonder compressie plus de XML van één werkblad):
