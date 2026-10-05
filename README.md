@@ -157,7 +157,7 @@ Geen installatie nodig; alleen Python 3.
 python3 scripts/crawl.py --bron demo --max-paginas 5     # fictieve pagina's, zonder netwerk
 python3 scripts/crawl.py --bron reisadvies --max-paginas 10   # ook: visum-nederland, caribisch-visum, ambassades
 python3 -m http.server --directory docs 8000             # scherm bekijken op localhost:8000
-python3 scripts/test.py                                  # 42 controles; --offline slaat het netwerk over
+python3 scripts/test.py                                  # 131 controles; --offline slaat het netwerk over
 ```
 
 Het scherm heeft Supabase nodig om iets te tonen; lokaal zie je zonder internet niets. Het resultaat van een lokale crawl in Supabase zetten kan met:
