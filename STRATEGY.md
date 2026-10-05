@@ -1,6 +1,6 @@
 ---
 name: SpellingSpeurneus
-last_updated: 2026-09-15
+last_updated: 2026-10-05
 ---
 
 # SpellingSpeurneus — Strategie
@@ -33,9 +33,27 @@ _Waarom het de aanpak dient:_ levert de daadwerkelijke spelfouten op die de reda
 
 ### Overzicht tonen
 
-Resultaten presenteren aan de redacteur, met filtering op URL.
+Resultaten presenteren aan de redacteur, met filtering op URL en op woord, en met een Excel-download van de spelfouten en van de namen.
 
-_Waarom het de aanpak dient:_ maakt de bevindingen bruikbaar voor de redacteur om gericht te controleren.
+_Waarom het de aanpak dient:_ maakt de bevindingen bruikbaar voor de redacteur om gericht te controleren, en om ze met collega's te delen.
+
+### Crawl starten, volgen en stoppen
+
+De redacteur kiest in het scherm een deel van de site (reisadviezen, visum voor Nederland, visum voor de Caribische Koninkrijksdelen, ambassades en consulaten), start de crawl, ziet de voortgang en kan hem stoppen. Er mag één crawl per dag.
+
+_Waarom het de aanpak dient:_ de redacteur beslist zelf wanneer er gecrawld wordt, zonder dat hij een GitHub-account of technische kennis nodig heeft. De limiet beschermt de site tegen te veel verkeer.
+
+### Vals alarm wegwerken
+
+De redacteur keurt een woord of naam goed met één klik. Het verdwijnt uit de lijst en de volgende crawl slaat het over. Eén lijst, in de database, die de redactie zelf bijhoudt.
+
+_Waarom het de aanpak dient:_ een woordenlijst kent niet alle goede woorden (vaktermen, huisstijl, namen). Zonder deze stap blijft de lijst vol vals alarm en kijkt niemand meer naar de echte fouten.
+
+### Namen nakijken
+
+Namen worden apart gezet en beoordeeld tegen een lijst met plaatsen (GeoNames): bekend, of lijkt op een bekende plaats. Een naam die fout blijkt, verplaatst de redacteur naar de spelfouten.
+
+_Waarom het de aanpak dient:_ in de eerste crawl was ruim 90% van de meldingen een naam. Zonder scheiding verdrinken de echte fouten, maar weggooien kan niet, want een verkeerd gespelde plaatsnaam is ook een fout op de site.
 
 ### Toegang beperken tot de redactie
 
