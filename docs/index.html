@@ -38,7 +38,10 @@
   .kop { background: var(--donkerblauw); color: #fff;
          border-bottom: 4px solid var(--hemelblauw); }
   .kop .omhulsel { padding-block: 20px; }
-  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  h1 { font-size: 1.6rem; margin: 0; }
+  /* Het icoon staat voor de titel; het is versiering, de titel zegt wat de app is. */
+  .kop .titel { display: flex; align-items: center; gap: 14px; }
+  .kop .logo { width: 48px; height: 48px; flex: none; }
   .kaart { background: var(--vlak); border: 1px solid var(--lijn);
            border-radius: 8px; padding: 16px; margin-bottom: 20px; }
   .feiten { display: flex; flex-wrap: wrap; gap: 24px; }
@@ -102,7 +105,8 @@
   .naamfilter label { margin: 0; }
   .naamfilter select { width: auto; }
   .crawlkaart .filters { align-items: end; margin-bottom: 12px; }
-  .crawlkaart .filter { flex: 0 1 220px; }
+  /* Breed genoeg voor de langste keuze, "Visum voor Caribische Koninkrijksdelen (±452 pagina's)". */
+  .crawlkaart .filter { flex: 1 1 380px; max-width: 480px; }
   .crawlkaart .knop { font-size: .95rem; padding: 9px 14px; font-weight: 600;
     background: var(--accent); color: var(--vlak); border-color: var(--accent); }
   .crawlkaart .knop:hover { background: var(--accent); opacity: .9; }
@@ -133,7 +137,8 @@
 
 <header class="kop">
   <div class="omhulsel">
-    <div>
+    <div class="titel">
+      <img class="logo" src="icoon.png" alt="" width="48" height="48">
       <h1>SpellingSpeurneus</h1>
     </div>
   </div>
