@@ -192,11 +192,35 @@ door een unieke index. Het token staat als Supabase-secret `GITHUB_TOKEN` (fine-
 de dagelijkse crawl "opmaken", bijvoorbeeld met een grote bron, of de redactie ervan afhouden.
 Een crawl over `paginas` is ruim twee uur aanhoudend verkeer naar de site; zie besluit 2.
 
-**Geen maximumaantal pagina's meer (5 oktober).** Het veld is uit het scherm gehaald: een crawl pakt
-altijd het hele gekozen deel. De Edge Function `crawl-starten` zet het aantal zelf op de grens van
-5000 (boven het grootste deel, ±1.015) en negeert een aantal in het verzoek; de kolom
-`crawl_aanvragen.max_paginas` blijft bestaan en staat dus altijd op 5000. De knop "Run workflow" in
-GitHub heeft het veld nog, met standaard 50: wie die gebruikt, moet het zelf verhogen.
+**Geen maximumaantal pagina's meer (5 oktober).** Het veld is uit het scherm én uit de workflow gehaald
+(de knop "Run workflow" in GitHub kent alleen nog het deel en de woordenlijst-versie): een crawl pakt
+altijd het hele gekozen deel. `crawl.py` heeft nog `--max-paginas` voor lokaal testen, standaard
+5000. De Edge Function `crawl-starten` zet het aantal zelf op die grens en stuurt het niet meer
+naar GitHub, dat een input die de workflow niet kent weigert; de kolom `crawl_aanvragen.max_paginas`
+blijft bestaan en staat dus altijd op 5000.
+
+**Een crawl stoppen (5 oktober).** Knop "Crawl stoppen" onder de voortgangsbalk, Edge Function
+`crawl-stoppen` (`supabase/functions/crawl-stoppen/`, de logica in `stoppen.ts` met tests in
+`stoppen.test.ts`, die `scripts/test.py` onder Node draait). De functie annuleert de run in GitHub
+(het token heeft daar Actions: schrijven voor) en zet de aanvraag op `gestopt`; migratie
+`20261005000000_crawl_stoppen.sql`. Wat je moet weten:
+- De crawl publiceert pas aan het eind, dus stoppen laat niets achter, maar wat tot dan toe is
+  gevonden gaat verloren.
+- **Tijdens "publiceren" kan niet gestopt worden:** het opslaan loopt in blokken, en annuleren
+  midden erin laat een half resultaat achter dat als laatste crawl zou gelden. Er blijft een klein
+  gat van een seconde tussen de controle en het annuleren; valt je klik daar precies in, dan staat
+  er een onvolledige crawl in `crawls`. Verwijder die dan met de hand.
+- De run wordt gevonden via de link die de workflow als eerste stap bij de aanvraag opslaat
+  (`voortgang.py --status gestart`). Ontbreekt die nog, dan zoekt de functie de ene lopende run van
+  na de aanvraag; zijn het er twee, dan stopt ze niets, want het kan een run zijn die iemand in GitHub
+  zelf heeft gestart.
+- Een gestopte crawl telt, net als een mislukte, niet mee voor "één per dag". Dat vraagt dat de
+  unieke index `crawl_aanvragen_per_dag` `where status not in ('mislukt', 'gestopt')` is: zie de
+  migratie. **Die index is nog niet vervangen**; de oude telt álle aanvragen. Tot dat gebeurd is
+  verbruikt een gestopte of mislukte crawl de dag toch, en geeft Crawl starten dan "vandaag al
+  gestart".
+- Omdat er geen inlog is, kan iedereen met de publieke key een lopende crawl stoppen. Er is een
+  bevestigingsvraag, maar geen echte drempel; zie besluit 6.
 
 **Delen van de site (5 oktober).** De keuzelijst is nu: Reisadviezen (`/reisadvies`), Visum voor
 Nederland (`/visum-nederland`), Visum voor Caribische Koninkrijksdelen (`/caribisch-visum`) en

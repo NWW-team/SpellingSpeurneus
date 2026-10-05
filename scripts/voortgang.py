@@ -11,6 +11,7 @@ de resultaten komen er wel. Alleen de standaardbibliotheek van Python.
 Als programma, voor de workflow:
 
     python3 scripts/voortgang.py --id 12 --status mislukt
+    python3 scripts/voortgang.py --id 12 --status gestart   # alleen de link naar de run
 """
 
 import argparse
@@ -30,7 +31,10 @@ def meld(aanvraag_id, **velden):
         return False
     velden["bijgewerkt_op"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     aanvraag = urllib.request.Request(
-        f"{basis}/rest/v1/crawl_aanvragen?id=eq.{int(aanvraag_id)}",
+        # Alleen een aanvraag die nog loopt: een crawl die is gestopt of is mislukt, mag door
+        # een late melding van de runner niet weer op "crawlen" komen te staan.
+        f"{basis}/rest/v1/crawl_aanvragen?id=eq.{int(aanvraag_id)}"
+        f"&status=in.(aangevraagd,crawlen,publiceren)",
         data=json.dumps(velden).encode("utf-8"), method="PATCH",
         headers={"apikey": sleutel, "Authorization": f"Bearer {sleutel}",
                  "Content-Type": "application/json", "Prefer": "return=minimal"})
@@ -55,11 +59,16 @@ def main():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--id", required=True)
     parser.add_argument("--status", required=True,
-                        choices=["crawlen", "publiceren", "klaar", "mislukt"])
+                        choices=["gestart", "crawlen", "publiceren", "klaar", "mislukt"],
+                        help="gestart: alleen de link naar deze run vastleggen, zodat de crawl "
+                             "te stoppen is")
     argumenten = parser.parse_args()
     if not argumenten.id:
         return  # een crawl zonder aanvraag meldt niets
-    meld(argumenten.id, status=argumenten.status)
+    if argumenten.status == "gestart":
+        meld(argumenten.id, run_url=run_url())
+    else:
+        meld(argumenten.id, status=argumenten.status)
 
 
 if __name__ == "__main__":

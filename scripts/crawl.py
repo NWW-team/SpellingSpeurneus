@@ -360,8 +360,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bron", default="demo",
                         choices=["demo", *DELEN], help="welk deel van de site")
-    parser.add_argument("--max-paginas", type=int, default=50,
-                        help="harde bovengrens op het aantal pagina's")
+    parser.add_argument("--max-paginas", type=int, default=5000,
+                        help="harde bovengrens op het aantal pagina's (standaard 5000: een heel deel)")
     parser.add_argument("--woordenlijst", default=str(WORTEL / "data" / "woordenlijst.txt"))
     parser.add_argument("--goedgekeurd", default=str(WORTEL / "goedgekeurd.json"),
                         help="JSON met de in het scherm goedgekeurde woorden en namen")

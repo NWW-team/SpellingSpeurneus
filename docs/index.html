@@ -116,6 +116,9 @@
     .vulling { transition: none; }
   }
   .voortgangtekst { margin: 6px 0 0; font-size: .9rem; }
+  .stopknop { margin-top: 8px; font-size: .9rem; padding: 6px 12px; font-weight: 600;
+    color: var(--waarschuwing); border-color: var(--waarschuwing); background: transparent; }
+  .stopknop:hover { background: var(--vlak); border-color: var(--waarschuwing); }
   .voortgangtekst a { color: var(--accent); }
   .crawlstatus { margin: 0; color: var(--gedempt); font-size: .9rem; }
   button[disabled] { opacity: .6; cursor: default; }
@@ -160,6 +163,7 @@
         <div class="vulling" id="vulling"></div>
       </div>
       <p class="voortgangtekst" id="voortgangtekst" aria-live="polite"></p>
+      <button type="button" class="stopknop" id="stopknop" hidden>Crawl stoppen</button>
     </div>
     <p class="crawlstatus" id="crawlstatus">Even kijken of er vandaag al een crawl is gestart…</p>
   </div>
@@ -622,6 +626,7 @@ const voortgangVak = document.getElementById("voortgang");
 const balk = document.getElementById("balk");
 const vulling = document.getElementById("vulling");
 const voortgangTekst = document.getElementById("voortgangtekst");
+const stopKnop = document.getElementById("stopknop");
 
 function minuten(seconden) {
   if (seconden < 90) return "minder dan 2 minuten";
@@ -638,17 +643,25 @@ function tekenVoortgang(a) {
   const actief = a && ACTIEF.includes(a.status) &&
     Date.now() - new Date(a.aangevraagd_op) < MAX_DUUR;
 
-  if (!actief && !(a && a.status === "mislukt" && nlDatum(a.aangevraagd_op) === nlDatum(new Date()))) {
+  const afgebroken = a && ["mislukt", "gestopt"].includes(a.status);
+  if (!actief && !(afgebroken && nlDatum(a.aangevraagd_op) === nlDatum(new Date()))) {
     voortgangVak.hidden = true;
+    stopKnop.hidden = true;
     return;
   }
   voortgangVak.hidden = false;
+  // Stoppen kan zolang er gecrawld of voorbereid wordt, ook als de crawl vast lijkt te zitten.
+  // Tijdens het opslaan niet meer: dan zou er een half resultaat achterblijven.
+  stopKnop.hidden = !["aangevraagd", "crawlen"].includes(a.status);
+  stopKnop.disabled = false;
   vulling.classList.remove("onbepaald");
   balk.removeAttribute("aria-valuenow");
 
-  if (a.status === "mislukt") {
+  if (afgebroken) {
     vulling.style.width = "0";
-    voortgangTekst.innerHTML = `De crawl is mislukt. Er is niets gepubliceerd en je mag opnieuw starten.${runLink(a)}`;
+    voortgangTekst.innerHTML = a.status === "gestopt"
+      ? "De crawl is gestopt. Er is niets gepubliceerd en je mag opnieuw starten."
+      : `De crawl is mislukt. Er is niets gepubliceerd en je mag opnieuw starten.${runLink(a)}`;
     return;
   }
 
@@ -674,7 +687,7 @@ function tekenVoortgang(a) {
     vulling.classList.add("onbepaald");
     vulling.style.width = "";
     voortgangTekst.innerHTML = a.status === "publiceren"
-      ? `Het resultaat wordt opgeslagen…${waarschuwing}`
+      ? `Het resultaat wordt opgeslagen… Stoppen kan nu niet meer.${waarschuwing}`
       : `De crawl wordt voorbereid (woordenlijst ophalen)…${waarschuwing}`;
   }
 }
@@ -691,8 +704,8 @@ async function laadAanvragen() {
     return;
   }
   const laatste = data[0];
-  // Een mislukte crawl telt niet mee: de dag komt dan vrij.
-  const vandaagGebruikt = laatste && laatste.status !== "mislukt" &&
+  // Een mislukte of gestopte crawl telt niet mee: de dag komt dan vrij.
+  const vandaagGebruikt = laatste && !["mislukt", "gestopt"].includes(laatste.status) &&
     nlDatum(laatste.aangevraagd_op) === nlDatum(new Date());
   if (vandaagGebruikt) {
     const wanneer = tijd(laatste.aangevraagd_op);
@@ -729,6 +742,29 @@ async function laadAanvragen() {
   }
   wasActief = actief;
 }
+
+stopKnop.addEventListener("click", async () => {
+  // Wat tot nu toe is gevonden gaat verloren: de crawl publiceert pas aan het eind.
+  if (!confirm("De crawl stoppen?\nWat tot nu toe is gevonden gaat verloren; er wordt niets gepubliceerd.")) return;
+  stopKnop.disabled = true;
+  try {
+    const antwoord = await fetch(`${SUPABASE_URL}/functions/v1/crawl-stoppen`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY },
+      body: "{}",
+    });
+    if (!antwoord.ok) {
+      let melding = `Er ging iets mis (${antwoord.status}).`;
+      try { melding = (await antwoord.json()).fout || melding; } catch { /* geen JSON */ }
+      throw new Error(melding);
+    }
+    await laadAanvragen();
+  } catch (fout) {
+    await laadAanvragen().catch(() => {});
+    stopKnop.disabled = false;
+    crawlStatus.textContent = "Stoppen is niet gelukt: " + fout.message;
+  }
+});
 
 crawlKnop.addEventListener("click", async () => {
   const bron = document.getElementById("crawlbron").value;

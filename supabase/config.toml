@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.crawl-starten]
 verify_jwt = false
+
+[functions.crawl-stoppen]
+verify_jwt = false

@@ -10,11 +10,10 @@ en wat je moet weten als je hieraan verder werkt.
 ## Hoe het werkt
 
 1. Je drukt in het scherm op **Crawl starten** en kiest een deel van de site. Een crawl
-   pakt altijd het hele deel; er is geen maximumaantal pagina's om in te stellen. Er mag één
-   crawl per dag. (De knop **Run workflow** bij
-   [de Crawl-workflow](../../actions/workflows/crawl.yml) in GitHub werkt nog steeds, voor wie
-   daar een account voor heeft; die valt buiten de limiet van één per dag en heeft wel een
-   maximumaantal pagina's, standaard 50.)
+   pakt altijd het hele deel; er is geen maximumaantal pagina's om in te stellen, ook niet bij
+   de knop **Run workflow** van [de Crawl-workflow](../../actions/workflows/crawl.yml) in
+   GitHub, waar alleen het deel te kiezen is. Er mag één crawl per dag via het scherm. Een
+   lopende crawl is te volgen aan de voortgangsbalk en met **Crawl stoppen** te stoppen.
 2. Een GitHub-runner leest de sitemaps, haalt de pagina's van het gekozen deel op en pakt de
    tekst uit het `<main>`-element. Menu's en voetteksten blijven buiten beeld.
 3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan de goedgekeurde woorden
@@ -23,6 +22,16 @@ en wat je moet weten als je hieraan verder werkt.
 5. Het resultaat gaat naar Supabase en verschijnt op de pagina hierboven.
 
 Er draait niets automatisch op de achtergrond. Een crawl gebeurt alleen als iemand erom vraagt.
+
+**Een crawl stoppen.** Zolang er gecrawld of voorbereid wordt, staat onder de voortgangsbalk de knop
+**Crawl stoppen**. Die roept de Edge Function
+[`crawl-stoppen`](supabase/functions/crawl-stoppen/stoppen.ts) aan, die de run in GitHub annuleert
+en de aanvraag op `gestopt` zet. Er wordt dan niets gepubliceerd: wat tot dan toe is gevonden
+gaat verloren, want de crawl publiceert pas aan het eind. Tijdens het opslaan van het resultaat
+kan stoppen niet meer, anders blijft er een half resultaat achter. Een gestopte of mislukte
+crawl telt niet mee voor de limiet van één per dag. De functie vindt de run via de link die de
+workflow bij de aanvraag opslaat; ontbreekt die nog (de eerste seconden), dan zoekt ze de ene
+lopende run die na de aanvraag is gestart, en bij twijfel stopt ze niets.
 
 De knop roept de Edge Function [`crawl-starten`](supabase/functions/crawl-starten/index.ts)
 aan, die de workflow in GitHub start. Het GitHub-token staat als secret `GITHUB_TOKEN` in
