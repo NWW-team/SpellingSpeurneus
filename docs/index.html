@@ -367,14 +367,18 @@ function korteUrl(url) {
   try { return new URL(url).pathname; } catch { return url; }
 }
 
+// De tellers bovenaan tellen wat nog openstaat: zonder wat de redactie heeft goedgekeurd, en met
+// een naam die als spelfout is aangewezen bij de spelfouten. Ze worden bij elke wijziging opnieuw
+// berekend (teken() roept dit aan), zodat ze altijd kloppen met wat in de tabbladen staat.
 function toonFeiten(gegevens) {
   const datum = datumTijd(gegevens.gestart_op);
-  const spelfouten = bevindingen.filter(b => !isNaam(b)).length;
+  const openstaand = bevindingen.filter(b => !goedgekeurdSleutels.has(b.woord.toLowerCase()));
+  const spelfouten = openstaand.filter(b => !isNaam(b)).length;
   // Namen tellen we per uniek woord, want zo staan ze ook in de tabel.
-  const namen = new Set(bevindingen.filter(isNaam).map(b => b.woord)).size;
+  const namen = new Set(openstaand.filter(isNaam).map(b => b.woord)).size;
   // Alleen tonen als er iets is. Een vakje dat altijd "0" zegt leest niemand
   // nog; een vakje dat er ineens staat, valt op.
-  const resten = bevindingen.filter(isSjabloonrest).length;
+  const resten = openstaand.filter(isSjabloonrest).length;
   const restenVak = resten
     ? `<div class="feit"><strong class="alarm">${resten}</strong>
          <span>sjabloonresten</span></div>`
@@ -435,6 +439,7 @@ function teken() {
 
   document.getElementById("aantal-spelfouten").textContent = spelfouten.length;
   tekenGoedgekeurd();
+  if (huidigeCrawl) toonFeiten(huidigeCrawl);
 }
 
 function tekenGoedgekeurd() {
@@ -628,7 +633,6 @@ document.addEventListener("click", async event => {
     if (verplaatsing) {
       await wijzigVerplaatsing(actie, woord);
       await laadVerplaatst();
-      if (huidigeCrawl) toonFeiten(huidigeCrawl);   // de teller van de spelfouten verandert mee
     } else {
       await wijzig(actie, woord, soort);
       await laadGoedgekeurd();
@@ -977,7 +981,6 @@ async function laadResultaten() {
     bevindingen = await haalBevindingen(crawl.id);
     if (mijn !== ronde) return;
 
-    toonFeiten(crawl);
     teken();
   } catch (fout) {
     if (mijn !== ronde) return;
