@@ -207,6 +207,7 @@ altijd een harde bovengrens op het aantal pagina's.
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `scripts/publiceer.py` | Zet het resultaat in Supabase, achter de toegangscontrole |
 | `supabase/` | Migraties (in de SQL Editor te plakken) en de Edge Function `goedkeuren` |
+| `docs/icoon.png` | Het icoon naast de titel: de hond met de neus omhoog, 128 × 128 pixels, met transparante hoeken |
 | `docs/xlsx.js` | Maakt de Excel-downloads in de browser, zonder bibliotheek |
 | `scripts/plaatsnamen.py` | Beoordeelt namen tegen GeoNames: bekend, lijkt op een bekende plaats, of geen oordeel |
 | `scripts/haal_goedgekeurd.py` | Haalt de in het scherm goedgekeurde woorden op, vlak voor de crawl |
