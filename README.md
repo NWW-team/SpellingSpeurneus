@@ -13,8 +13,8 @@ en wat je moet weten als je hieraan verder werkt.
    maximumaantal pagina's. Er mag één crawl per dag. (De knop **Run workflow** bij
    [de Crawl-workflow](../../actions/workflows/crawl.yml) in GitHub werkt nog steeds, voor wie
    daar een account voor heeft; die valt buiten de limiet van één per dag.)
-2. Een GitHub-runner leest de sitemap, haalt die pagina's op en pakt de tekst uit het
-   `<main>`-element. Menu's en voetteksten blijven buiten beeld.
+2. Een GitHub-runner leest de sitemaps, haalt de pagina's van het gekozen deel op en pakt de
+   tekst uit het `<main>`-element. Menu's en voetteksten blijven buiten beeld.
 3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan de goedgekeurde woorden
    en namen in Supabase (tabel `goedgekeurd`, zie [Vals alarm wegwerken](#vals-alarm-wegwerken)).
 4. Wat overblijft wordt in tweeën gedeeld: **spelfouten** en **namen**. Zie hieronder.
@@ -28,6 +28,24 @@ Supabase en heeft alleen *Actions: read and write* op deze repository. De limiet
 dag zit in de database (tabel `crawl_aanvragen`, unieke index op de datum in Nederlandse
 tijd), dus twee gelijktijdige aanvragen komen er niet allebei door. Mislukt het starten bij
 GitHub, dan wordt de aanvraag weer verwijderd en blijft de dag beschikbaar.
+
+## Delen van de site
+
+Je kiest een deel van de site; alles onder dat pad hoort erbij.
+
+| Deel | Pad | Pagina's (±) |
+|---|---|---|
+| Reisadviezen | `/reisadvies` | 236 |
+| Visum voor Nederland | `/visum-nederland` | 1.015 |
+| Visum voor Caribische Koninkrijksdelen | `/caribisch-visum` | 452 |
+| Ambassades en consulaten | `/contact/ambassades-consulaten-generaal` | 219 |
+
+De pagina's staan verspreid over de sitemaps van de site (de visumpagina's zitten in de
+grote `paginas`-sitemap), dus de crawler leest ze allemaal en houdt over wat onder het pad
+valt. Een deel toevoegen is één regel in `DELEN` in `scripts/crawl.py`, plus dezelfde naam in
+de lijst in de workflow, in de Edge Function `crawl-starten`, in de controle op
+`crawl_aanvragen.bron` en in de keuzelijst in `docs/index.html`. De overige pagina's van de
+site (alles buiten deze vier paden) zijn geen keuze.
 
 ## Spelfouten en namen
 
@@ -98,7 +116,7 @@ Geen installatie nodig; alleen Python 3.
 
 ```bash
 python3 scripts/crawl.py --bron demo --max-paginas 5     # fictieve pagina's, zonder netwerk
-python3 scripts/crawl.py --bron reisadvies --max-paginas 10
+python3 scripts/crawl.py --bron reisadvies --max-paginas 10   # ook: visum-nederland, caribisch-visum, ambassades
 python3 -m http.server --directory docs 8000             # scherm bekijken op localhost:8000
 python3 scripts/test.py                                  # 42 controles; --offline slaat het netwerk over
 ```

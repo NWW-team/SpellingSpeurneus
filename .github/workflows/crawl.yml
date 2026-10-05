@@ -9,7 +9,7 @@ on:
         description: "Welk deel van de site"
         type: choice
         default: reisadvies
-        options: [demo, reisadvies, paginas, ambassades]
+        options: [demo, reisadvies, visum-nederland, caribisch-visum, ambassades]
       max_paginas:
         description: "Maximaal aantal pagina's"
         default: "50"

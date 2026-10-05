@@ -27,11 +27,17 @@ SITE = "https://www.nederlandwereldwijd.nl"
 PROJECT_URL = "https://github.com/NWW-team/SpellingSpeurneus"
 USER_AGENT = f"SpellingSpeurneus/0.1 (+{PROJECT_URL})"
 
-SITEMAPS = {
-    "paginas": f"{SITE}/paginas/sitemap.xml",
-    "reisadvies": f"{SITE}/reisadvies/sitemap.xml",
-    "ambassades": f"{SITE}/contact/ambassades-consulaten-generaal/sitemap.xml",
+# De delen van de site die je kunt kiezen. Een deel is een pad: alles daarachter hoort
+# erbij ("/reisadvies" en "/reisadvies/albanie", niet "/reisadvies-iets"). De pagina's
+# staan verspreid over de sitemaps van de site (de visumpagina's zitten in de grote
+# "paginas"-sitemap), dus we lezen ze allemaal en houden over wat onder het pad valt.
+DELEN = {
+    "reisadvies": "/reisadvies",
+    "visum-nederland": "/visum-nederland",
+    "caribisch-visum": "/caribisch-visum",
+    "ambassades": "/contact/ambassades-consulaten-generaal",
 }
+SITEMAP_INDEX = f"{SITE}/sitemap.xml"
 
 WORTEL = Path(__file__).resolve().parent.parent
 LEESTEKENS = " \t\n\r.,;:!?()[]{}<>\"'“”‘’„…*•·|/\\&%=–—@#$^~`-"
@@ -79,6 +85,28 @@ def lees_sitemap(url, pauze):
     """Geeft de URL's uit een sitemap terug, in volgorde van het bestand."""
     xml = haal_op(url, pauze)
     return re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", xml)
+
+
+def alle_sitemap_urls(pauze, index=SITEMAP_INDEX):
+    """Alle pagina-URL's van de site, uit de sitemap-index en de sitemaps daarin."""
+    urls = []
+    for url in lees_sitemap(index, pauze):
+        if url.endswith(".xml"):
+            urls.extend(alle_sitemap_urls(pauze, url))
+        else:
+            urls.append(url)
+    return urls
+
+
+def valt_onder(url, pad):
+    """Of een URL onder `pad` valt: het pad zelf, of alles erachter."""
+    eigen = urllib.parse.urlparse(url).path.rstrip("/")
+    return eigen == pad or eigen.startswith(pad + "/")
+
+
+def urls_van_deel(urls, deel):
+    """De URL's van één deel van de site, zonder dubbelen, in volgorde van de sitemaps."""
+    return list(dict.fromkeys(url for url in urls if valt_onder(url, DELEN[deel])))
 
 
 def naar_patroon(pad):
@@ -300,8 +328,12 @@ def verzamel_paginas(bron, max_paginas, pauze, bij_totaal=lambda n: None):
         return overgeslagen
 
     mag_ophalen = maak_robots_controle()
-    urls = lees_sitemap(SITEMAPS[bron], 0)
-    print(f"Sitemap {bron}: {len(urls)} URL's gevonden.")
+    alle = alle_sitemap_urls(0)
+    urls = urls_van_deel(alle, bron)
+    print(f"Deel {bron} ({DELEN[bron]}): {len(urls)} van de {len(alle)} URL's in de sitemaps.")
+    if not urls:
+        sys.exit(f"Geen enkele URL onder {DELEN[bron]} in de sitemaps. Is de site verbouwd? "
+                 f"Controleer {SITEMAP_INDEX}.")
     bij_totaal(min(len(urls), max_paginas))
 
     opgehaald = 0
@@ -327,7 +359,7 @@ def verzamel_paginas(bron, max_paginas, pauze, bij_totaal=lambda n: None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bron", default="demo",
-                        choices=["demo", *SITEMAPS], help="welk deel van de site")
+                        choices=["demo", *DELEN], help="welk deel van de site")
     parser.add_argument("--max-paginas", type=int, default=50,
                         help="harde bovengrens op het aantal pagina's")
     parser.add_argument("--woordenlijst", default=str(WORTEL / "data" / "woordenlijst.txt"))

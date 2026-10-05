@@ -17,7 +17,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from plaatsnamen import Plaatsnamen, afstand, samenvatting, tokens  # noqa: E402
 from voortgang import meld  # noqa: E402
-from crawl import (SITE, is_bekend, lees_goedgekeurd,  # noqa: E402
+from crawl import (DELEN, SITE, alle_sitemap_urls, is_bekend, urls_van_deel, valt_onder, lees_goedgekeurd,  # noqa: E402
                    maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
                    zoek_fouten)
 
@@ -144,6 +144,59 @@ def main():
                 os.environ.pop(k, None)
             else:
                 os.environ[k] = v
+
+    print("\nDelen van de site")
+    controle("het pad zelf hoort erbij", valt_onder(SITE + "/reisadvies", "/reisadvies"))
+    controle("alles daarachter hoort erbij", valt_onder(SITE + "/reisadvies/albanie", "/reisadvies"))
+    controle("een slotstreep maakt niet uit", valt_onder(SITE + "/reisadvies/", "/reisadvies"))
+    controle("een query telt niet mee", valt_onder(SITE + "/visum-nederland?a=1", "/visum-nederland"))
+    controle("een ander pad met dezelfde beginletters hoort er niet bij",
+             not valt_onder(SITE + "/reisadvies-iets", "/reisadvies"))
+    controle("een ander deel hoort er niet bij", not valt_onder(SITE + "/visum-nederland/x", "/caribisch-visum"))
+    controle("diep onderliggende pagina's horen erbij",
+             valt_onder(SITE + "/contact/ambassades-consulaten-generaal/afghanistan/kabul",
+                        "/contact/ambassades-consulaten-generaal"))
+    controle("er zijn vier delen met de gevraagde paden",
+             DELEN == {"reisadvies": "/reisadvies", "visum-nederland": "/visum-nederland",
+                       "caribisch-visum": "/caribisch-visum",
+                       "ambassades": "/contact/ambassades-consulaten-generaal"}, str(DELEN))
+    voorbeeld = [SITE + p for p in ("/reisadvies/albanie", "/visum-nederland/schengenvisum",
+                                     "/caribisch-visum/kort-verblijf/a", "/reisadvies/albanie",
+                                     "/reisadvies", "/over-ons")]
+    gevonden = urls_van_deel(voorbeeld, "reisadvies")
+    controle("een deel kiest zijn pagina's, zonder dubbelen",
+             gevonden == [SITE + "/reisadvies/albanie", SITE + "/reisadvies"], str(gevonden))
+
+    # De sitemap-index en de sitemaps daarin, via een lokale nagemaakte server
+    paginas = {
+        "/sitemap.xml": "<sitemapindex><sitemap><loc>{b}/a.xml</loc></sitemap>"
+                        "<sitemap><loc>{b}/b.xml</loc></sitemap></sitemapindex>",
+        "/a.xml": "<urlset><url><loc>https://x.nl/visum-nederland/1</loc></url>"
+                  "<url><loc>https://x.nl/reisadvies</loc></url></urlset>",
+        "/b.xml": "<urlset><url><loc>https://x.nl/visum-nederland/2</loc></url></urlset>",
+    }
+
+    class Nepsite(BaseHTTPRequestHandler):
+        def do_GET(self):
+            tekst = paginas.get(self.path)
+            self.send_response(200 if tekst else 404)
+            self.end_headers()
+            if tekst:
+                self.wfile.write(tekst.format(b=f"http://127.0.0.1:{self.server.server_port}").encode())
+
+        def log_message(self, *args):
+            pass
+
+    nepsite = HTTPServer(("127.0.0.1", 0), Nepsite)
+    threading.Thread(target=nepsite.serve_forever, daemon=True).start()
+    try:
+        verzameld = alle_sitemap_urls(0, f"http://127.0.0.1:{nepsite.server_port}/sitemap.xml")
+        controle("alle sitemaps uit de index worden gelezen", len(verzameld) == 3, str(verzameld))
+        controle("de URL's van een deel komen uit meerdere sitemaps",
+                 urls_van_deel(verzameld, "visum-nederland") ==
+                 ["https://x.nl/visum-nederland/1", "https://x.nl/visum-nederland/2"])
+    finally:
+        nepsite.shutdown()
 
     print("\nPlaatsnamen beoordelen")
     # Een klein bestand in het echte GeoNames-formaat (tabs, 19 kolommen).
