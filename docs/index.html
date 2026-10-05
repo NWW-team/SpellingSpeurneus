@@ -94,6 +94,8 @@
   @media (prefers-color-scheme: dark) {
     .fout { color: #ffb3b0; background: #3a1f1e; border-color: #6b2f2c; }
   }
+  .exportbalk { display: flex; justify-content: flex-end; margin: 0 0 8px; }
+  .exportbalk button { font-size: .85rem; padding: 6px 12px; }
   .plaats { display: block; margin-top: 2px; font-size: .75rem; color: var(--gedempt); }
   .plaats.twijfel { color: var(--waarschuwing); font-weight: 600; }
   .naamfilter { margin: 0 0 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -197,6 +199,9 @@
   </div>
 
   <div id="paneel-spelfouten" role="tabpanel" aria-labelledby="tab-spelfouten">
+    <div class="exportbalk">
+      <button type="button" id="xlsx-spelfouten">Download als Excel</button>
+    </div>
     <div class="kaart tabelhouder">
       <table>
         <thead><tr><th>Woord</th><th>Zin</th><th>Pagina</th><th></th></tr></thead>
@@ -226,6 +231,9 @@
         <option value="bekend">Bekende plaatsnamen</option>
         <option value="rest">Overige</option>
       </select>
+    </div>
+    <div class="exportbalk">
+      <button type="button" id="xlsx-namen">Download als Excel</button>
     </div>
     <div class="kaart tabelhouder">
       <table>
@@ -260,6 +268,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="xlsx.js"></script>
 <script>
 // Publieke projectconfiguratie. De publishable key is bedoeld om in een
 // frontend te staan. Let op: er is geen inlog meer, dus de database geeft de
@@ -295,6 +304,9 @@ const woordFilter = document.getElementById("woordfilter");
 const naamSoort = document.getElementById("naamsoort");
 const tabbladen = [...document.querySelectorAll(".tabblad")];
 let bevindingen = [];
+let huidigeCrawl = null;              // de crawl waarvan de bevindingen op het scherm staan
+// Wat nu in de tabbladen staat (na de filters), voor de Excel-downloads.
+const zichtbaarVoorExport = { spelfouten: [], namen: [] };
 let goedgekeurd = [];                 // actieve goedkeuringen uit Supabase
 let goedgekeurdSleutels = new Set();  // dezelfde woorden, kleine letters
 
@@ -424,6 +436,8 @@ function tekenGoedgekeurd() {
 function tekenSpelfouten(rijen) {
   if (!rijen.length) {
     leeg(rijenLichaam, "Geen spelfouten die aan het filter voldoen.");
+    zichtbaarVoorExport.spelfouten = [];
+    zetExportKnop("spelfouten");
     return;
   }
 
@@ -431,6 +445,9 @@ function tekenSpelfouten(rijen) {
   // melding dat niet in een lijst van honderden hoort te verdwijnen.
   const geordend = [...rijen].sort(
     (a, z) => (isSjabloonrest(z) ? 1 : 0) - (isSjabloonrest(a) ? 1 : 0));
+
+  zichtbaarVoorExport.spelfouten = geordend;
+  zetExportKnop("spelfouten");
 
   rijenLichaam.innerHTML = geordend.map(b => {
     const rest = isSjabloonrest(b);
@@ -484,8 +501,12 @@ function tekenNamen(rijen) {
   document.getElementById("aantal-namen").textContent = alle.length;
   if (!namen.length) {
     leeg(naamLichaam, "Geen namen die aan het filter voldoen.");
+    zichtbaarVoorExport.namen = [];
+    zetExportKnop("namen");
     return;
   }
+  zichtbaarVoorExport.namen = namen;
+  zetExportKnop("namen");
 
   naamLichaam.innerHTML = namen.map(b => {
     // De link wijst naar de pagina van het getoonde voorbeeld. Staat de naam
@@ -560,6 +581,61 @@ document.addEventListener("click", async event => {
     foutVak.textContent = `${actie === "intrekken" ? "Intrekken" : "Goedkeuren"} van "${woord}" is niet gelukt: ${fout.message}`;
     foutVak.hidden = false;
   }
+});
+
+// ---------------------------------------------------------------------------
+// Excel-downloads
+// ---------------------------------------------------------------------------
+// De download bevat wat nu in het tabblad staat: met de filters die je hebt gezet, en zonder wat
+// is goedgekeurd. Zonder filters is dat de hele lijst. Dat staat ook in de bestandsnaam.
+const exportKnoppen = {
+  spelfouten: document.getElementById("xlsx-spelfouten"),
+  namen: document.getElementById("xlsx-namen"),
+};
+
+function zetExportKnop(welke) {
+  const aantal = zichtbaarVoorExport[welke].length;
+  exportKnoppen[welke].textContent = `Download als Excel (${aantal} ${aantal === 1 ? "rij" : "rijen"})`;
+  exportKnoppen[welke].disabled = aantal === 0;
+}
+
+function exportBestandsnaam(soort) {
+  const datum = huidigeCrawl ? nlDatum(huidigeCrawl.gestart_op) : nlDatum(new Date());
+  const deel = huidigeCrawl ? huidigeCrawl.bron : "crawl";
+  const gefilterd = urlFilter.value.trim() || woordFilter.value.trim() ||
+    (soort === "namen" && naamSoort.value !== "alles");
+  return `${soort}-${deel}-${datum}${gefilterd ? "-gefilterd" : ""}.xlsx`;
+}
+
+exportKnoppen.spelfouten.addEventListener("click", () => {
+  downloadXlsx(exportBestandsnaam("spelfouten"), {
+    werkblad: "Spelfouten",
+    kolommen: [
+      { titel: "Woord", breedte: 26 }, { titel: "Zin", breedte: 90 },
+      { titel: "Pagina", breedte: 60 }, { titel: "Paginatitel", breedte: 40 },
+      { titel: "Soort", breedte: 14 },
+    ],
+    rijen: zichtbaarVoorExport.spelfouten.map(b => [
+      b.woord, b.context, b.url, b.titel || "", isSjabloonrest(b) ? "sjabloonrest" : "spelfout",
+    ]),
+  });
+});
+
+exportKnoppen.namen.addEventListener("click", () => {
+  const oordeel = n => n.plaats_status === "twijfel" ? "mogelijk verkeerd gespeld"
+    : n.plaats_status === "bekend" ? "bekende plaatsnaam" : "";
+  downloadXlsx(exportBestandsnaam("namen"), {
+    werkblad: "Namen",
+    kolommen: [
+      { titel: "Naam", breedte: 26 }, { titel: "Voorbeeldzin", breedte: 90 },
+      { titel: "Pagina (voorbeeld)", breedte: 60 }, { titel: "Aantal pagina's", breedte: 16 },
+      { titel: "Oordeel", breedte: 26 }, { titel: "Lijkt op", breedte: 22 },
+      { titel: "Paginatitel", breedte: 40 },
+    ],
+    rijen: zichtbaarVoorExport.namen.map(n => [
+      n.woord, n.context, n.url, n.paginas.size, oordeel(n), n.suggestie || "", n.titel || "",
+    ]),
+  });
 });
 
 urlFilter.addEventListener("input", teken);
@@ -820,6 +896,7 @@ async function laadResultaten() {
     }
 
     const crawl = crawls[0];
+    huidigeCrawl = crawl;
     bevindingen = await haalBevindingen(crawl.id);
     if (mijn !== ronde) return;
 

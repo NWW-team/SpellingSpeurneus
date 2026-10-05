@@ -199,6 +199,18 @@ altijd het hele gekozen deel. `crawl.py` heeft nog `--max-paginas` voor lokaal t
 naar GitHub, dat een input die de workflow niet kent weigert; de kolom `crawl_aanvragen.max_paginas`
 blijft bestaan en staat dus altijd op 5000.
 
+**Excel-downloads (5 oktober).** Op Spelfouten en Namen staat een knop "Download als Excel", zie
+"Downloaden als Excel" in [README.md](README.md). Het bestand wordt in de browser gemaakt door
+`docs/xlsx.js`, een eigen kleine schrijver (zip zonder compressie plus de XML van één werkblad):
+geen bibliotheek en geen CDN, dus de download werkt ook als de CDN van supabase-js niet laadt.
+**Het is niet in een echte Excel geopend.** De sandbox waarin dit is gebouwd heeft geen Excel of
+werkend LibreOffice (die kan daar zelfs geen csv laden), en pip en npm zijn dicht. `scripts/test.py`
+toetst daarom de structuur met een gewone XML-lezer (geldige XML, verwijzingen, stijlen, volgorde van de
+elementen, tekst die tekst blijft, besturingstekens, de celgrens van Excel van 32.767 tekens), en de
+knoppen zijn in Chromium geprobeerd met nagemaakte gegevens. **Open een download dus een keer in Excel.**
+Meldt Excel dat het bestand hersteld moet worden, dan zit de fout in `docs/xlsx.js`; zeg het, met de
+melding erbij.
+
 **Een crawl stoppen (5 oktober).** Knop "Crawl stoppen" onder de voortgangsbalk, Edge Function
 `crawl-stoppen` (`supabase/functions/crawl-stoppen/`, de logica in `stoppen.ts` met tests in
 `stoppen.test.ts`, die `scripts/test.py` onder Node draait). De functie annuleert de run in GitHub
