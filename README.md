@@ -9,10 +9,12 @@ en wat je moet weten als je hieraan verder werkt.
 
 ## Hoe het werkt
 
-1. Je drukt in het scherm op **Crawl starten** en kiest een deel van de site plus een
-   maximumaantal pagina's. Er mag één crawl per dag. (De knop **Run workflow** bij
+1. Je drukt in het scherm op **Crawl starten** en kiest een deel van de site. Een crawl
+   pakt altijd het hele deel; er is geen maximumaantal pagina's om in te stellen. Er mag één
+   crawl per dag. (De knop **Run workflow** bij
    [de Crawl-workflow](../../actions/workflows/crawl.yml) in GitHub werkt nog steeds, voor wie
-   daar een account voor heeft; die valt buiten de limiet van één per dag.)
+   daar een account voor heeft; die valt buiten de limiet van één per dag en heeft wel een
+   maximumaantal pagina's, standaard 50.)
 2. Een GitHub-runner leest de sitemaps, haalt de pagina's van het gekozen deel op en pakt de
    tekst uit het `<main>`-element. Menu's en voetteksten blijven buiten beeld.
 3. Elk woord wordt getoetst aan de OpenTaal-woordenlijst en aan de goedgekeurde woorden

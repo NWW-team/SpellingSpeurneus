@@ -192,6 +192,12 @@ door een unieke index. Het token staat als Supabase-secret `GITHUB_TOKEN` (fine-
 de dagelijkse crawl "opmaken", bijvoorbeeld met een grote bron, of de redactie ervan afhouden.
 Een crawl over `paginas` is ruim twee uur aanhoudend verkeer naar de site; zie besluit 2.
 
+**Geen maximumaantal pagina's meer (5 oktober).** Het veld is uit het scherm gehaald: een crawl pakt
+altijd het hele gekozen deel. De Edge Function `crawl-starten` zet het aantal zelf op de grens van
+5000 (boven het grootste deel, ±1.015) en negeert een aantal in het verzoek; de kolom
+`crawl_aanvragen.max_paginas` blijft bestaan en staat dus altijd op 5000. De knop "Run workflow" in
+GitHub heeft het veld nog, met standaard 50: wie die gebruikt, moet het zelf verhogen.
+
 **Delen van de site (5 oktober).** De keuzelijst is nu: Reisadviezen (`/reisadvies`), Visum voor
 Nederland (`/visum-nederland`), Visum voor Caribische Koninkrijksdelen (`/caribisch-visum`) en
 Ambassades en consulaten (`/contact/ambassades-consulaten-generaal`), telkens met alles daarachter.

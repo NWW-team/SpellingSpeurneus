@@ -27,14 +27,14 @@ Deno.serve(async (verzoek) => {
   if (verzoek.method === "OPTIONS") return new Response(null, { status: 204, headers: KOP });
   if (verzoek.method !== "POST") return antwoord(405, { fout: "Alleen POST." });
 
-  let invoer: { bron?: unknown; max_paginas?: unknown };
+  let invoer: { bron?: unknown };
   try { invoer = await verzoek.json(); } catch { return antwoord(400, { fout: "Geen geldige JSON." }); }
 
-  const { bron, max_paginas } = invoer;
+  const { bron } = invoer;
   if (typeof bron !== "string" || !BRONNEN.includes(bron)) return antwoord(400, { fout: "Onbekend deel van de site." });
-  if (!Number.isInteger(max_paginas) || (max_paginas as number) < 1 || (max_paginas as number) > MAX_PAGINAS) {
-    return antwoord(400, { fout: `Het aantal pagina's is een geheel getal van 1 tot ${MAX_PAGINAS}.` });
-  }
+  // Een crawl pakt altijd het hele deel. Het aantal staat vast op een grens boven het grootste
+  // deel; een aantal in het verzoek (van een oude versie van het scherm) wordt genegeerd.
+  const max_paginas = MAX_PAGINAS;
 
   const token = Deno.env.get("GITHUB_TOKEN");
   if (!token) return antwoord(500, { fout: "Het GitHub-token is niet ingesteld in Supabase." });
