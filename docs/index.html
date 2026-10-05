@@ -39,10 +39,17 @@
   .kop { background: var(--donkerblauw); color: #fff;
          border-bottom: 4px solid var(--hemelblauw); }
   .kop .omhulsel { padding-block: 20px; }
-  h1 { font-size: 1.6rem; margin: 0; }
+  h1 { font-size: 2.25rem; line-height: 1.15; margin: 0; }
   /* Het icoon staat voor de titel; het is versiering, de titel zegt wat de app is. */
-  .kop .titel { display: flex; align-items: center; gap: 14px; }
-  .kop .logo { width: 48px; height: 48px; flex: none; }
+  .kop .titel { display: flex; align-items: center; gap: 18px; }
+  .kop .logo { width: 88px; height: 88px; flex: none; }
+  /* Op een telefoon schaalt de titel mee met de breedte, anders is "SpellingSpeurneus" breder
+     dan het scherm en schuift de pagina zijwaarts. */
+  @media (max-width: 520px) {
+    h1 { font-size: clamp(1.05rem, 6.4vw, 1.7rem); }
+    .kop .titel { gap: 14px; }
+    .kop .logo { width: 56px; height: 56px; }
+  }
   .kaart { background: var(--vlak); border: 1px solid var(--lijn);
            border-radius: 8px; padding: 16px; margin-bottom: 20px; }
   .feiten { display: flex; flex-wrap: wrap; gap: 24px; }
@@ -139,7 +146,7 @@
 <header class="kop">
   <div class="omhulsel">
     <div class="titel">
-      <img class="logo" src="icoon.png" alt="" width="48" height="48">
+      <img class="logo" src="icoon-groot.png" alt="" width="88" height="88">
       <h1>SpellingSpeurneus</h1>
     </div>
   </div>
