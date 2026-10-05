@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import zipfile
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -306,6 +307,69 @@ def main():
                  (uitkomst.stdout + uitkomst.stderr)[-300:] if uitkomst.returncode else "")
     else:
         print("  (Node 22.18 of nieuwer ontbreekt: stoppen.test.ts overgeslagen)")
+
+    print("\nExcel-bestand (docs/xlsx.js)")
+    # We maken een bestand onder Node en lezen het met een gewone XML-lezer terug. Een echte
+    # Excel of LibreOffice is hier niet te draaien, dus dit toetst de structuur: geldige XML,
+    # verwijzingen die kloppen, stijlen die bestaan en tekst die tekst blijft.
+    if node:
+        import xml.etree.ElementTree as ET
+        xl_pad = tijdelijk / "proef.xlsx"
+        gelukt = subprocess.run([node, str(WORTEL / "scripts" / "xlsx_proef.js"), str(WORTEL / "docs" / "xlsx.js"), str(xl_pad)],
+                                capture_output=True, text=True)
+        controle("het bestand wordt gemaakt", gelukt.returncode == 0 and xl_pad.exists(), gelukt.stderr[-200:])
+        z = zipfile.ZipFile(xl_pad)
+        controle("de zip is heel (CRC's kloppen)", z.testzip() is None)
+        namen_in_zip = [i.filename for i in z.infolist()]
+        controle("[Content_Types].xml staat vooraan", namen_in_zip[0] == "[Content_Types].xml", str(namen_in_zip))
+        controle("de bestanden zijn niet gecomprimeerd en hebben het UTF-8-teken",
+                 all(i.compress_type == 0 and i.flag_bits & 0x800 for i in z.infolist()))
+        ns = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+        bomen = {}
+        for naam in namen_in_zip:
+            bomen[naam] = ET.fromstring(z.read(naam))      # gooit bij ongeldige XML
+        controle("alle onderdelen zijn geldige XML", len(bomen) == len(namen_in_zip))
+        typen = {e.get("PartName") for e in bomen["[Content_Types].xml"] if e.get("PartName")}
+        controle("elk onderdeel heeft een inhoudstype",
+                 all(("/" + n) in typen for n in namen_in_zip if n.startswith("xl/") and n.endswith(".xml")
+                     and "_rels" not in n), str(typen))
+        doelen = [e.get("Target") for r in ("xl/_rels/workbook.xml.rels",) for e in bomen[r]]
+        controle("de verwijzingen wijzen naar bestaande onderdelen",
+                 all(("xl/" + d) in namen_in_zip for d in doelen), str(doelen))
+        blad = bomen["xl/worksheets/sheet1.xml"]
+        controle("de elementen staan in de volgorde die Excel eist",
+                 [e.tag.split("}")[1] for e in blad] == ["sheetViews", "cols", "sheetData", "autoFilter"])
+        werkbladnaam = bomen["xl/workbook.xml"].find(".//m:sheet", ns).get("name")
+        controle("de werkbladnaam is geldig (geen : / [ ] en niet te lang)",
+                 not any(t in werkbladnaam for t in ':\\/?*[]') and 0 < len(werkbladnaam) <= 31, werkbladnaam)
+        aantal_stijlen = len(bomen["xl/styles.xml"].find("m:cellXfs", ns))
+        cellen = list(blad.iter("{%s}c" % ns["m"]))
+        controle("elke stijl die een cel noemt bestaat", all(int(c.get("s", 0)) < aantal_stijlen for c in cellen))
+        controle("er staat geen formule in het bestand", not list(blad.iter("{%s}f" % ns["m"])))
+        rijen_xml = list(blad.iter("{%s}row" % ns["m"]))
+        controle("kopregel plus alle rijen, in volgorde",
+                 [int(r.get("r")) for r in rijen_xml] == list(range(1, 306 + 1)), str(len(rijen_xml)))
+
+        def tekst(rij_nr, kolom):
+            for c in rijen_xml[rij_nr - 1]:
+                if c.get("r") == f"{kolom}{rij_nr}":
+                    t = c.find("m:is/m:t", ns)
+                    return t.text if t is not None else c.find("m:v", ns).text
+            return None
+        controle("de kopregel klopt", [tekst(1, k) for k in "ABCD"] == ["Woord", "Zin", "Pagina", "Aantal"])
+        controle("tekens als & < > \" blijven heel", tekst(2, "B") == 'Dat is nieet goed & <mooi> "zo".', tekst(2, "B"))
+        controle("een getal blijft een getal", tekst(2, "D") == "3")
+        controle("tekst die met = + @ begint blijft tekst",
+                 tekst(3, "A") == "=1+1" and tekst(3, "C") == "+cmd" and tekst(3, "D") == "@som")
+        controle("accenten en een emoji blijven heel", tekst(4, "A") == "Córdoba" and tekst(4, "B") == "Zürich 🌍 São")
+        controle("een leeg veld geeft geen cel", tekst(4, "D") is None and tekst(4, "C") is None)
+        controle("een besturingsteken wordt weggehaald", tekst(5, "A") == "metstuur", repr(tekst(5, "A")))
+        controle("een regeleinde blijft staan", tekst(5, "B") == "regel een\nregel twee")
+        controle("een te lange tekst wordt afgekapt op de celgrens van Excel", len(tekst(6, "B")) == 32767)
+        controle("het filter loopt over de hele tabel",
+                 blad.find("m:autoFilter", ns).get("ref") == "A1:D306")
+    else:
+        print("  (Node ontbreekt: de controles op het Excel-bestand zijn overgeslagen)")
 
     print("\nGoedgekeurde woorden ophalen")
     # Dit is de enige lijst. Lukt het ophalen niet, dan moet de run stoppen en geen

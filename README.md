@@ -98,6 +98,24 @@ meer dan twee letters afwijkt. Hoe het matcht staat in
 [`scripts/plaatsnamen.py`](scripts/plaatsnamen.py). De workflow haalt de bestanden per run op;
 lukt dat niet, dan krijgen namen geen oordeel en gaat de crawl gewoon door.
 
+## Downloaden als Excel
+
+Boven de lijst bij **Spelfouten** en bij **Namen** staat een knop **Download als Excel**. Het bestand
+bevat wat nu in het tabblad staat: met de filters die je hebt gezet (URL, woord, en bij namen de
+keuzelijst), en zonder wat is goedgekeurd. Zonder filters is dat de hele lijst. De knop zegt hoeveel
+rijen erin komen; staat er een filter aan, dan eindigt de bestandsnaam op `-gefilterd`, bijvoorbeeld
+`spelfouten-visum-nederland-2026-10-02.xlsx`.
+
+| Tabblad | Kolommen |
+|---|---|
+| Spelfouten | Woord, Zin, Pagina (de URL), Paginatitel, Soort (spelfout of sjabloonrest). Sjabloonresten staan bovenaan |
+| Namen | Naam, Voorbeeldzin, Pagina (voorbeeld), Aantal pagina's, Oordeel, Lijkt op, Paginatitel. Elke naam één keer, de te nakijken namen eerst |
+
+Het bestand wordt in de browser gemaakt, zonder dat er iets naar een server gaat. Het heeft een vette
+kopregel, een bevroren kopregel en filterknoppen. Alles is tekst, dus een woord dat met `=` of `+`
+begint blijft tekst en wordt nooit een formule. De schrijver staat in
+[`docs/xlsx.js`](docs/xlsx.js), zonder externe bibliotheek.
+
 ## Vals alarm wegwerken
 
 Meldt de app een woord of naam die gewoon goed is? Klik op **Goedkeuren**. Het verdwijnt uit
@@ -189,6 +207,7 @@ altijd een harde bovengrens op het aantal pagina's.
 | `docs/index.html` | Het scherm. Eén bestand, geen buildstap |
 | `scripts/publiceer.py` | Zet het resultaat in Supabase, achter de toegangscontrole |
 | `supabase/` | Migraties (in de SQL Editor te plakken) en de Edge Function `goedkeuren` |
+| `docs/xlsx.js` | Maakt de Excel-downloads in de browser, zonder bibliotheek |
 | `scripts/plaatsnamen.py` | Beoordeelt namen tegen GeoNames: bekend, lijkt op een bekende plaats, of geen oordeel |
 | `scripts/haal_goedgekeurd.py` | Haalt de in het scherm goedgekeurde woorden op, vlak voor de crawl |
 | `data/opentaal.sha256` | De versie van de woordenlijst waarop wij ons baseren |
