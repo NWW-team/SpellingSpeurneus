@@ -10,9 +10,6 @@ on:
         type: choice
         default: reisadvies
         options: [demo, reisadvies, visum-nederland, caribisch-visum, ambassades]
-      max_paginas:
-        description: "Maximaal aantal pagina's"
-        default: "50"
       aanvraag_id:
         description: "Id van de aanvraag in Supabase (door het scherm ingevuld, voor de voortgangsbalk)"
         default: ""
@@ -32,6 +29,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Legt de link naar deze run vast bij de aanvraag, zodat het scherm de crawl kan stoppen.
+      - name: Run koppelen aan de aanvraag
+        if: inputs.aanvraag_id != ''
+        env:
+          SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AANVRAAG_ID: ${{ inputs.aanvraag_id }}
+        run: python3 scripts/voortgang.py --id "$AANVRAAG_ID" --status gestart
 
       - name: Controles draaien
         run: python3 scripts/test.py --offline
@@ -95,7 +101,6 @@ jobs:
       - name: Crawlen en spelling toetsen
         env:
           BRON: ${{ inputs.bron }}
-          MAX_PAGINAS: ${{ inputs.max_paginas }}
           AANVRAAG_ID: ${{ inputs.aanvraag_id }}
           # Voor de voortgangsbalk. Zonder aanvraag-id meldt de crawl niets.
           SUPABASE_URL: https://riwznqurcluudvyrkwxe.supabase.co
@@ -103,7 +108,7 @@ jobs:
         run: |
           # Bewust buiten docs/: alles in die map wordt door GitHub Pages
           # publiek uitgeleverd. Het resultaat gaat naar Supabase.
-          python3 scripts/crawl.py --bron "$BRON" --max-paginas "$MAX_PAGINAS" \
+          python3 scripts/crawl.py --bron "$BRON" \
             --aanvraag-id "$AANVRAAG_ID" --uit resultaten.json
 
       # Het resultaat werd hier eerder in deze publieke repository gecommit en

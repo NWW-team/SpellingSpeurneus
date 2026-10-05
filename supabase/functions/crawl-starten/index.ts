@@ -60,9 +60,11 @@ Deno.serve(async (verzoek) => {
       "X-GitHub-Api-Version": "2022-11-28",
       "User-Agent": "SpellingSpeurneus",
     },
-    // GitHub wil alle inputs als tekst. opentaal_ref blijft op de standaardwaarde.
-    // aanvraag_id laat de crawler zijn voortgang aan deze rij melden.
-    body: JSON.stringify({ ref: "main", inputs: { bron, max_paginas: String(max_paginas), aanvraag_id: String(rij.id) } }),
+    // GitHub wil alle inputs als tekst. opentaal_ref blijft op de standaardwaarde. De workflow
+    // kent geen maximumaantal pagina's meer (een crawl pakt het hele deel); een input die de
+    // workflow niet kent wordt door GitHub geweigerd. aanvraag_id laat de crawler zijn
+    // voortgang aan deze rij melden en maakt de crawl stopbaar.
+    body: JSON.stringify({ ref: "main", inputs: { bron, aanvraag_id: String(rij.id) } }),
   });
 
   if (!gh.ok) {

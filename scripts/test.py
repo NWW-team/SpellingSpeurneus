@@ -112,7 +112,9 @@ def main():
         os.environ["SUPABASE_SERVICE_ROLE_KEY"] = "sleutel"
         controle("een melding geeft True", meld("12", status="crawlen", paginas_klaar=5) is True)
         pad, lichaam, apikey = ontvangen[-1]
-        controle("de melding gaat naar de juiste rij", pad.endswith("/crawl_aanvragen?id=eq.12"), pad)
+        controle("de melding gaat naar de juiste rij", "/crawl_aanvragen?id=eq.12" in pad, pad)
+        controle("een gestopte of mislukte aanvraag wordt niet meer bijgewerkt",
+                 "status=in.(aangevraagd,crawlen,publiceren)" in pad, pad)
         controle("de velden komen aan, plus een tijdstip",
                  lichaam["status"] == "crawlen" and lichaam["paginas_klaar"] == 5
                  and "bijgewerkt_op" in lichaam)
@@ -134,6 +136,16 @@ def main():
                  and statussen[0].get("paginas_totaal") == 5, f"{statussen[:1]}")
         controle("de crawl meldt zijn laatste stand",
                  statussen[-1].get("paginas_klaar") == 5, f"{statussen[-1:]}")
+        # De workflow legt als eerste de link naar de run vast, zodat de crawl te stoppen is
+        ontvangen.clear()
+        subprocess.run([sys.executable, str(WORTEL / "scripts" / "voortgang.py"), "--id", "7",
+                        "--status", "gestart"], check=True, capture_output=True,
+                       env={**os.environ, "GITHUB_SERVER_URL": "https://github.com",
+                            "GITHUB_REPOSITORY": "NWW-team/SpellingSpeurneus", "GITHUB_RUN_ID": "555"})
+        controle("gestart legt alleen de link naar de run vast",
+                 ontvangen and ontvangen[0][1].get("run_url") ==
+                 "https://github.com/NWW-team/SpellingSpeurneus/actions/runs/555"
+                 and "status" not in ontvangen[0][1], str(ontvangen[:1]))
         os.environ["SUPABASE_URL"] = "http://127.0.0.1:1"
         controle("een onbereikbare server stopt niets, het geeft False",
                  meld("12", status="crawlen") is False)
@@ -269,6 +281,31 @@ def main():
     pl_run = draai_crawl(tijdelijk / "pl.json")
     controle("de crawl draait ook zonder plaatsnamenlijst",
              all("plaats_status" not in b for b in pl_run["bevindingen"]))
+
+    print("\nEen crawl stoppen (Edge Function)")
+    # De logica staat los van Supabase en GitHub en draait onder Node (22.18 of nieuwer).
+    import shutil
+    node = shutil.which("node")
+
+    def node_kan_typescript():
+        # Zonder opties lezen kan Node 22.18 of nieuwer. Een oudere Node (of geen) slaat de
+        # controle over: ze hoort een crawl nooit tegen te houden.
+        try:
+            versie = subprocess.run([node, "--version"], capture_output=True, text=True).stdout.strip()
+            hoofd, klein = (int(x) for x in versie.lstrip("v").split(".")[:2])
+            return (hoofd, klein) >= (22, 18)
+        except (ValueError, OSError):
+            return False
+
+    if node and node_kan_typescript():
+        uitkomst = subprocess.run([node, str(WORTEL / "supabase" / "functions" / "crawl-stoppen" / "stoppen.test.ts")],
+                                  capture_output=True, text=True)
+        regels = [r for r in uitkomst.stdout.splitlines() if r.strip().startswith(("OK", "FOUT"))]
+        controle(f"de {len(regels)} controles van stoppen.test.ts slagen",
+                 uitkomst.returncode == 0 and len(regels) > 0 and not any("FOUT" in r for r in regels),
+                 (uitkomst.stdout + uitkomst.stderr)[-300:] if uitkomst.returncode else "")
+    else:
+        print("  (Node 22.18 of nieuwer ontbreekt: stoppen.test.ts overgeslagen)")
 
     print("\nGoedgekeurde woorden ophalen")
     # Dit is de enige lijst. Lukt het ophalen niet, dan moet de run stoppen en geen
