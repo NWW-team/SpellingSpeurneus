@@ -152,10 +152,6 @@
           <option value="ambassades">Ambassades en consulaten (±219 pagina's)</option>
         </select>
       </div>
-      <div class="filter">
-        <label for="crawlaantal">Maximaal aantal pagina's</label>
-        <input type="number" id="crawlaantal" value="50" min="1" max="5000" step="1">
-      </div>
       <button type="button" class="knop" id="crawlknop">Crawl starten</button>
     </div>
     <div class="voortgang" id="voortgang" hidden>
@@ -605,6 +601,11 @@ async function laadGoedgekeurd() {
 // Er mag er één per dag. De database dwingt dat af; hier tonen we alleen of de
 // dag al is gebruikt, zodat de knop niet naar een weigering leidt.
 const crawlKnop = document.getElementById("crawlknop");
+// De naam van een deel zoals in de keuzelijst, zonder het aantal pagina's erachter.
+function deelNaam(bron) {
+  const optie = [...document.getElementById("crawlbron").options].find(o => o.value === bron);
+  return optie ? optie.textContent.replace(/\s*\(.*\)\s*$/, "") : bron;
+}
 const crawlStatus = document.getElementById("crawlstatus");
 const nlDatum = d => new Date(d).toLocaleDateString("sv-SE", NL_TIJD);  // jjjj-mm-dd
 
@@ -681,7 +682,7 @@ function tekenVoortgang(a) {
 async function laadAanvragen() {
   const { data, error } = await sb
     .from("crawl_aanvragen")
-    .select("aangevraagd_op, bron, max_paginas, status, paginas_klaar, paginas_totaal, crawl_gestart_op, bijgewerkt_op, run_url")
+    .select("aangevraagd_op, bron, status, paginas_klaar, paginas_totaal, crawl_gestart_op, bijgewerkt_op, run_url")
     .order("aangevraagd_op", { ascending: false })
     .limit(1);
   if (error) {
@@ -696,7 +697,7 @@ async function laadAanvragen() {
   if (vandaagGebruikt) {
     const wanneer = tijd(laatste.aangevraagd_op);
     crawlStatus.textContent =
-      `Vandaag is er al een crawl gestart (${wanneer}, ${laatste.bron}, maximaal ${laatste.max_paginas} pagina's). Morgen kan er weer één.`;
+      `Vandaag is er al een crawl gestart (${wanneer}, ${deelNaam(laatste.bron)}). Morgen kan er weer één.`;
     crawlKnop.disabled = true;
   } else {
     crawlStatus.textContent = laatste
@@ -731,13 +732,10 @@ async function laadAanvragen() {
 
 crawlKnop.addEventListener("click", async () => {
   const bron = document.getElementById("crawlbron").value;
-  const aantal = Number(document.getElementById("crawlaantal").value);
-  if (!Number.isInteger(aantal) || aantal < 1 || aantal > 5000) {
-    crawlStatus.textContent = "Vul een geheel aantal pagina's in van 1 tot 5000.";
-    return;
-  }
-  // Een crawl kost de site verkeer en er mag er maar één per dag: vraag het na.
-  if (!confirm(`Crawl starten voor "${bron}", maximaal ${aantal} pagina's?\nEr mag er maar één per dag.`)) return;
+  // Een crawl pakt het hele gekozen deel, kost de site verkeer en er mag er maar één per
+  // dag: vraag het na, met de naam en het aantal pagina's zoals in de keuzelijst.
+  const gekozen = document.getElementById("crawlbron").selectedOptions[0].textContent;
+  if (!confirm(`Crawl starten voor: ${gekozen}?\nEr mag er maar één per dag.`)) return;
 
   crawlKnop.disabled = true;
   crawlStatus.textContent = "Bezig met starten…";
@@ -745,7 +743,7 @@ crawlKnop.addEventListener("click", async () => {
     const antwoord = await fetch(`${SUPABASE_URL}/functions/v1/crawl-starten`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY },
-      body: JSON.stringify({ bron, max_paginas: aantal }),
+      body: JSON.stringify({ bron }),
     });
     if (!antwoord.ok) {
       let melding = `Er ging iets mis (${antwoord.status}).`;
