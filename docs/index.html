@@ -241,9 +241,6 @@
         <option value="rest">Overige</option>
       </select>
     </div>
-    <div class="exportbalk">
-      <button type="button" id="xlsx-namen">Download als Excel</button>
-    </div>
     <div class="kaart tabelhouder">
       <table>
         <thead><tr><th>Naam</th><th>Voorbeeld</th><th>Pagina</th><th></th></tr></thead>
@@ -315,7 +312,7 @@ const tabbladen = [...document.querySelectorAll(".tabblad")];
 let bevindingen = [];
 let huidigeCrawl = null;              // de crawl waarvan de bevindingen op het scherm staan
 // Wat nu in de tabbladen staat (na de filters), voor de Excel-downloads.
-const zichtbaarVoorExport = { spelfouten: [], namen: [] };
+const zichtbaarVoorExport = { spelfouten: [] };
 let goedgekeurd = [];                 // actieve goedkeuringen uit Supabase
 let goedgekeurdSleutels = new Set();  // dezelfde woorden, kleine letters
 let verplaatstSleutels = new Set();   // namen die de redactie als spelfout heeft aangewezen, kleine letters
@@ -533,12 +530,8 @@ function tekenNamen(rijen) {
   document.getElementById("aantal-namen").textContent = alle.length;
   if (!namen.length) {
     leeg(naamLichaam, "Geen namen die aan het filter voldoen.");
-    zichtbaarVoorExport.namen = [];
-    zetExportKnop("namen");
     return;
   }
-  zichtbaarVoorExport.namen = namen;
-  zetExportKnop("namen");
 
   naamLichaam.innerHTML = namen.map(b => {
     // De link wijst naar de pagina van het getoonde voorbeeld. Staat de naam
@@ -644,7 +637,6 @@ document.addEventListener("click", async event => {
 // is goedgekeurd. Zonder filters is dat de hele lijst. Dat staat ook in de bestandsnaam.
 const exportKnoppen = {
   spelfouten: document.getElementById("xlsx-spelfouten"),
-  namen: document.getElementById("xlsx-namen"),
 };
 
 function zetExportKnop(welke) {
@@ -653,39 +645,21 @@ function zetExportKnop(welke) {
   exportKnoppen[welke].disabled = aantal === 0;
 }
 
-function exportBestandsnaam(soort) {
+function exportBestandsnaam() {
   const datum = huidigeCrawl ? nlDatum(huidigeCrawl.gestart_op) : nlDatum(new Date());
   const deel = huidigeCrawl ? huidigeCrawl.bron : "crawl";
-  const gefilterd = urlFilter.value.trim() || woordFilter.value.trim() ||
-    (soort === "namen" && naamSoort.value !== "alles");
-  return `${soort}-${deel}-${datum}${gefilterd ? "-gefilterd" : ""}.xlsx`;
+  const gefilterd = urlFilter.value.trim() || woordFilter.value.trim();
+  return `spelfouten-${deel}-${datum}${gefilterd ? "-gefilterd" : ""}.xlsx`;
 }
 
 exportKnoppen.spelfouten.addEventListener("click", () => {
-  downloadXlsx(exportBestandsnaam("spelfouten"), {
+  downloadXlsx(exportBestandsnaam(), {
     werkblad: "Spelfouten",
     kolommen: [
       { titel: "Woord", breedte: 26 }, { titel: "Zin", breedte: 90 },
       { titel: "Pagina", breedte: 60 },
     ],
     rijen: zichtbaarVoorExport.spelfouten.map(b => [b.woord, b.context, b.url]),
-  });
-});
-
-exportKnoppen.namen.addEventListener("click", () => {
-  const oordeel = n => n.plaats_status === "twijfel" ? "mogelijk verkeerd gespeld"
-    : n.plaats_status === "bekend" ? "bekende plaatsnaam" : "";
-  downloadXlsx(exportBestandsnaam("namen"), {
-    werkblad: "Namen",
-    kolommen: [
-      { titel: "Naam", breedte: 26 }, { titel: "Voorbeeldzin", breedte: 90 },
-      { titel: "Pagina (voorbeeld)", breedte: 60 }, { titel: "Aantal pagina's", breedte: 16 },
-      { titel: "Oordeel", breedte: 26 }, { titel: "Lijkt op", breedte: 22 },
-      { titel: "Paginatitel", breedte: 40 },
-    ],
-    rijen: zichtbaarVoorExport.namen.map(n => [
-      n.woord, n.context, n.url, n.paginas.size, oordeel(n), n.suggestie || "", n.titel || "",
-    ]),
   });
 });
 
