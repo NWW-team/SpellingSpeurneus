@@ -219,16 +219,9 @@
 
   <div id="paneel-namen" role="tabpanel" aria-labelledby="tab-namen" hidden>
     <p class="uitleg">Woorden met een hoofdletter middenin een zin: plaatsen,
-      organisaties en anderstalige bronnen. De woordenlijst kent geen namen, dus
-      ze staan hier allemaal — ook de goede. Elke naam staat één keer, met een
-      voorbeeldzin en een link naar het reisadvies waar die zin staat. Is een naam
-      verkeerd gespeld? Klik op <em>Is een spelfout</em>: hij staat dan bij de
-      Spelfouten, ook bij de volgende crawl.</p>
-    <p class="uitleg" id="naamoordeel-uitleg" hidden>Onder de naam staat een oordeel uit
+      organisaties en anderstalige bronnen. Onder de naam staat een oordeel uit
       <a href="https://www.geonames.org">GeoNames</a>: <em>bekende plaatsnaam</em>, of
-      <em>lijkt op</em> een bekende plaats (mogelijk verkeerd gespeld, dus bekijk die
-      eerst). Geen oordeel betekent dat de naam er niet in staat en op niets lijkt:
-      een organisatie, een persoon of een woord uit een andere taal.</p>
+      <em>lijkt op</em> een bekende plaats. Geen oordeel betekent dat de naam er niet in staat.</p>
     <p class="fout" id="naamoordeel-ontbreekt" hidden>Deze crawl heeft nog geen oordeel over
       de plaatsnamen: hij is gedraaid voordat die check bestond, of de lijst van GeoNames
       kon niet worden opgehaald. Start een nieuwe crawl om het oordeel erbij te krijgen.</p>
@@ -241,9 +234,6 @@
         <option value="rest">Overige</option>
       </select>
     </div>
-    <div class="exportbalk">
-      <button type="button" id="xlsx-namen">Download als Excel</button>
-    </div>
     <div class="kaart tabelhouder">
       <table>
         <thead><tr><th>Naam</th><th>Voorbeeld</th><th>Pagina</th><th></th></tr></thead>
@@ -253,10 +243,6 @@
   </div>
 
   <div id="paneel-goedgekeurd" role="tabpanel" aria-labelledby="tab-goedgekeurd" hidden>
-    <p class="uitleg">De enige lijst met goedgekeurde woorden en namen: alles wat
-      de crawler als goed beschouwt, behalve de woordenlijst van OpenTaal. Ze
-      verdwijnen uit de lijsten hierboven en de volgende crawl slaat ze over.
-      Intrekken zet ze terug. Zoek met <em>Filter op woord</em>.</p>
     <div class="kaart tabelhouder">
       <table>
         <thead><tr><th>Woord</th><th>Soort</th><th>Goedgekeurd op</th><th></th></tr></thead>
@@ -315,7 +301,7 @@ const tabbladen = [...document.querySelectorAll(".tabblad")];
 let bevindingen = [];
 let huidigeCrawl = null;              // de crawl waarvan de bevindingen op het scherm staan
 // Wat nu in de tabbladen staat (na de filters), voor de Excel-downloads.
-const zichtbaarVoorExport = { spelfouten: [], namen: [] };
+const zichtbaarVoorExport = { spelfouten: [] };
 let goedgekeurd = [];                 // actieve goedkeuringen uit Supabase
 let goedgekeurdSleutels = new Set();  // dezelfde woorden, kleine letters
 let verplaatstSleutels = new Set();   // namen die de redactie als spelfout heeft aangewezen, kleine letters
@@ -381,7 +367,6 @@ function toonFeiten(gegevens) {
     ${restenVak}
     <div class="feit"><strong>${namen}</strong><span>namen apart gezet</span></div>
     <div class="feit"><strong>${gegevens.aantal_paginas}</strong><span>pagina's bekeken</span></div>
-    <div class="feit"><strong>${ontsnap(gegevens.bron)}</strong><span>deel van de site</span></div>
     <div class="feit"><strong>${datum}</strong><span>laatste crawl</span></div>`;
 }
 
@@ -524,7 +509,6 @@ function tekenNamen(rijen) {
   // Een crawl van voor de plaatsnamencheck (of zonder GeoNames) heeft geen oordelen:
   // zeg dat, in plaats van uitleg te geven over iets dat er niet staat.
   const heeftOordeel = alle.some(n => n.plaats_status);
-  document.getElementById("naamoordeel-uitleg").hidden = !heeftOordeel;
   document.getElementById("naamoordeel-ontbreekt").hidden = heeftOordeel || !alle.length;
   naamSoort.closest(".naamfilter").hidden = !heeftOordeel;
 
@@ -534,12 +518,8 @@ function tekenNamen(rijen) {
   document.getElementById("aantal-namen").textContent = alle.length;
   if (!namen.length) {
     leeg(naamLichaam, "Geen namen die aan het filter voldoen.");
-    zichtbaarVoorExport.namen = [];
-    zetExportKnop("namen");
     return;
   }
-  zichtbaarVoorExport.namen = namen;
-  zetExportKnop("namen");
 
   naamLichaam.innerHTML = namen.map(b => {
     // De link wijst naar de pagina van het getoonde voorbeeld. Staat de naam
@@ -569,6 +549,8 @@ function kiesTabblad(gekozen) {
     tab.tabIndex = actief ? 0 : -1;
     document.getElementById(tab.getAttribute("aria-controls")).hidden = !actief;
   }
+  // Bij Goedgekeurd staan alleen woorden, dus daar is filteren op URL zinloos.
+  urlFilter.closest(".filter").hidden = gekozen.id === "tab-goedgekeurd";
   gekozen.focus();
 }
 
@@ -645,7 +627,6 @@ document.addEventListener("click", async event => {
 // is goedgekeurd. Zonder filters is dat de hele lijst. Dat staat ook in de bestandsnaam.
 const exportKnoppen = {
   spelfouten: document.getElementById("xlsx-spelfouten"),
-  namen: document.getElementById("xlsx-namen"),
 };
 
 function zetExportKnop(welke) {
@@ -654,43 +635,21 @@ function zetExportKnop(welke) {
   exportKnoppen[welke].disabled = aantal === 0;
 }
 
-function exportBestandsnaam(soort) {
+function exportBestandsnaam() {
   const datum = huidigeCrawl ? nlDatum(huidigeCrawl.gestart_op) : nlDatum(new Date());
   const deel = huidigeCrawl ? huidigeCrawl.bron : "crawl";
-  const gefilterd = urlFilter.value.trim() || woordFilter.value.trim() ||
-    (soort === "namen" && naamSoort.value !== "alles");
-  return `${soort}-${deel}-${datum}${gefilterd ? "-gefilterd" : ""}.xlsx`;
+  const gefilterd = urlFilter.value.trim() || woordFilter.value.trim();
+  return `spelfouten-${deel}-${datum}${gefilterd ? "-gefilterd" : ""}.xlsx`;
 }
 
 exportKnoppen.spelfouten.addEventListener("click", () => {
-  downloadXlsx(exportBestandsnaam("spelfouten"), {
+  downloadXlsx(exportBestandsnaam(), {
     werkblad: "Spelfouten",
     kolommen: [
       { titel: "Woord", breedte: 26 }, { titel: "Zin", breedte: 90 },
-      { titel: "Pagina", breedte: 60 }, { titel: "Paginatitel", breedte: 40 },
-      { titel: "Soort", breedte: 14 },
+      { titel: "Pagina", breedte: 60 },
     ],
-    rijen: zichtbaarVoorExport.spelfouten.map(b => [
-      b.woord, b.context, b.url, b.titel || "",
-      isSjabloonrest(b) ? "sjabloonrest" : isVerplaatst(b) ? "spelfout (verplaatst vanuit Namen)" : "spelfout",
-    ]),
-  });
-});
-
-exportKnoppen.namen.addEventListener("click", () => {
-  const oordeel = n => n.plaats_status === "twijfel" ? "mogelijk verkeerd gespeld"
-    : n.plaats_status === "bekend" ? "bekende plaatsnaam" : "";
-  downloadXlsx(exportBestandsnaam("namen"), {
-    werkblad: "Namen",
-    kolommen: [
-      { titel: "Naam", breedte: 26 }, { titel: "Voorbeeldzin", breedte: 90 },
-      { titel: "Pagina (voorbeeld)", breedte: 60 }, { titel: "Aantal pagina's", breedte: 16 },
-      { titel: "Oordeel", breedte: 26 }, { titel: "Lijkt op", breedte: 22 },
-      { titel: "Paginatitel", breedte: 40 },
-    ],
-    rijen: zichtbaarVoorExport.namen.map(n => [
-      n.woord, n.context, n.url, n.paginas.size, oordeel(n), n.suggestie || "", n.titel || "",
-    ]),
+    rijen: zichtbaarVoorExport.spelfouten.map(b => [b.woord, b.context, b.url]),
   });
 });
 
