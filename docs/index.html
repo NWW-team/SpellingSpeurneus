@@ -666,13 +666,9 @@ exportKnoppen.spelfouten.addEventListener("click", () => {
     werkblad: "Spelfouten",
     kolommen: [
       { titel: "Woord", breedte: 26 }, { titel: "Zin", breedte: 90 },
-      { titel: "Pagina", breedte: 60 }, { titel: "Paginatitel", breedte: 40 },
-      { titel: "Soort", breedte: 14 },
+      { titel: "Pagina", breedte: 60 },
     ],
-    rijen: zichtbaarVoorExport.spelfouten.map(b => [
-      b.woord, b.context, b.url, b.titel || "",
-      isSjabloonrest(b) ? "sjabloonrest" : isVerplaatst(b) ? "spelfout (verplaatst vanuit Namen)" : "spelfout",
-    ]),
+    rijen: zichtbaarVoorExport.spelfouten.map(b => [b.woord, b.context, b.url]),
   });
 });
 
