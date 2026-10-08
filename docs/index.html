@@ -219,16 +219,9 @@
 
   <div id="paneel-namen" role="tabpanel" aria-labelledby="tab-namen" hidden>
     <p class="uitleg">Woorden met een hoofdletter middenin een zin: plaatsen,
-      organisaties en anderstalige bronnen. De woordenlijst kent geen namen, dus
-      ze staan hier allemaal — ook de goede. Elke naam staat één keer, met een
-      voorbeeldzin en een link naar het reisadvies waar die zin staat. Is een naam
-      verkeerd gespeld? Klik op <em>Is een spelfout</em>: hij staat dan bij de
-      Spelfouten, ook bij de volgende crawl.</p>
-    <p class="uitleg" id="naamoordeel-uitleg" hidden>Onder de naam staat een oordeel uit
+      organisaties en anderstalige bronnen. Onder de naam staat een oordeel uit
       <a href="https://www.geonames.org">GeoNames</a>: <em>bekende plaatsnaam</em>, of
-      <em>lijkt op</em> een bekende plaats (mogelijk verkeerd gespeld, dus bekijk die
-      eerst). Geen oordeel betekent dat de naam er niet in staat en op niets lijkt:
-      een organisatie, een persoon of een woord uit een andere taal.</p>
+      <em>lijkt op</em> een bekende plaats. Geen oordeel betekent dat de naam er niet in staat.</p>
     <p class="fout" id="naamoordeel-ontbreekt" hidden>Deze crawl heeft nog geen oordeel over
       de plaatsnamen: hij is gedraaid voordat die check bestond, of de lijst van GeoNames
       kon niet worden opgehaald. Start een nieuwe crawl om het oordeel erbij te krijgen.</p>
@@ -520,7 +513,6 @@ function tekenNamen(rijen) {
   // Een crawl van voor de plaatsnamencheck (of zonder GeoNames) heeft geen oordelen:
   // zeg dat, in plaats van uitleg te geven over iets dat er niet staat.
   const heeftOordeel = alle.some(n => n.plaats_status);
-  document.getElementById("naamoordeel-uitleg").hidden = !heeftOordeel;
   document.getElementById("naamoordeel-ontbreekt").hidden = heeftOordeel || !alle.length;
   naamSoort.closest(".naamfilter").hidden = !heeftOordeel;
 
