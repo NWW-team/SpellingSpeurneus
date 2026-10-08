@@ -280,11 +280,11 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8D0tbPlRD5eWqjIJDdQgKg_BxKn2Knx
 const NL_TIJD = { timeZone: "Europe/Amsterdam" };
 function tijd(datum) {
   return new Date(datum).toLocaleTimeString("nl-NL",
-    { ...NL_TIJD, hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+    { ...NL_TIJD, hour: "numeric", minute: "2-digit", hourCycle: "h23" })
     .replace(":", ".") + " uur";
 }
 function datumTijd(datum) {
-  return new Date(datum).toLocaleDateString("nl-NL", { ...NL_TIJD, dateStyle: "medium" })
+  return new Date(datum).toLocaleDateString("nl-NL", { ...NL_TIJD, dateStyle: "long" })
     + ", " + tijd(datum);
 }
 
@@ -821,9 +821,9 @@ async function laadAanvragen() {
     crawlKnop.disabled = true;
   } else {
     crawlStatus.textContent = laatste
-      ? "Er mag één crawl per dag. De laatste was op " + new Date(laatste.aangevraagd_op)
-          .toLocaleDateString("nl-NL", { ...NL_TIJD, dateStyle: "medium" }) + "."
-      : "Er mag één crawl per dag.";
+      ? "Maximaal 1 crawl per dag. De laatste was op " + new Date(laatste.aangevraagd_op)
+          .toLocaleDateString("nl-NL", { ...NL_TIJD, dateStyle: "long" }) + "."
+      : "Maximaal 1 crawl per dag.";
     crawlKnop.disabled = false;
   }
 
