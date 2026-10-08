@@ -65,9 +65,9 @@
     background: var(--grond); color: var(--inkt); }
   input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .tabbladen { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
-  .tabblad { font-size: .95rem; padding: 8px 14px; border-radius: 6px;
+  .tabblad, .deeltab { font-size: .95rem; padding: 8px 14px; border-radius: 6px;
     background: transparent; border: 1px solid transparent; color: var(--gedempt); }
-  .tabblad[aria-selected="true"] { background: var(--vlak); border-color: var(--lijn);
+  .tabblad[aria-selected="true"], .deeltab[aria-selected="true"] { background: var(--vlak); border-color: var(--lijn);
     color: var(--inkt); font-weight: 600;
     border-bottom: 3px solid var(--tabrand); border-radius: 6px 6px 0 0; }
   .tabblad .aantal { color: var(--gedempt); font-weight: 400; }
@@ -159,18 +159,11 @@
 
   <p class="fout" id="fout" role="alert" hidden></p>
 
+  <div class="tabbladen deeltabs" role="tablist" aria-label="Deel van de site" id="deeltabs"></div>
+
   <div class="kaart crawlkaart" id="crawlkaart">
-    <h2>Nieuwe crawl</h2>
+    <h2 id="crawlkop">Nieuwe crawl</h2>
     <div class="filters">
-      <div class="filter">
-        <label for="crawlbron">Deel van de site</label>
-        <select id="crawlbron">
-          <option value="reisadvies">Reisadviezen (±236 pagina's)</option>
-          <option value="visum-nederland">Visum voor Nederland (±1.015 pagina's)</option>
-          <option value="caribisch-visum">Visum voor Caribische Koninkrijksdelen (±452 pagina's)</option>
-          <option value="ambassades">Ambassades en consulaten (±219 pagina's)</option>
-        </select>
-      </div>
       <button type="button" class="knop" id="crawlknop">Crawl starten</button>
     </div>
     <div class="voortgang" id="voortgang" hidden>
@@ -761,10 +754,9 @@ async function laadGoedgekeurd() {
 // Er mag er één per dag. De database dwingt dat af; hier tonen we alleen of de
 // dag al is gebruikt, zodat de knop niet naar een weigering leidt.
 const crawlKnop = document.getElementById("crawlknop");
-// De naam van een deel zoals in de keuzelijst, zonder het aantal pagina's erachter.
+// De naam van een deel, zoals op de tab.
 function deelNaam(bron) {
-  const optie = [...document.getElementById("crawlbron").options].find(o => o.value === bron);
-  return optie ? optie.textContent.replace(/\s*\(.*\)\s*$/, "") : bron;
+  return DEEL_INFO[bron] ? DEEL_INFO[bron].naam : bron;
 }
 const crawlStatus = document.getElementById("crawlstatus");
 const nlDatum = d => new Date(d).toLocaleDateString("sv-SE", NL_TIJD);  // jjjj-mm-dd
@@ -838,13 +830,13 @@ function tekenVoortgang(a) {
     if (klaar >= 3 && verstreken > 0) {
       rest = `nog ${minuten(((a.paginas_totaal - klaar) * verstreken) / klaar)}, plus het opslaan`;
     }
-    voortgangTekst.innerHTML = `Pagina ${klaar} van ${a.paginas_totaal} (${percentage}%) — ${rest}.${waarschuwing}`;
+    voortgangTekst.innerHTML = `${ontsnap(deelNaam(a.bron))}: pagina ${klaar} van ${a.paginas_totaal} (${percentage}%) — ${rest}.${waarschuwing}`;
   } else {
     vulling.classList.add("onbepaald");
     vulling.style.width = "";
     voortgangTekst.innerHTML = a.status === "publiceren"
-      ? `Het resultaat wordt opgeslagen… Stoppen kan nu niet meer.${waarschuwing}`
-      : `De crawl wordt voorbereid (woordenlijst ophalen)…${waarschuwing}`;
+      ? `${ontsnap(deelNaam(a.bron))}: het resultaat wordt opgeslagen… Stoppen kan nu niet meer.${waarschuwing}`
+      : `${ontsnap(deelNaam(a.bron))}: de crawl wordt voorbereid (woordenlijst ophalen)…${waarschuwing}`;
   }
 }
 
@@ -894,7 +886,7 @@ async function laadAanvragen() {
     vulling.style.width = "100%";
     balk.setAttribute("aria-valuenow", "100");
     voortgangTekst.textContent = "De crawl is klaar. De nieuwe resultaten staan hieronder.";
-    laadResultaten();
+    laadResultaten(DELEN.includes(laatste.bron) ? laatste.bron : huidigeDeel);
   }
   wasActief = actief;
 }
@@ -923,10 +915,10 @@ stopKnop.addEventListener("click", async () => {
 });
 
 crawlKnop.addEventListener("click", async () => {
-  const bron = document.getElementById("crawlbron").value;
+  const bron = huidigeDeel;
   // Een crawl pakt het hele gekozen deel, kost de site verkeer en er mag er maar één per
   // dag: vraag het na, met de naam en het aantal pagina's zoals in de keuzelijst.
-  const gekozen = document.getElementById("crawlbron").selectedOptions[0].textContent;
+  const gekozen = `${DEEL_INFO[bron].naam} (${DEEL_INFO[bron].paginas} pagina's)`;
   if (!confirm(`Crawl starten voor: ${gekozen}?\nEr mag er maar één per dag.`)) return;
 
   crawlKnop.disabled = true;
@@ -952,36 +944,95 @@ crawlKnop.addEventListener("click", async () => {
   }
 });
 
-async function laadResultaten() {
+// De delen van de site, in de volgorde van de keuzelijst bij "Nieuwe crawl".
+const DEEL_INFO = {
+  "reisadvies": { naam: "Reisadviezen", paginas: "±236" },
+  "visum-nederland": { naam: "Visum voor Nederland", paginas: "±1.015" },
+  "caribisch-visum": { naam: "Visum voor Caribische Koninkrijksdelen", paginas: "±452" },
+  "ambassades": { naam: "Ambassades en consulaten", paginas: "±219" },
+};
+const DELEN = Object.keys(DEEL_INFO);
+const deeltabsVak = document.getElementById("deeltabs");
+let huidigeDeel = DELEN[0];           // altijd Reisadvies bij het openen
+let laatstePerDeel = {};              // per deel de laatste crawl, of undefined als er geen is
+
+function tekenDeeltabs() {
+  const info = DEEL_INFO[huidigeDeel];
+  document.getElementById("crawlkop").textContent = `Nieuwe crawl: ${info.naam}`;
+  document.getElementById("crawlknop").textContent = `Crawl starten (${info.paginas} pagina's)`;
+  deeltabsVak.innerHTML = DELEN.map(bron => `
+    <button type="button" class="deeltab" role="tab" data-deel="${bron}"
+            aria-selected="${bron === huidigeDeel}" tabindex="${bron === huidigeDeel ? 0 : -1}">
+      ${ontsnap(deelNaam(bron))}
+    </button>`).join("");
+}
+
+deeltabsVak.addEventListener("click", event => {
+  const tab = event.target.closest(".deeltab");
+  if (tab) kiesDeel(tab.dataset.deel);
+});
+deeltabsVak.addEventListener("keydown", event => {
+  const stap = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
+  const tab = event.target.closest(".deeltab");
+  if (!stap || !tab) return;
+  event.preventDefault();
+  const nummer = DELEN.indexOf(tab.dataset.deel);
+  kiesDeel(DELEN[(nummer + stap + DELEN.length) % DELEN.length], true);
+});
+
+// Toont de laatste crawl van één deel. Heeft dat deel nog geen crawl, dan zegt het scherm dat.
+async function kiesDeel(bron, focus = false) {
+  const mijn = ++ronde;
+  huidigeDeel = bron;
+  tekenDeeltabs();
+  if (focus) deeltabsVak.querySelector(`[data-deel="${bron}"]`).focus();
+  try {
+    const crawl = laatstePerDeel[bron];
+    if (!crawl) {
+      huidigeCrawl = null;
+      bevindingen = [];
+      teken();  // zet tellers, exportknoppen en het tabblad Namen terug naar leeg
+      feitenVak.innerHTML = `<span class="melding">${ontsnap(deelNaam(bron))} is nog niet gecrawld.
+        Start hierboven een crawl om te beginnen.</span>`;
+      leeg(rijenLichaam, "Nog niets te zien.");
+      leeg(naamLichaam, "Nog niets te zien.");
+      return;
+    }
+    wisGegevens();
+    const rijen = await haalBevindingen(crawl.id);
+    if (mijn !== ronde) return;
+    huidigeCrawl = crawl;
+    bevindingen = rijen;
+    teken();
+  } catch (fout) {
+    if (mijn !== ronde) return;
+    feitenVak.innerHTML =
+      `<span class="melding">Kan de resultaten niet ophalen: ${ontsnap(fout.message || String(fout))}</span>`;
+    leeg(rijenLichaam, "Geen gegevens opgehaald.");
+    leeg(naamLichaam, "Geen gegevens opgehaald.");
+  }
+}
+
+// `deel`: welk deel erna getoond wordt. Zonder valt het terug op het deel dat nu open staat.
+async function laadResultaten(deel = huidigeDeel) {
   const mijn = ++ronde;
   try {
     await laadGoedgekeurd();
     await laadVerplaatst();
     if (mijn !== ronde) return;
-    const { data: crawls, error: crawlfout } = await sb
+    // Per deel de laatste crawl.
+    const antwoorden = await Promise.all(DELEN.map(bron => sb
       .from("crawls")
       .select("id, gestart_op, bron, aantal_paginas")
+      .eq("bron", bron)
       .order("gestart_op", { ascending: false })
-      .limit(1);
-    if (crawlfout) throw crawlfout;
+      .limit(1)));
     if (mijn !== ronde) return;
-
-    if (!crawls.length) {
-      feitenVak.innerHTML = '<span class="melding">Er is nog geen crawl gedraaid.</span>';
-      document.getElementById("aantal-spelfouten").textContent = "0";
-      document.getElementById("aantal-namen").textContent = "0";
-      leeg(rijenLichaam, "Start een crawl met de knop hierboven.");
-      leeg(naamLichaam, "Nog niets te zien.");
-      tekenGoedgekeurd();
-      return;
-    }
-
-    const crawl = crawls[0];
-    huidigeCrawl = crawl;
-    bevindingen = await haalBevindingen(crawl.id);
-    if (mijn !== ronde) return;
-
-    teken();
+    const mislukt = antwoorden.find(a => a.error);
+    if (mislukt) throw mislukt.error;
+    laatstePerDeel = Object.fromEntries(DELEN.map((bron, i) => [bron, antwoorden[i].data[0]]));
+    tekenGoedgekeurd();
+    await kiesDeel(deel);
   } catch (fout) {
     if (mijn !== ronde) return;
     feitenVak.innerHTML =
@@ -1009,6 +1060,7 @@ async function haalBevindingen(crawlId) {
   }
 }
 
+tekenDeeltabs();
 laadAanvragen();
 laadResultaten();
 </script>
