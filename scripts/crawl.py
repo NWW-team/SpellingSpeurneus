@@ -388,7 +388,7 @@ def main():
     parser.add_argument("--aanvraag-id", default="",
                         help="id van de aanvraag in Supabase, voor de voortgangsbalk; "
                              "zonder dit meldt de crawl geen voortgang")
-    parser.add_argument("--uit", default=str(WORTEL / "docs" / "resultaten.json"))
+    parser.add_argument("--uit", default=str(WORTEL / "resultaten.json"))
     parser.add_argument("--pauze", type=float, default=0.5,
                         help="seconden wachten tussen twee pagina's")
     argumenten = parser.parse_args()

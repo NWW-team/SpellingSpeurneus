@@ -1,6 +1,5 @@
-// Woorden en namen goedkeuren of intrekken. Vervangt het kopiëren naar
-// data/uitzonderingen.txt. Draait met de service-role key die Supabase de functie
-// zelf meegeeft; die komt nooit in de browser.
+// Woorden en namen goedkeuren of intrekken. Draait met de service-role key die
+// Supabase de functie zelf meegeeft; die komt nooit in de browser.
 //
 // Deze functie is voor iedereen aan te roepen (zie besluit 6 in OVERDRACHT.md).
 // De bescherming is daarom: strenge invoercontrole en een limiet op het aantal

@@ -114,8 +114,6 @@
   .naamfilter label { margin: 0; }
   .naamfilter select { width: auto; }
   .crawlkaart .filters { align-items: end; margin-bottom: 12px; }
-  /* Breed genoeg voor de langste keuze, "Visum voor Caribische Koninkrijksdelen (±452 pagina's)". */
-  .crawlkaart .filter { flex: 1 1 380px; max-width: 480px; }
   .crawlkaart .knop { font-size: .95rem; padding: 9px 14px; font-weight: 600;
     background: var(--accent); color: var(--vlak); border-color: var(--accent); }
   .crawlkaart .knop:hover { background: var(--accent); opacity: .9; }
@@ -301,8 +299,8 @@ const naamSoort = document.getElementById("naamsoort");
 const tabbladen = [...document.querySelectorAll(".tabblad")];
 let bevindingen = [];
 let huidigeCrawl = null;              // de crawl waarvan de bevindingen op het scherm staan
-// Wat nu in de tabbladen staat (na de filters), voor de Excel-downloads.
-const zichtbaarVoorExport = { spelfouten: [] };
+// Wat nu bij Spelfouten staat (na de filters), voor de Excel-download.
+let zichtbaarVoorExport = [];
 let goedgekeurd = [];                 // actieve goedkeuringen uit Supabase
 let goedgekeurdSleutels = new Set();  // dezelfde woorden, kleine letters
 let verplaatstSleutels = new Set();   // namen die de redactie als spelfout heeft aangewezen, kleine letters
@@ -449,8 +447,8 @@ function tekenGoedgekeurd() {
 function tekenSpelfouten(rijen) {
   if (!rijen.length) {
     leeg(rijenLichaam, "Geen spelfouten die aan het filter voldoen.");
-    zichtbaarVoorExport.spelfouten = [];
-    zetExportKnop("spelfouten");
+    zichtbaarVoorExport = [];
+    zetExportKnop();
     return;
   }
 
@@ -459,8 +457,8 @@ function tekenSpelfouten(rijen) {
   const geordend = [...rijen].sort(
     (a, z) => (isSjabloonrest(z) ? 1 : 0) - (isSjabloonrest(a) ? 1 : 0));
 
-  zichtbaarVoorExport.spelfouten = geordend;
-  zetExportKnop("spelfouten");
+  zichtbaarVoorExport = geordend;
+  zetExportKnop();
 
   rijenLichaam.innerHTML = geordend.map(b => {
     const rest = isSjabloonrest(b);
@@ -621,18 +619,16 @@ document.addEventListener("click", async event => {
 });
 
 // ---------------------------------------------------------------------------
-// Excel-downloads
+// Excel-download
 // ---------------------------------------------------------------------------
-// De download bevat wat nu in het tabblad staat: met de filters die je hebt gezet, en zonder wat
+// De download bevat wat nu in het tabblad Spelfouten staat: met de filters die je hebt gezet, en zonder wat
 // is goedgekeurd. Zonder filters is dat de hele lijst. Dat staat ook in de bestandsnaam.
-const exportKnoppen = {
-  spelfouten: document.getElementById("xlsx-spelfouten"),
-};
+const exportKnop = document.getElementById("xlsx-spelfouten");
 
-function zetExportKnop(welke) {
-  const aantal = zichtbaarVoorExport[welke].length;
-  exportKnoppen[welke].textContent = `Download als Excel (${aantal} ${aantal === 1 ? "rij" : "rijen"})`;
-  exportKnoppen[welke].disabled = aantal === 0;
+function zetExportKnop() {
+  const aantal = zichtbaarVoorExport.length;
+  exportKnop.textContent = `Download als Excel (${aantal} ${aantal === 1 ? "rij" : "rijen"})`;
+  exportKnop.disabled = aantal === 0;
 }
 
 function exportBestandsnaam() {
@@ -642,14 +638,14 @@ function exportBestandsnaam() {
   return `spelfouten-${deel}-${datum}${gefilterd ? "-gefilterd" : ""}.xlsx`;
 }
 
-exportKnoppen.spelfouten.addEventListener("click", () => {
+exportKnop.addEventListener("click", () => {
   downloadXlsx(exportBestandsnaam(), {
     werkblad: "Spelfouten",
     kolommen: [
       { titel: "Woord", breedte: 26 }, { titel: "Zin", breedte: 90 },
       { titel: "Pagina", breedte: 60 },
     ],
-    rijen: zichtbaarVoorExport.spelfouten.map(b => [b.woord, b.context, b.url]),
+    rijen: zichtbaarVoorExport.map(b => [b.woord, b.context, b.url]),
   });
 });
 
