@@ -281,7 +281,8 @@ const NL_TIJD = { timeZone: "Europe/Amsterdam" };
 function tijd(datum) {
   return new Date(datum).toLocaleTimeString("nl-NL",
     { ...NL_TIJD, hour: "numeric", minute: "2-digit", hourCycle: "h23" })
-    .replace(":", ".") + " uur";
+    // De browser zet voor het Nederlands zelf een nul voor het uur, dus die halen we er hier af.
+    .replace(":", ".").replace(/^0(?=\d)/, "") + " uur";
 }
 function datumTijd(datum) {
   return new Date(datum).toLocaleDateString("nl-NL", { ...NL_TIJD, dateStyle: "long" })
