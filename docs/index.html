@@ -245,8 +245,8 @@
   <div id="paneel-goedgekeurd" role="tabpanel" aria-labelledby="tab-goedgekeurd" hidden>
     <div class="kaart tabelhouder">
       <table>
-        <thead><tr><th>Woord</th><th>Soort</th><th>Goedgekeurd op</th><th></th></tr></thead>
-        <tbody id="goedgekeurdrijen"><tr><td colspan="4" class="melding">Bezig met laden…</td></tr></tbody>
+        <thead><tr><th>Woord</th><th>Soort</th><th></th></tr></thead>
+        <tbody id="goedgekeurdrijen"><tr><td colspan="3" class="melding">Bezig met laden…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -398,8 +398,8 @@ function knopCel(woord, soort, extra = "") {
             Goedkeuren</button>${tweede}</div></td>`;
 }
 
-function leeg(lichaam, tekst) {
-  lichaam.innerHTML = `<tr><td colspan="4" class="melding">${tekst}</td></tr>`;
+function leeg(lichaam, tekst, kolommen = 4) {
+  lichaam.innerHTML = `<tr><td colspan="${kolommen}" class="melding">${tekst}</td></tr>`;
 }
 
 function teken() {
@@ -424,7 +424,7 @@ function tekenGoedgekeurd() {
   document.getElementById("aantal-goedgekeurd").textContent = goedgekeurd.length;
   const lichaam = document.getElementById("goedgekeurdrijen");
   if (!goedgekeurd.length) {
-    leeg(lichaam, "Nog niets goedgekeurd.");
+    leeg(lichaam, "Nog niets goedgekeurd.", 3);
     return;
   }
   // Alfabetisch, en gefilterd op het woordfilter, zodat een woord snel te vinden is.
@@ -433,14 +433,13 @@ function tekenGoedgekeurd() {
     .filter(g => g.woord.toLowerCase().includes(term))
     .sort((a, z) => a.woord.localeCompare(z.woord, "nl", { sensitivity: "base" }));
   if (!rijen.length) {
-    leeg(lichaam, "Geen goedgekeurde woorden die aan het filter voldoen.");
+    leeg(lichaam, "Geen goedgekeurde woorden die aan het filter voldoen.", 3);
     return;
   }
   lichaam.innerHTML = rijen.map(g => `
     <tr>
       <td class="woord">${ontsnap(g.woord)}</td>
       <td>${g.soort === "naam" ? "naam" : "woord"}</td>
-      <td>${datumTijd(g.goedgekeurd_op)}</td>
       <td class="acties"><button type="button" data-actie="intrekken"
           data-woord="${ontsnap(g.woord)}" data-soort="${g.soort}">Intrekken</button></td>
     </tr>`).join("");
