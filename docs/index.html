@@ -878,7 +878,7 @@ crawlKnop.addEventListener("click", async () => {
   // Een crawl pakt het hele gekozen deel, kost de site verkeer en er mag er maar één per
   // dag: vraag het na, met de naam en het aantal pagina's zoals in de keuzelijst.
   const gekozen = `${DEEL_INFO[bron].naam} (${DEEL_INFO[bron].paginas} pagina's)`;
-  if (!confirm(`Crawl starten voor: ${gekozen}?\nEr mag er maar één per dag.`)) return;
+  if (!confirm(`Crawl starten voor: ${gekozen}?\nEr mag er maar 1 per dag.`)) return;
 
   crawlKnop.disabled = true;
   crawlStatus.textContent = "Bezig met starten…";
