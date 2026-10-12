@@ -11,6 +11,9 @@
 //     rijen: [["nieet", "Dat is nieet goed."]],
 //   });                                  // Uint8Array
 //
+// Een cel mag ook een lijst met stukken zijn, om een deel van de tekst vet te maken:
+//   ["Dat is ", { tekst: "nieet", vet: true }, " goed."]
+//
 // De tests staan in scripts/test.py (die dit bestand onder Node laadt).
 
 (function (wereld) {
@@ -103,6 +106,21 @@
     if (waarde === null || waarde === undefined || waarde === "") return "";
     if (typeof waarde === "number" && Number.isFinite(waarde)) {
       return `<c r="${verwijzing}"${s}><v>${waarde}</v></c>`;
+    }
+    if (Array.isArray(waarde)) {
+      // Opgemaakte tekst: een stuk per <r>. Vet krijgt zijn eigen lettertype, de rest erft van de cel.
+      let over = MAX_CEL;
+      const stukken = [];
+      for (const stuk of waarde) {
+        const gegeven = typeof stuk === "string" ? { tekst: stuk } : stuk;
+        const tekst = String(gegeven.tekst ?? "").slice(0, over);
+        over -= tekst.length;
+        if (!tekst) continue;
+        const opmaak = gegeven.vet ? '<rPr><rFont val="Calibri"/><b/><sz val="11"/></rPr>' : "";
+        stukken.push(`<r>${opmaak}<t xml:space="preserve">${ontsnap(tekst)}</t></r>`);
+      }
+      if (!stukken.length) return "";
+      return `<c r="${verwijzing}"${s} t="inlineStr"><is>${stukken.join("")}</is></c>`;
     }
     const tekst = ontsnap(String(waarde).slice(0, MAX_CEL));
     return `<c r="${verwijzing}"${s} t="inlineStr"><is><t xml:space="preserve">${tekst}</t></is></c>`;

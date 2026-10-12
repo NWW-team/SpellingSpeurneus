@@ -350,7 +350,7 @@ def main():
         controle("er staat geen formule in het bestand", not list(blad.iter("{%s}f" % ns["m"])))
         rijen_xml = list(blad.iter("{%s}row" % ns["m"]))
         controle("kopregel plus alle rijen, in volgorde",
-                 [int(r.get("r")) for r in rijen_xml] == list(range(1, 306 + 1)), str(len(rijen_xml)))
+                 [int(r.get("r")) for r in rijen_xml] == list(range(1, 307 + 1)), str(len(rijen_xml)))
 
         def tekst(rij_nr, kolom):
             for c in rijen_xml[rij_nr - 1]:
@@ -369,7 +369,12 @@ def main():
         controle("een regeleinde blijft staan", tekst(5, "B") == "regel een\nregel twee")
         controle("een te lange tekst wordt afgekapt op de celgrens van Excel", len(tekst(6, "B")) == 32767)
         controle("het filter loopt over de hele tabel",
-                 blad.find("m:autoFilter", ns).get("ref") == "A1:D306")
+                 blad.find("m:autoFilter", ns).get("ref") == "A1:D307")
+        stukken = rijen_xml[306].findall("m:c", ns)[1].findall("m:is/m:r", ns)
+        vet = [r.find("m:rPr/m:b", ns) is not None for r in stukken]
+        controle("opgemaakte tekst: een stuk vet, de rest gewoon", vet == [False, True, False], str(vet))
+        controle("opgemaakte tekst blijft samen de hele zin",
+                 "".join(r.find("m:t", ns).text for r in stukken) == "Dat is nieet & <co goed.")
     else:
         print("  (Node ontbreekt: de controles op het Excel-bestand zijn overgeslagen)")
 

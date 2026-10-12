@@ -638,6 +638,17 @@ function exportBestandsnaam() {
   return `spelfouten-${deel}-${datum}${gefilterd ? "-gefilterd" : ""}.xlsx`;
 }
 
+// De zin in drie stukken, met het woord in het midden: zo kan de Excel het woord vet maken.
+// Hij zoekt het woord op dezelfde manier als markeer() voor de gele markering in het scherm.
+function zinMetVetWoord(zin, woord) {
+  // De crawler schrijft ’ als ', dus in de zin kan het woord met een andere apostrof staan.
+  const gezocht = woord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/'/g, "['\u2019]");
+  const treffer = new RegExp("(^|[^\\p{L}])(" + gezocht + ")(?![\\p{L}])", "u").exec(zin);
+  if (!treffer) return zin;
+  const begin = treffer.index + treffer[1].length;
+  return [zin.slice(0, begin), { tekst: treffer[2], vet: true }, zin.slice(begin + treffer[2].length)];
+}
+
 exportKnop.addEventListener("click", () => {
   downloadXlsx(exportBestandsnaam(), {
     werkblad: "Spelfouten",
@@ -647,7 +658,7 @@ exportKnop.addEventListener("click", () => {
       { titel: "Woord", breedte: 26 }, { titel: "Suggestie", breedte: 26 },
       { titel: "Opmerking", breedte: 40 },
     ],
-    rijen: zichtbaarVoorExport.map(b => [b.url, b.context, b.woord, "", ""]),
+    rijen: zichtbaarVoorExport.map(b => [b.url, zinMetVetWoord(b.context, b.woord), b.woord, "", ""]),
   });
 });
 
