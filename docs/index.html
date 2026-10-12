@@ -641,11 +641,13 @@ function exportBestandsnaam() {
 exportKnop.addEventListener("click", () => {
   downloadXlsx(exportBestandsnaam(), {
     werkblad: "Spelfouten",
+    // Suggestie en Opmerking blijven leeg: die vult de redacteur zelf in.
     kolommen: [
-      { titel: "Woord", breedte: 26 }, { titel: "Zin", breedte: 90 },
-      { titel: "Pagina", breedte: 60 },
+      { titel: "Pagina", breedte: 60 }, { titel: "Zin", breedte: 90 },
+      { titel: "Woord", breedte: 26 }, { titel: "Suggestie", breedte: 26 },
+      { titel: "Opmerking", breedte: 40 },
     ],
-    rijen: zichtbaarVoorExport.map(b => [b.woord, b.context, b.url]),
+    rijen: zichtbaarVoorExport.map(b => [b.url, b.context, b.woord, "", ""]),
   });
 });
 
