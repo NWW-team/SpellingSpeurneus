@@ -115,7 +115,8 @@ is goedgekeurd. Zonder filters is dat de hele lijst. De knop zegt hoeveel
 rijen erin komen; staat er een filter aan, dan eindigt de bestandsnaam op `-gefilterd`, bijvoorbeeld
 `spelfouten-visum-nederland-2026-10-02.xlsx`.
 
-De kolommen zijn Woord, Zin en Pagina (de URL). Sjabloonresten staan bovenaan. Bij **Namen** is geen
+De kolommen zijn Pagina (de URL), Zin, Woord, Suggestie en Opmerking. Suggestie en Opmerking
+blijven leeg: die vult de redacteur zelf in. In de Zin staat de spelfout vet. Sjabloonresten staan bovenaan. Bij **Namen** is geen
 download: die lijst is bedoeld om na te lopen in het scherm.
 
 Het bestand wordt in de browser gemaakt, zonder dat er iets naar een server gaat. Het heeft een vette

@@ -9,6 +9,8 @@ const rijen = [
   ["lang", "x".repeat(40000), "y", 1],
 ];
 for (let i = 0; i < 300; i++) rijen.push(["w" + i, "zin " + i, "https://x.nl/" + i, i]);
+// Opgemaakte tekst: een deel van de zin vet, met tekens die ontsnapt moeten worden.
+rijen.push(["vet", ["Dat is ", { tekst: "nieet & <co", vet: true }, " goed."], "", null]);
 require("fs").writeFileSync(process.argv[3], maakXlsx({
   werkblad: "Spel:fouten/Test[1]",
   kolommen: [
