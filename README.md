@@ -3,13 +3,17 @@
 Zoekt spelfouten op [nederlandwereldwijd.nl](https://www.nederlandwereldwijd.nl),
 wanneer de webredacteur daarom vraagt. Zie [STRATEGY.md](STRATEGY.md) voor het waarom
 en [OVERDRACHT.md](OVERDRACHT.md) voor de stand van zaken, de openstaande besluiten
-en wat je moet weten als je hieraan verder werkt.
+en wat je moet weten als je hieraan verder werkt (ook voor een nieuwe chat met Claude).
+
+Er is ook een **Engelstalige zusterapp**, [TypoTapir](https://github.com/NWW-team/TypoTapir), voor
+[netherlandsworldwide.nl](https://www.netherlandsworldwide.nl): een kopie van deze app met een Britse
+woordenlijst. Zie [OVERDRACHT.md](OVERDRACHT.md).
 
 **Resultaten bekijken:** https://nww-team.github.io/SpellingSpeurneus/ — zonder inlog. Zie [Toegang](#toegang).
 
 ## Hoe het werkt
 
-1. Je drukt in het scherm op **Crawl starten** en kiest een deel van de site. Een crawl
+1. Je kiest in het scherm de tab van een deel van de site en drukt in die tab op **Crawl starten**. Een crawl
    pakt altijd het hele deel; er is geen maximumaantal pagina's om in te stellen, ook niet bij
    de knop **Run workflow** van [de Crawl-workflow](../../actions/workflows/crawl.yml) in
    GitHub, waar alleen het deel te kiezen is. Er mag één crawl per dag via het scherm. Een
@@ -57,6 +61,10 @@ valt. Een deel toevoegen is één regel in `DELEN` in `scripts/crawl.py`, plus d
 de lijst in de workflow, in de Edge Function `crawl-starten`, in de controle op
 `crawl_aanvragen.bron` en in `DEEL_INFO` in `docs/index.html`. De overige pagina's van de
 site (alles buiten deze vier paden) zijn geen keuze.
+
+In het scherm heeft elk deel een eigen **tab**. Een tab toont de laatste crawl van dat deel, met eigen cijfers,
+spelfouten, namen en Excel. Bij het openen staat Reisadviezen open. De goedgekeurde woorden en namen gelden voor
+alle delen samen, en er mag één crawl per dag, ongeacht het deel.
 
 ## Spelfouten en namen
 
@@ -155,7 +163,7 @@ Geen installatie nodig; alleen Python 3.
 python3 scripts/crawl.py --bron demo --max-paginas 5     # fictieve pagina's, zonder netwerk
 python3 scripts/crawl.py --bron reisadvies --max-paginas 10   # ook: visum-nederland, caribisch-visum, ambassades
 python3 -m http.server --directory docs 8000             # scherm bekijken op localhost:8000
-python3 scripts/test.py                                  # 131 controles; --offline slaat het netwerk over
+python3 scripts/test.py                                  # 133 controles; --offline slaat het netwerk over
 ```
 
 Het scherm heeft Supabase nodig om iets te tonen; lokaal zie je zonder internet niets. Het resultaat van een lokale crawl in Supabase zetten kan met:
