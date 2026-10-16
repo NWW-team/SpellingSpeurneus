@@ -169,9 +169,10 @@ def main():
     controle("een ander deel hoort er niet bij", not valt_onder(SITE + "/visum-nederland/x", "/caribisch-visum"))
     controle("diep onderliggende pagina's horen erbij",
              valt_onder(SITE + "/reisadvies/albanie/regio/x", "/reisadvies"))
-    controle("er zijn drie delen met de gevraagde paden",
+    controle("er zijn vier delen met de gevraagde paden",
              DELEN == {"reisadvies": "/reisadvies", "visum-nederland": "/visum-nederland",
-                       "caribisch-visum": "/caribisch-visum"}, str(DELEN))
+                       "caribisch-visum": "/caribisch-visum",
+                       "afspraak-maken": "/afspraak-maken"}, str(DELEN))
     voorbeeld = [SITE + p for p in ("/reisadvies/albanie", "/visum-nederland/schengenvisum",
                                      "/caribisch-visum/kort-verblijf/a", "/reisadvies/albanie",
                                      "/reisadvies", "/over-ons")]
