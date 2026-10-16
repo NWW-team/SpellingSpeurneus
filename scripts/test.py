@@ -168,12 +168,10 @@ def main():
              not valt_onder(SITE + "/reisadvies-iets", "/reisadvies"))
     controle("een ander deel hoort er niet bij", not valt_onder(SITE + "/visum-nederland/x", "/caribisch-visum"))
     controle("diep onderliggende pagina's horen erbij",
-             valt_onder(SITE + "/contact/ambassades-consulaten-generaal/afghanistan/kabul",
-                        "/contact/ambassades-consulaten-generaal"))
-    controle("er zijn vier delen met de gevraagde paden",
+             valt_onder(SITE + "/reisadvies/albanie/regio/x", "/reisadvies"))
+    controle("er zijn drie delen met de gevraagde paden",
              DELEN == {"reisadvies": "/reisadvies", "visum-nederland": "/visum-nederland",
-                       "caribisch-visum": "/caribisch-visum",
-                       "ambassades": "/contact/ambassades-consulaten-generaal"}, str(DELEN))
+                       "caribisch-visum": "/caribisch-visum"}, str(DELEN))
     voorbeeld = [SITE + p for p in ("/reisadvies/albanie", "/visum-nederland/schengenvisum",
                                      "/caribisch-visum/kort-verblijf/a", "/reisadvies/albanie",
                                      "/reisadvies", "/over-ons")]
