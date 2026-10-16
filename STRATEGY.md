@@ -39,7 +39,7 @@ _Waarom het de aanpak dient:_ maakt de bevindingen bruikbaar voor de redacteur o
 
 ### Crawl starten, volgen en stoppen
 
-De redacteur kiest in het scherm een deel van de site (reisadviezen, visum voor Nederland, visum voor de Caribische Koninkrijksdelen, ambassades en consulaten), start de crawl, ziet de voortgang en kan hem stoppen. Er mag één crawl per dag.
+De redacteur kiest in het scherm een deel van de site (reisadviezen, visum voor Nederland, visum voor de Caribische Koninkrijksdelen), start de crawl, ziet de voortgang en kan hem stoppen. Er mag één crawl per dag.
 
 _Waarom het de aanpak dient:_ de redacteur beslist zelf wanneer er gecrawld wordt, zonder dat hij een GitHub-account of technische kennis nodig heeft. De limiet beschermt de site tegen te veel verkeer.
 

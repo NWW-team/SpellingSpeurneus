@@ -20,7 +20,7 @@ drukt op **Crawl starten**, volgt de voortgang, en loopt daarna de spelfouten en
 keurt hij goed; een naam die fout is, verplaatst hij naar de spelfouten; en de spelfouten kan hij als Excel
 downloaden. Er draait niets vanzelf.
 
-**Stand op 13 oktober.** Drie van de vier delen zijn gecrawld; Ambassades en consulaten nog niet.
+**Stand op 13 oktober.** Alle drie de delen zijn gecrawld.
 
 | Deel | Laatste crawl | Pagina's | Spelfouten | Namen |
 |---|---|---|---|---|
@@ -124,7 +124,6 @@ op het pad (`DELEN` in `crawl.py`).
 | Reisadviezen | `/reisadvies` | 236 | ja (8 oktober) |
 | Visum voor Nederland | `/visum-nederland` | 1.015 | ja (9 oktober) |
 | Visum voor Caribische Koninkrijksdelen | `/caribisch-visum` | 452 | ja (12 oktober) |
-| Ambassades en consulaten | `/contact/ambassades-consulaten-generaal` | 219 | nog niet |
 
 Een crawl pakt altijd het hele deel (er is geen maximumaantal; `crawl.py --max-paginas` bestaat nog voor
 lokaal testen, standaard 5000). "Overige pagina's" (de rest van de ±4.900) is geen keuze. Een deel
@@ -200,8 +199,7 @@ In volgorde van belang.
    inwoners, wat een groot deel van de valse twijfel wegneemt.
 5. **De visumcrawls zijn gedraaid, maar nog niet nagelopen.** Visum voor Nederland gaf 2.679 spelfouten, grotendeels
    goede samenstellingen die OpenTaal niet kent (zie "In het kort"). Goedkeuren van de top van de
-   lijst (`inwilligingsbrief` alleen al 864 keer) haalt het grootste deel weg. Daarna Ambassades en
-   consulaten crawlen, en een nieuwe crawl van de visumdelen om te zien wat er echt overblijft.
+   lijst (`inwilligingsbrief` alleen al 864 keer) haalt het grootste deel weg. Daarna een nieuwe crawl van de visumdelen om te zien wat er echt overblijft.
 6. **De 11 echte fouten die op 5 oktober nog op de site stonden** (zie "In het kort") opnieuw nakijken en naar
    de webredactie sturen. De sjabloonfout
    `undefined` op `reisadvies/estland`, die bij de sitebeheerder hoorde en niet bij de redactie, is
@@ -361,7 +359,7 @@ gemeld; een suggestie is een hint, geen oordeel.
 
 ## Wat er bewust niet in zit
 
-Grammatica, stijl en d/t-fouten · alle pagina's van de site in één run (alleen de vier delen) · continu of
+Grammatica, stijl en d/t-fouten · alle pagina's van de site in één run (alleen de drie delen) · continu of
 gepland scannen · meerdere talen · terugschrijven naar het CMS · inloggen, rollen of rechten per gebruiker ·
 bevindingen bewaren om trends over tijd te zien (de oude crawls staan er wel, maar het scherm toont alleen de
 nieuwste) · afgeschermde of interne pagina's · een maximumaantal pagina's per crawl.
