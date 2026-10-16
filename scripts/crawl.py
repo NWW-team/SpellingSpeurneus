@@ -35,6 +35,7 @@ DELEN = {
     "reisadvies": "/reisadvies",
     "visum-nederland": "/visum-nederland",
     "caribisch-visum": "/caribisch-visum",
+    "afspraak-maken": "/afspraak-maken",
 }
 SITEMAP_INDEX = f"{SITE}/sitemap.xml"
 

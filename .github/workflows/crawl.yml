@@ -9,7 +9,7 @@ on:
         description: "Welk deel van de site"
         type: choice
         default: reisadvies
-        options: [demo, reisadvies, visum-nederland, caribisch-visum]
+        options: [demo, reisadvies, visum-nederland, caribisch-visum, afspraak-maken]
       aanvraag_id:
         description: "Id van de aanvraag in Supabase (door het scherm ingevuld, voor de voortgangsbalk)"
         default: ""
