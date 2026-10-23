@@ -54,13 +54,14 @@ Je kiest een deel van de site; alles onder dat pad hoort erbij.
 | Visum voor Nederland | `/visum-nederland` | 1.015 |
 | Visum voor Caribische Koninkrijksdelen | `/caribisch-visum` | 452 |
 | Afspraak maken | `/afspraak-maken` | 219 |
+| Paspoort of ID-kaart | `/paspoort-id-kaart` | 686 |
 
 De pagina's staan verspreid over de sitemaps van de site (de visumpagina's zitten in de
 grote `paginas`-sitemap), dus de crawler leest ze allemaal en houdt over wat onder het pad
 valt. Een deel toevoegen is één regel in `DELEN` in `scripts/crawl.py`, plus dezelfde naam in
 de lijst in de workflow, in de Edge Function `crawl-starten`, in de controle op
 `crawl_aanvragen.bron` en in `DEEL_INFO` in `docs/index.html`. De overige pagina's van de
-site (alles buiten deze vier paden) zijn geen keuze.
+site (alles buiten deze vijf paden) zijn geen keuze.
 
 In het scherm heeft elk deel een eigen **tab**. Een tab toont de laatste crawl van dat deel, met eigen cijfers,
 spelfouten, namen en Excel. Bij het openen staat Reisadviezen open. De goedgekeurde woorden en namen gelden voor
@@ -161,7 +162,7 @@ Geen installatie nodig; alleen Python 3.
 
 ```bash
 python3 scripts/crawl.py --bron demo --max-paginas 5     # fictieve pagina's, zonder netwerk
-python3 scripts/crawl.py --bron reisadvies --max-paginas 10   # ook: visum-nederland, caribisch-visum, afspraak-maken
+python3 scripts/crawl.py --bron reisadvies --max-paginas 10   # ook: visum-nederland, caribisch-visum, afspraak-maken, paspoort-id-kaart
 python3 -m http.server --directory docs 8000             # scherm bekijken op localhost:8000
 python3 scripts/test.py                                  # 133 controles; --offline slaat het netwerk over
 ```

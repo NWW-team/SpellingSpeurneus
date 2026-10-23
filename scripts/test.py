@@ -18,8 +18,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from plaatsnamen import Plaatsnamen, afstand, samenvatting, tokens  # noqa: E402
 from voortgang import meld  # noqa: E402
-from crawl import (DELEN, SITE, alle_sitemap_urls, is_bekend, urls_van_deel, valt_onder, verplaats_namen, lees_goedgekeurd,  # noqa: E402
-                   maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
+from crawl import (DELEN, SITE, alle_sitemap_urls, is_bekend, is_webadres, urls_van_deel, valt_onder, verplaats_namen, lees_goedgekeurd,  # noqa: E402
+                   lijkt_op_typfout, maak_robots_controle, naar_patroon, soort_van, tekst_uit_main,
                    zoek_fouten)
 
 WORTEL = Path(__file__).resolve().parent.parent
@@ -56,11 +56,16 @@ def main():
     offline = "--offline" in sys.argv
     tijdelijk = Path(tempfile.mkdtemp())
 
+    # Gewone woorden in de woordenlijst, zoals in de echte lijst. Met een lege lijst is elk woord
+    # onbekend en geldt een zin als anderstalig citaat (zie "tros" in zoek_fouten).
+    gewoon = {"een", "persoon", "of", "laat", "weten", "wijs", "de", "erop", "stuur",
+              "mail", "naar", "vandaag", "het", "u", "bij", "voor", "is", "zijn"}
+
     def woorden_in(zin):
-        return [b["woord"] for b in zoek_fouten(zin, set())]
+        return [b["woord"] for b in zoek_fouten(zin, set(gewoon))]
 
     def woorden_in_met(zin, toegestaan):
-        return [b["woord"] for b in zoek_fouten(zin, toegestaan)]
+        return [b["woord"] for b in zoek_fouten(zin, toegestaan | gewoon)]
 
 
     print("De drie ingebouwde fouten in demo/")
@@ -169,10 +174,11 @@ def main():
     controle("een ander deel hoort er niet bij", not valt_onder(SITE + "/visum-nederland/x", "/caribisch-visum"))
     controle("diep onderliggende pagina's horen erbij",
              valt_onder(SITE + "/reisadvies/albanie/regio/x", "/reisadvies"))
-    controle("er zijn vier delen met de gevraagde paden",
+    controle("er zijn vijf delen met de gevraagde paden",
              DELEN == {"reisadvies": "/reisadvies", "visum-nederland": "/visum-nederland",
                        "caribisch-visum": "/caribisch-visum",
-                       "afspraak-maken": "/afspraak-maken"}, str(DELEN))
+                       "afspraak-maken": "/afspraak-maken",
+                       "paspoort-id-kaart": "/paspoort-id-kaart"}, str(DELEN))
     voorbeeld = [SITE + p for p in ("/reisadvies/albanie", "/visum-nederland/schengenvisum",
                                      "/caribisch-visum/kort-verblijf/a", "/reisadvies/albanie",
                                      "/reisadvies", "/over-ons")]
@@ -532,19 +538,54 @@ def main():
     controle("onzin blijft onbekend", not is_bekend("radiotaxy's", woordjes))
 
     print("\nWoorden uit een zin halen")
-    def woorden_in(zin):
-        return [b["woord"] for b in zoek_fouten(zin, set())]
-
-    def woorden_in_met(zin, toegestaan):
-        return [b["woord"] for b in zoek_fouten(zin, toegestaan)]
     controle("weglatingsstreepje", "Nood" in woorden_in("Nood- of crisissituatie."))
     controle("schuine streep splitst",
-             woorden_in("Laat familie/vrienden weten.")[1:3] == ["familie", "vrienden"])
+             woorden_in("Laat familie/vrienden weten.") == ["familie", "vrienden"])
     controle("haakje middenin splitst", "chauffeur" in woorden_in("Wijs de (bus)chauffeur erop."))
     controle("koppelteken blijft heel", "e-mail" in woorden_in("Stuur een e-mail."))
     controle("e-mailadres wordt overgeslagen",
              not any("@" in w for w in woorden_in("Mail naar iemand@voorbeeld.nl vandaag.")))
     controle("onzichtbare tekens weg", "adres" in woorden_in("Het a\u200bdres."))
+
+    print("\nAnderstalige citaten, webadressen en ander schrift")
+    nl = {"de", "het", "een", "u", "uw", "paspoort", "kaart", "aanvragen", "aangevraagd", "wordt",
+          "gewoon", "en", "of", "bij", "dat", "vraagt", "aan", "kijk", "op", "voor", "meer",
+          "informatie", "gelegaliseerd", "daarna", "nog", "laat", "ga", "naar", "neem", "is", "nodig"}
+
+    def fouten_in(zin):
+        teller = {}
+        return [b["woord"] for b in zoek_fouten(zin, nl, teller)], teller
+
+    citaat = "U vraagt de acte de naissance complète aan."
+    controle("Grieks schrift is nooit een spelfout",
+             fouten_in("U vraagt \u0391\u03c0\u03bf\u03c3\u03c0\u03ac\u03c3\u03bc\u03b1 aan.")[0] == [])
+    controle("accenten blijven Latijns", fouten_in("Het caf\u00e9 is gewoon.")[0] == ["caf\u00e9"])
+    controle("een tros van drie onbekende woorden valt weg", fouten_in(citaat)[0] == [])
+    controle("de tros wordt geteld", fouten_in(citaat)[1].get("tros") == 3, str(fouten_in(citaat)))
+    controle("één typfout blijft gemeld", fouten_in("Uw paspoort wordt gewoom aangevraagd.")[0] == ["gewoom"])
+    controle("twee typfouten dicht bij elkaar blijven gemeld",
+             fouten_in("Uw paspoortt wordt gewoom aangevraagd.")[0] == ["paspoortt", "gewoom"])
+    controle("drie typfouten ver uit elkaar blijven gemeld",
+             fouten_in("Uw paspoortt wordt gewoon aangevraagd en daarna nog gewoom gelegaliseerd, laatr.")[0]
+             == ["paspoortt", "gewoom", "laatr"])
+    controle("een woord met één letter verschil blijft gemeld, ook in een tros",
+             "paspoortt" in fouten_in("U vraagt de acte de naissance paspoortt aan.")[0]
+             and "naissance" not in fouten_in("U vraagt de acte de naissance paspoortt aan.")[0])
+    controle("namen met een hoofdletter tellen niet mee voor de tros",
+             fouten_in("Ga naar Rijswijk Zoetermeer Voorburg voor het paspoort.")[0]
+             == ["Rijswijk", "Zoetermeer", "Voorburg"])
+    controle("www-adres wordt overgeslagen", fouten_in("Kijk op www.rijksoverheid.nl voor meer informatie.")[0] == [])
+    controle("domein met bekende uitgang wordt overgeslagen", is_webadres("ambassade.org"))
+    controle("http(s)-adres wordt overgeslagen",
+             fouten_in("Kijk op https://ambassade.org/aanvragen voor meer.")[0] == [])
+    controle("uitgang die ook een woord is telt niet zomaar", not is_webadres("kaart.de"))
+    controle("... maar wel achter een andere uitgang of www.",
+             is_webadres("ministerie.gov.it") and is_webadres("www.ministerie.it"))
+    controle("een vergeten spatie blijft een fout", not is_webadres("ID-card.This"))
+    controle("webadressen worden geteld", fouten_in("Kijk op www.x.nl voor meer.")[1].get("webadres") == 1)
+    controle("lijkt_op_typfout: één letter verschil vanaf vijf letters",
+             lijkt_op_typfout("paspoortt", {"paspoort"}) and lijkt_op_typfout("paspoot", {"paspoort"})
+             and not lijkt_op_typfout("kaar", {"kaart"}) and not lijkt_op_typfout("naissance", {"paspoort"}))
 
     if offline:
         print("\n(robots.txt tegen de echte site overgeslagen: --offline)")

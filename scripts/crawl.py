@@ -36,6 +36,7 @@ DELEN = {
     "visum-nederland": "/visum-nederland",
     "caribisch-visum": "/caribisch-visum",
     "afspraak-maken": "/afspraak-maken",
+    "paspoort-id-kaart": "/paspoort-id-kaart",
 }
 SITEMAP_INDEX = f"{SITE}/sitemap.xml"
 
@@ -50,6 +51,19 @@ SPLITSERS = re.compile(r"[\s/()\[\]]+")
 # Een punt middenin een woord wijst op een vergeten spatie, behalve bij een
 # webadres. Deze staarten laten we daarom met rust.
 DOMEINEN = (".com", ".nl", ".org", ".net", ".eu", ".gov", ".int")
+# Webadressen: nooit een spelfout. Uitgangen die ook een gewoon woord zijn ("it", "be", "de")
+# tellen alleen na "www." of na een andere uitgang ("gov.it", "co.at"). Zo blijft
+# "kaart.de" (vergeten spatie) een fout, en "ID-card.This" ook: een uitgang telt alleen in
+# kleine letters.
+UITGANGEN = ("com", "nl", "org", "net", "eu", "gov", "int", "edu", "info", "uk", "fr", "es",
+             "gr", "tr", "se", "ch", "io", "co")
+TWEEDUITGANGEN = ("it", "no", "us", "at", "be", "de")
+# Een tros: drie onbekende woorden binnen vijf opeenvolgende woorden. Dat is vrijwel altijd
+# een anderstalig citaat (een documentnaam in de taal van het land), geen reeks typfouten.
+TROS_AANTAL = 3
+TROS_VENSTER = 5
+# Letters waarmee we een woord met één letter verschil bij een bekend woord zoeken.
+ALFABET = "abcdefghijklmnopqrstuvwxyzàáâäçèéêëìíîïñòóôöùúûü"
 # Resten van het sjabloon of het CMS die zichtbaar in de tekst staan. Op
 # reisadvies/estland stond zo het woord "undefined" boven aan de pagina.
 #
@@ -254,6 +268,45 @@ def is_plakfout(woord):
     return not all(len(deel) == 1 for deel in delen)
 
 
+def is_webadres(woord):
+    """Zegt of het woord een webadres is: www., http(s) of een domein met bekende uitgang."""
+    laag = woord.lower()
+    if laag in ("http", "https") or laag.startswith(("www.", "http://", "https://")):
+        return True
+    delen = woord.split(".")
+    if len(delen) < 2 or not all(delen):
+        return False
+    uitgang = delen[-1]
+    if uitgang in UITGANGEN:
+        return True
+    return uitgang in TWEEDUITGANGEN and len(delen) >= 3 and delen[-2] in UITGANGEN
+
+
+def ander_schrift(woord):
+    """Letters buiten het Latijnse schrift (Grieks, Cyrillisch, Arabisch, ...); accenten blijven Latijns."""
+    return any(teken.isalpha() and ord(teken) > 0x24F for teken in woord)
+
+
+def lijkt_op_typfout(woord, toegestaan):
+    """Zegt of het woord één letter verschilt van een bekend woord (lengte vanaf 5).
+
+    Zo'n woord in een tros is eerder een typfout dan een anderstalig citaat ("firts"
+    naast "first"), dus het blijft gemeld.
+    """
+    laag = woord.lower()
+    if len(laag) < 5:
+        return False
+    for i in range(len(laag) + 1):
+        for letter in ALFABET:
+            if laag[:i] + letter + laag[i:] in toegestaan:
+                return True
+            if i < len(laag) and letter != laag[i] and laag[:i] + letter + laag[i + 1:] in toegestaan:
+                return True
+        if i < len(laag) and laag[:i] + laag[i + 1:] in toegestaan:
+            return True
+    return False
+
+
 def soort_van(woord, zin):
     """Deelt een bevinding in: 'spelfout' of 'naam'.
 
@@ -278,14 +331,21 @@ def soort_van(woord, zin):
     return "spelfout"
 
 
-def zoek_fouten(tekst, toegestaan):
+def zoek_fouten(tekst, toegestaan, teller=None):
     """Geeft per onbekend woord een bevinding met de zin eromheen.
 
     `toegestaan` is de woordenlijst en de goedgekeurde woorden bij elkaar. Door ze
     samen te nemen klopt ook een samenstelling die beide combineert, zoals
     "lhbtiq+-vriendelijke": het eerste deel komt uit onze eigen lijst, het
     tweede uit de woordenlijst.
+
+    Overgeslagen woorden (ander schrift, webadressen, tros) worden geteld in `teller`
+    (een dict) als die is meegegeven; de woorden zelf bewaren we niet.
     """
+    def tel(reden):
+        if teller is not None:
+            teller[reden] = teller.get(reden, 0) + 1
+
     bevindingen = []
     gezien = set()
     for zin in re.split(r"(?<=[.!?])\s+", tekst):
@@ -302,6 +362,9 @@ def zoek_fouten(tekst, toegestaan):
         # opdelen. Anders meldt de app "de&nbsp;grens" nog een keer naast het
         # "&nbsp;" dat er de oorzaak van is. De zin zelf blijft heel: die gaat
         # ongewijzigd als context mee.
+        # Per woord in de zin: (bevinding, telt_mee_voor_tros). Bekende woorden staan er
+        # ook in (met None), want de tros is een telling binnen opeenvolgende woorden.
+        reeks = []
         for ruw in SPLITSERS.split(SJABLOONRESTEN.sub(" ", zin)):
             woord = ruw.translate(ONZICHTBAAR).replace("’", "'").strip(LEESTEKENS)
             if not woord or not any(teken.isalpha() for teken in woord):
@@ -310,14 +373,36 @@ def zoek_fouten(tekst, toegestaan):
                 continue  # versienummers, jaartallen, codes
             if "@" in woord:
                 continue  # e-mailadressen
+            if ander_schrift(woord):
+                tel("ander schrift")
+                continue
+            if is_webadres(woord):
+                tel("webadres")
+                continue
             if is_bekend(woord, toegestaan):
+                reeks.append((None, False))
                 continue
             sleutel = (woord, zin)
             if sleutel in gezien:
                 continue
             gezien.add(sleutel)
-            bevindingen.append({"woord": woord, "soort": soort_van(woord, zin),
-                                "context": kort(zin)})
+            soort = soort_van(woord, zin)
+            reeks.append(({"woord": woord, "soort": soort, "context": kort(zin)},
+                          soort == "spelfout"))
+        # Een onbekend woord (geen naam) in een tros valt weg, tenzij het op een typfout lijkt.
+        in_tros = set()
+        for begin in range(max(1, len(reeks) - TROS_VENSTER + 1)):
+            venster = range(begin, min(begin + TROS_VENSTER, len(reeks)))
+            onbekend = [i for i in venster if reeks[i][1]]
+            if len(onbekend) >= TROS_AANTAL:
+                in_tros.update(onbekend)
+        for i, (bevinding, telt_mee) in enumerate(reeks):
+            if bevinding is None:
+                continue
+            if i in in_tros and not lijkt_op_typfout(bevinding["woord"], toegestaan):
+                tel("tros")
+                continue
+            bevindingen.append(bevinding)
     return bevindingen
 
 
@@ -422,6 +507,7 @@ def main():
     paginas = verzamel_paginas(argumenten.bron, argumenten.max_paginas, argumenten.pauze,
                                totaal_bekend)
     overgeslagen = []
+    overgeslagen_woorden = {}
     while True:
         try:
             url, pagina_html = next(paginas)
@@ -437,9 +523,12 @@ def main():
             print(f"  geen <main> gevonden: {url}")
             continue
         titel = titel_uit(pagina_html)
-        for bevinding in zoek_fouten(tekst, toegestaan):
+        for bevinding in zoek_fouten(tekst, toegestaan, overgeslagen_woorden):
             bevindingen.append({"url": url, "titel": titel, **bevinding})
 
+    if overgeslagen_woorden:
+        print("Woorden overgeslagen: " + ", ".join(f"{aantal} ({reden})" for reden, aantal
+                                                    in sorted(overgeslagen_woorden.items())) + ".")
     verplaatst = verplaats_namen(bevindingen, lees_goedgekeurd(argumenten.naam_is_spelfout))
     if verplaatst:
         print(f"{verplaatst} bevindingen van namen die de redactie als spelfout heeft aangewezen.")
