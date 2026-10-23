@@ -3,11 +3,14 @@
 Wat een volgende sessie of collega moet weten om hier verder te kunnen. Voor hoe de app werkt voor
 wie hem gebruikt: zie [README.md](README.md). Voor het waarom: [STRATEGY.md](STRATEGY.md).
 
-Laatst bijgewerkt: **13 oktober 2026**.
+Laatst bijgewerkt: **23 oktober 2026**.
 
 Op 5 oktober is dit document helemaal herschreven; op 13 oktober is het bijgewerkt voor wat er sindsdien
 veranderd is (zie [Wat er sinds 5 oktober is veranderd](#wat-er-sinds-5-oktober-is-veranderd)). **Er is ook
 een Engelstalige zusterapp bijgekomen: TypoTapir** (zie [TypoTapir](#typotapir-de-engelstalige-zusterapp)).
+Op 23 oktober zijn de tabs Afspraak maken en Paspoort of ID-kaart erbij gekomen, is Ambassades en consulaten
+vervallen en filtert de toets nu anderstalige citaten en webadressen weg (zie
+[Wat er sinds 13 oktober is veranderd](#wat-er-sinds-13-oktober-is-veranderd)).
 Wil je in een nieuwe chat met Claude doorwerken? Begin dan bij
 [Verder werken in een nieuwe chat](#verder-werken-in-een-nieuwe-chat).
 
@@ -20,16 +23,21 @@ drukt op **Crawl starten**, volgt de voortgang, en loopt daarna de spelfouten en
 keurt hij goed; een naam die fout is, verplaatst hij naar de spelfouten; en de spelfouten kan hij als Excel
 downloaden. Er draait niets vanzelf.
 
-**Stand op 13 oktober.** Drie van de vijf delen zijn gecrawld; Afspraak maken en Paspoort of ID-kaart nog niet.
+**Stand op 23 oktober.** Alle vijf delen zijn gecrawld.
 
 | Deel | Laatste crawl | Pagina's | Spelfouten | Namen |
 |---|---|---|---|---|
 | Reisadviezen | 8 oktober | 236 | 43 | 1.801 |
 | Visum voor Nederland | 9 oktober | 1.015 | 2.679 | 1.279 |
 | Visum voor Caribische Koninkrijksdelen | 12 oktober | 452 | 46 | 564 |
+| Afspraak maken | 19 oktober | 219 | 665 | 1.376 |
+| Paspoort of ID-kaart | 23 oktober | 686 | 1.155 | 1.622 |
 
-In de database staan 11 crawls (25.878 bevindingen), 924 actieve goedgekeurde woorden en namen en 60 namen die
-als spelfout zijn aangewezen. Het scherm toont per deel de laatste crawl.
+De tab Ambassades en consulaten is op 16 oktober weggehaald (na een crawl met 0 spelfouten en 44 namen). Die
+crawl staat nog in de database; het scherm toont hem niet meer.
+
+In de database staan 14 crawls (30.740 bevindingen) en 1.184 actieve goedgekeurde woorden en namen, plus de
+namen die als spelfout zijn aangewezen. Het scherm toont per deel de laatste crawl.
 
 **Wat die cijfers betekenen.** De 2.679 spelfouten bij Visum voor Nederland zijn grotendeels
 valse meldingen: goede Nederlandse samenstellingen die OpenTaal niet kent (`inwilligingsbrief` 864 keer,
@@ -63,6 +71,28 @@ correctie op de site, en niet door Goedkeuren, is het doel van de app.
 - **Opgeruimd:** een dode CSS-regel, de exportcode van twee downloads naar één, README en OVERDRACHT
   bijgewerkt, de standaardwaarde van `--uit` in `crawl.py` is nu `resultaten.json` (zoals de workflow doet).
 - **Controles:** 133 (`python3 scripts/test.py --offline`).
+
+## Wat er sinds 13 oktober is veranderd
+
+- **Ambassades en consulaten is weg** (16 oktober): uit het scherm, `DELEN`, de workflow, `crawl-starten` en de
+  tests. In de databasecheck op `crawl_aanvragen.bron` blijft `ambassades` staan, zodat de oude crawl en aanvraag
+  geldig blijven.
+- **Nieuwe tabs:** Afspraak maken (`/afspraak-maken`, 219 pagina's, 19 oktober gecrawld) en Paspoort of ID-kaart
+  (`/paspoort-id-kaart`, 686 pagina's, 23 oktober). Elk met een migratie voor de bronnenlijst
+  (`20261016000000_…`, `20261023000000_…`), toegepast in Supabase, en `crawl-starten` opnieuw gedeployd (versie 9).
+  De pagina's `/reizen-paspoort-id-kaart/…` vallen buiten het deel: het pad begint anders.
+- **Filter tegen anderstalige citaten en webadressen** in `zoek_fouten` (`scripts/crawl.py`). Het kwam uit
+  TypoTapir, waar de paspoortpagina's vol citaten in de taal van het land staan, en geldt voor alle delen, maar pas
+  bij een nieuwe crawl. De bestaande crawls zijn dus niet nagelopen met dit filter. Zie
+  "Hoe de toets werkt" voor de regels.
+- **Resultaat van de eerste crawls met het filter:** Afspraak maken 665 spelfouten, waarvan vooral samenstellingen
+  die OpenTaal niet kent (`huwelijksbevoegdheid` 147 pagina's, `optieprocedure` en `optieverklaring` elk 95).
+  Paspoort of ID-kaart 1.155 spelfouten; de top bestaat uit sjabloon- en menuwoorden die op bijna elke pagina
+  staan (`fotomatrix` 217 pagina's, `filtertool` 210) en uit losse Engelse en Franse woorden (`shipping`,
+  `instructions`, `personbevis`). Goedkeuren van de top haalt het grootste deel weg; een echte typfout daartussen
+  is `geleganiseerde`. De drempels (3 onbekende woorden binnen 5) zijn niet apart afgeregeld.
+- **Controles:** 150 (`python3 scripts/test.py --offline`). Testzinnen krijgen gewone woorden mee in de
+  woordenlijst (`gewoon` in `test.py`); met een lege lijst is elk woord onbekend en telt elke zin als citaat.
 
 ## Hoe het in elkaar zit
 
@@ -124,8 +154,8 @@ op het pad (`DELEN` in `crawl.py`).
 | Reisadviezen | `/reisadvies` | 236 | ja (8 oktober) |
 | Visum voor Nederland | `/visum-nederland` | 1.015 | ja (9 oktober) |
 | Visum voor Caribische Koninkrijksdelen | `/caribisch-visum` | 452 | ja (12 oktober) |
-| Afspraak maken | `/afspraak-maken` | 219 | nog niet |
-| Paspoort of ID-kaart | `/paspoort-id-kaart` | 686 | nog niet |
+| Afspraak maken | `/afspraak-maken` | 219 | ja (19 oktober) |
+| Paspoort of ID-kaart | `/paspoort-id-kaart` | 686 | ja (23 oktober) |
 
 Een crawl pakt altijd het hele deel (er is geen maximumaantal; `crawl.py --max-paginas` bestaat nog voor
 lokaal testen, standaard 5000). "Overige pagina's" (de rest van de ±4.900) is geen keuze. Een deel
@@ -199,9 +229,10 @@ In volgorde van belang.
 4. **De plaatsnamencheck bijstellen** (voorstel, nog niet gedaan; zie "Plaatsnamen" hieronder). Verwacht:
    Nederlandse woorden in een naam overslaan en suggesties beperken tot plaatsen vanaf ±100.000
    inwoners, wat een groot deel van de valse twijfel wegneemt.
-5. **De visumcrawls zijn gedraaid, maar nog niet nagelopen.** Visum voor Nederland gaf 2.679 spelfouten, grotendeels
+5. **De visumcrawls en de twee nieuwste delen zijn gedraaid, maar nog niet nagelopen.** Visum voor Nederland gaf 2.679 spelfouten, grotendeels
    goede samenstellingen die OpenTaal niet kent (zie "In het kort"). Goedkeuren van de top van de
-   lijst (`inwilligingsbrief` alleen al 864 keer) haalt het grootste deel weg. Daarna een nieuwe crawl van de visumdelen om te zien wat er echt overblijft.
+   lijst (`inwilligingsbrief` alleen al 864 keer) haalt het grootste deel weg. Hetzelfde geldt voor Afspraak maken en Paspoort of ID-kaart (zie "Wat er sinds 13 oktober is veranderd").
+   Daarna een nieuwe crawl om te zien wat er echt overblijft.
 6. **De 11 echte fouten die op 5 oktober nog op de site stonden** (zie "In het kort") opnieuw nakijken en naar
    de webredactie sturen. De sjabloonfout
    `undefined` op `reisadvies/estland`, die bij de sitebeheerder hoorde en niet bij de redactie, is
@@ -300,6 +331,24 @@ Gevolgen die je moet kennen:
 - **Sjabloonresten** (`undefined`, `[object Object]`, `{{titel}}`, `&nbsp;`) worden altijd gemeld, bovenaan.
   Het scherm toont ze met een eigen vakje; `SJABLOONRESTEN` in `crawl.py` en `SJABLOONREST` in
   `docs/index.html` moeten gelijk blijven.
+- **Filter tegen anderstalige citaten en webadressen** (`zoek_fouten`; de regels staan als constanten bovenin
+  `crawl.py`):
+  1. *Ander schrift:* een woord met letters boven U+024F (Grieks, Cyrillisch, Arabisch, …) is nooit een
+     spelfout. Accenten blijven Latijns.
+  2. *Tros:* drie onbekende woorden binnen vijf opeenvolgende woorden gelden als anderstalig citaat en vallen weg
+     (`TROS_AANTAL`, `TROS_VENSTER`). Alleen woorden die als spelfout zijn ingedeeld; namen met een hoofdletter
+     tellen niet mee en vallen niet weg.
+  3. *Uitzondering `lijkt_op_typfout`:* een woord in een tros blijft gemeld als het één letter verschilt van een
+     bekend woord (vanaf vijf letters), want dat is eerder een typfout dan een citaat. De Engelse varianten die
+     TypoTapir daarnaast kent (z→s, or→our, er→re) bestaan hier niet.
+  4. *Webadressen* (`is_webadres`): `www.`, `http(s)` en een domein met een bekende uitgang in kleine letters
+     worden overgeslagen. Uitgangen die ook een woord zijn (`it`, `no`, `us`, `at`, `be`, `de`) tellen alleen na
+     `www.` of na een andere uitgang (`gov.it`); zo blijft `kaart.de` (vergeten spatie) een fout. `ID-card.This`
+     blijft een fout, want de uitgang telt alleen in kleine letters.
+  5. Het logboek van de run meldt aan het eind hoeveel woorden zijn overgeslagen, per reden ("Woorden
+     overgeslagen: …"). De woorden zelf worden niet bewaard.
+  Bijwerkingen: drie echte typfouten vlak naast elkaar kunnen wegvallen, en een typfout binnen een webadres
+  wordt niet meer gevonden. Nog niet gemeten met de echte OpenTaal-lijst op een volledige crawl.
 - **Anderstalige woorden zonder hoofdletter** (`and`, `for`, `travel`) staan bij de spelfouten. Ze zijn op
   15 september door de redactie goedgekeurd, met als gevolg dat een Engels woord middenin een Nederlandse
   zin nooit meer opvalt; dat is hun keuze. Voor nieuwe gevallen geldt hetzelfde.
@@ -351,7 +400,8 @@ gemeld; een suggestie is een hint, geen oordeel.
   na een tijd zonder gebruik; dat is een aanname. Controleer bij vreemd gedrag eerst de projectstatus.
 - **Alleen de tekst in `<main>`** wordt gelezen. Menu's, voetteksten en cookiemeldingen blijven buiten
   beeld. Verandert de site van structuur, dan is dit de aanname die als eerste breekt. Eén taal: komen er
-  anderstalige pagina's, dan meldt de app ze als één grote fout.
+  anderstalige pagina's, dan meldt de app ze als één grote fout. Anderstalige citaten *binnen* een
+  Nederlandse pagina filtert de tros-regel grotendeels weg (zie "Hoe de toets werkt").
 - **Een crawl over een deel waar de sitemaps geen enkele URL meer voor hebben** stopt met een foutmelding,
   in plaats van stil niets te doen.
 - Een late melding van de runner kan een gestopte of mislukte aanvraag niet meer op "crawlen" zetten (de

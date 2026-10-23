@@ -133,6 +133,20 @@ kopregel, een bevroren kopregel en filterknoppen. Alles is tekst, dus een woord 
 begint blijft tekst en wordt nooit een formule. De schrijver staat in
 [`docs/xlsx.js`](docs/xlsx.js), zonder externe bibliotheek.
 
+## Anderstalige citaten en webadressen
+
+Sommige pagina's (vooral Paspoort of ID-kaart) citeren officiële documentnamen in de taal van het land, vaak
+tussen haakjes. Een Nederlandse woordenlijst ziet elk zo'n woord als fout. Daarom slaat de crawl over:
+
+- woorden in een **ander schrift** (Grieks, Cyrillisch, Arabisch, …), want dat is nooit een spelfout;
+- een **tros**: drie onbekende woorden binnen vijf opeenvolgende woorden, behalve een woord dat één letter
+  verschilt van een bekend woord (dat is eerder een typfout). Namen met een hoofdletter doen hier niet aan mee;
+- **webadressen** (`www.…`, `http(s)…` en domeinen als `.nl` of `.org`).
+
+Een vergeten spatie (`ID-card.This`) blijft een fout. Aan het eind van de crawl staat in het logboek
+hoeveel woorden zijn overgeslagen. De regels staan bovenin `scripts/crawl.py` (`TROS_AANTAL`, `TROS_VENSTER`).
+Een nadeel: drie echte typfouten vlak naast elkaar kunnen ook wegvallen.
+
 ## Vals alarm wegwerken
 
 Meldt de app een woord of naam die gewoon goed is? Klik op **Goedkeuren**. Het verdwijnt uit
