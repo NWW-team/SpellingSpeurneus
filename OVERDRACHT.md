@@ -3,7 +3,7 @@
 Wat een volgende sessie of collega moet weten om hier verder te kunnen. Voor hoe de app werkt voor
 wie hem gebruikt: zie [README.md](README.md). Voor het waarom: [STRATEGY.md](STRATEGY.md).
 
-Laatst bijgewerkt: **23 oktober 2026**.
+Laatst bijgewerkt: **27 oktober 2026**.
 
 Op 5 oktober is dit document helemaal herschreven; op 13 oktober is het bijgewerkt voor wat er sindsdien
 veranderd is (zie [Wat er sinds 5 oktober is veranderd](#wat-er-sinds-5-oktober-is-veranderd)). **Er is ook
@@ -23,7 +23,7 @@ drukt op **Crawl starten**, volgt de voortgang, en loopt daarna de spelfouten en
 keurt hij goed; een naam die fout is, verplaatst hij naar de spelfouten; en de spelfouten kan hij als Excel
 downloaden. Er draait niets vanzelf.
 
-**Stand op 23 oktober.** Alle vijf delen zijn gecrawld.
+**Stand op 27 oktober.** Vijf van de zes delen zijn gecrawld; Consulaire verklaring nog niet.
 
 | Deel | Laatste crawl | Pagina's | Spelfouten | Namen |
 |---|---|---|---|---|
@@ -85,6 +85,8 @@ correctie op de site, en niet door Goedkeuren, is het doel van de app.
   TypoTapir, waar de paspoortpagina's vol citaten in de taal van het land staan, en geldt voor alle delen, maar pas
   bij een nieuwe crawl. De bestaande crawls zijn dus niet nagelopen met dit filter. Zie
   "Hoe de toets werkt" voor de regels.
+- **Nieuwe tab Consulaire verklaring** (27 oktober, `/verklaring`, 728 pagina's), met migratie
+  `20261027000000_deel_verklaring.sql`. Nog niet gecrawld.
 - **Resultaat van de eerste crawls met het filter:** Afspraak maken 665 spelfouten, waarvan vooral samenstellingen
   die OpenTaal niet kent (`huwelijksbevoegdheid` 147 pagina's, `optieprocedure` en `optieverklaring` elk 95).
   Paspoort of ID-kaart 1.155 spelfouten; de top bestaat uit sjabloon- en menuwoorden die op bijna elke pagina
@@ -156,6 +158,7 @@ op het pad (`DELEN` in `crawl.py`).
 | Visum voor Caribische Koninkrijksdelen | `/caribisch-visum` | 452 | ja (12 oktober) |
 | Afspraak maken | `/afspraak-maken` | 219 | ja (19 oktober) |
 | Paspoort of ID-kaart | `/paspoort-id-kaart` | 686 | ja (23 oktober) |
+| Consulaire verklaring | `/verklaring` | 728 | nog niet |
 
 Een crawl pakt altijd het hele deel (er is geen maximumaantal; `crawl.py --max-paginas` bestaat nog voor
 lokaal testen, standaard 5000). "Overige pagina's" (de rest van de ±4.900) is geen keuze. Een deel
@@ -411,7 +414,7 @@ gemeld; een suggestie is een hint, geen oordeel.
 
 ## Wat er bewust niet in zit
 
-Grammatica, stijl en d/t-fouten · alle pagina's van de site in één run (alleen de vijf delen) · continu of
+Grammatica, stijl en d/t-fouten · alle pagina's van de site in één run (alleen de zes delen) · continu of
 gepland scannen · meerdere talen · terugschrijven naar het CMS · inloggen, rollen of rechten per gebruiker ·
 bevindingen bewaren om trends over tijd te zien (de oude crawls staan er wel, maar het scherm toont alleen de
 nieuwste) · afgeschermde of interne pagina's · een maximumaantal pagina's per crawl.

@@ -37,6 +37,7 @@ DELEN = {
     "caribisch-visum": "/caribisch-visum",
     "afspraak-maken": "/afspraak-maken",
     "paspoort-id-kaart": "/paspoort-id-kaart",
+    "verklaring": "/verklaring",
 }
 SITEMAP_INDEX = f"{SITE}/sitemap.xml"
 
