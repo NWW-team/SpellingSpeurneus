@@ -65,6 +65,11 @@
     background: var(--grond); color: var(--inkt); }
   input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .tabbladen { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+  /* De delen van de site: alfabetisch, in een raster van 3 bij 2 (2 of 1 kolom op smalle schermen). */
+  .deeltabs { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .deeltab { text-align: center; }
+  @media (max-width: 720px) { .deeltabs { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 440px) { .deeltabs { grid-template-columns: 1fr; } }
   .tabblad, .deeltab { font-size: .95rem; padding: 8px 14px; border-radius: 6px;
     background: transparent; border: 1px solid transparent; color: var(--gedempt); }
   .tabblad[aria-selected="true"], .deeltab[aria-selected="true"] { background: var(--vlak); border-color: var(--lijn);
@@ -912,18 +917,19 @@ crawlKnop.addEventListener("click", async () => {
   }
 });
 
-// De delen van de site, in de volgorde van de keuzelijst bij "Nieuwe crawl".
+// De delen van de site, in de volgorde van de tabs: alfabetisch op naam. Een nieuw deel hoort
+// op zijn alfabetische plek; de tabs staan in een raster van 3 bij 2.
 const DEEL_INFO = {
-  "reisadvies": { naam: "Reisadviezen", paginas: "±236" },
-  "visum-nederland": { naam: "Visum voor Nederland", paginas: "±1.015" },
-  "caribisch-visum": { naam: "Visum voor Caribische Koninkrijksdelen", paginas: "±452" },
   "afspraak-maken": { naam: "Afspraak maken", paginas: "±219" },
-  "paspoort-id-kaart": { naam: "Paspoort of ID-kaart", paginas: "±686" },
   "verklaring": { naam: "Consulaire verklaring", paginas: "±728" },
+  "paspoort-id-kaart": { naam: "Paspoort of ID-kaart", paginas: "±686" },
+  "reisadvies": { naam: "Reisadviezen", paginas: "±236" },
+  "caribisch-visum": { naam: "Visum voor Caribische Koninkrijksdelen", paginas: "±452" },
+  "visum-nederland": { naam: "Visum voor Nederland", paginas: "±1.015" },
 };
 const DELEN = Object.keys(DEEL_INFO);
 const deeltabsVak = document.getElementById("deeltabs");
-let huidigeDeel = DELEN[0];           // altijd Reisadvies bij het openen
+let huidigeDeel = "reisadvies";       // altijd Reisadviezen bij het openen
 let laatstePerDeel = {};              // per deel de laatste crawl, of undefined als er geen is
 
 function tekenDeeltabs() {

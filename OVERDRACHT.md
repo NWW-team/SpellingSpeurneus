@@ -55,7 +55,8 @@ correctie op de site, en niet door Goedkeuren, is het doel van de app.
 - **Tabs per deel van de site.** Het scherm toont per deel de laatste crawl, met eigen cijfers (spelfouten,
   namen, pagina's, laatste crawl), eigen spelfouten en namen. Bij het openen staat Reisadviezen open, ook
   als een ander deel de nieuwste crawl heeft (bewuste keuze). Een deel zonder crawl zegt dat. De lijst met
-  delen staat als `DEEL_INFO` in `docs/index.html`.
+  delen staat als `DEEL_INFO` in `docs/index.html`, alfabetisch op naam; de tabs staan in een raster van 3 bij 2
+  (2 of 1 kolom op smalle schermen). Een nieuw deel hoort op zijn alfabetische plek.
 - **Crawl starten zit in de tab.** Geen keuzelijst meer: de knop crawlt het deel van de actieve tab. De limiet
   van één crawl per dag geldt voor alle delen samen. De voortgangstekst noemt het deel.
 - **De Excel** (alleen bij Spelfouten) heeft de kolommen Pagina, Zin, Woord, Suggestie, Opmerking; de laatste
